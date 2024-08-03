@@ -6,7 +6,8 @@ const Footer = () => {
       <div class="container">
         <div class="text text-center">
           <p>
-            @ Dhruvermafz 2024, Developed By <a href="#">Dhruv Verma</a>
+            @ Dhruvermafz 2024, Developed By{" "}
+            <a href="https://dhruvermafz.vercel.app/">Dhruv Verma</a>
           </p>
         </div>
       </div>

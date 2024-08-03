@@ -1,7 +1,8 @@
 import React from "react";
 import ProfileCard from "../components/Cards/ProfileCard";
 import WorkExperience from "../components/Cards/WorkExperience";
-
+import TechnologiesIWorked from "../components/TechStack/TechnologiesIWorked";
+import Projects from "../components/Cards/Projects";
 const Home = () => {
   return (
     <section class="home-area">
@@ -9,6 +10,9 @@ const Home = () => {
         <div class="row g-4">
           <ProfileCard />
           <WorkExperience />
+          <Projects />
+
+          <TechnologiesIWorked />
         </div>
       </div>
     </section>
