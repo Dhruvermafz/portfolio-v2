@@ -7,9 +7,11 @@ import Home from "../pages/Home";
 // import Register from "../Pages/Register";
 // import SearchResultList from "../Pages/SearchResultList";
 // import ThankYou from "../Pages/ThankYou";
-// import About from "../Pages/About";
+import About from "../pages/About";
 // import FAQ from "../Shared/FAQ";
-// import Contact from "../Pages/Contact";
+import Contact from "../pages/Contact";
+import Projects from "../pages/Projects";
+import Blogs from "../pages/Blogs";
 // import Gallery from "../Pages/Gallery";
 // import PageNotFound from "../Pages/PageNotFound";
 // import Blogs from "../Pages/Blogs";
@@ -21,7 +23,11 @@ const Router = () => {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route path="/about" element={<About />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/blogs" element={<Blogs />} />
+        {/*
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/login" element={<Login />} />
@@ -30,8 +36,8 @@ const Router = () => {
       <Route path="/search" element={<SearchResultList />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/gallery" element={<Gallery />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/blogs" element={<Blogs />} />
+    
+      
       <Route path="/blogs/:id" element={<BlogDetails />} />
       <Route path="*" element={<PageNotFound />} /> */}
       </Routes>
