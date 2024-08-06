@@ -12,6 +12,7 @@ import About from "../pages/About";
 import Contact from "../pages/Contact";
 import Projects from "../pages/Projects";
 import Blogs from "../pages/Blogs";
+import ProjectDetails from "../pages/ProjectDetails";
 // import Gallery from "../Pages/Gallery";
 // import PageNotFound from "../Pages/PageNotFound";
 // import Blogs from "../Pages/Blogs";
@@ -26,7 +27,8 @@ const Router = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/projects" element={<Projects />} />
-        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/project/:id" element={<ProjectDetails />} />
+        <Route path="/blog" element={<Blogs />} />
         {/*
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/:id" element={<TourDetails />} />

@@ -12,12 +12,12 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { MdOutlineLightMode } from "react-icons/md";
 import { FaAppStoreIos } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
+import { FaProjectDiagram } from "react-icons/fa";
 const navItems = [
   { path: "/", label: "Home", icon: <MdHome /> },
   { path: "/about", label: "About", icon: <FaRegCircleUser /> },
-  { path: "/services", label: "Services", icon: <MdWorkOutline /> },
-  { path: "/portfolio", label: "Works", icon: <MdWork /> },
+  { path: "/technologies", label: "Technologies", icon: <MdWorkOutline /> },
+  { path: "/projects", label: "Projects", icon: <FaProjectDiagram /> },
   { path: "/blog", label: "Blog", icon: <FaBlog /> },
   { path: "/contact", label: "Contact", icon: <MdContacts /> },
 ];
@@ -50,10 +50,10 @@ const Header = () => {
               <ul className="navbar-info mx-auto">
                 {navItems.map((item) => (
                   <li className="nav-item" key={item.path}>
-                    <a className="nav-link" to={item.path}>
+                    <Link className="nav-link" to={item.path}>
                       {item.icon}
                       <span>{item.label}</span>
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
