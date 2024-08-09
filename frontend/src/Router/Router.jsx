@@ -13,6 +13,7 @@ import Contact from "../pages/Contact";
 import Projects from "../pages/Projects";
 import Blogs from "../pages/Blogs";
 import ProjectDetails from "../pages/ProjectDetails";
+import NotFound from "../pages/404";
 // import Gallery from "../Pages/Gallery";
 // import PageNotFound from "../Pages/PageNotFound";
 // import Blogs from "../Pages/Blogs";
@@ -29,6 +30,7 @@ const Router = () => {
         <Route path="/projects" element={<Projects />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/blog" element={<Blogs />} />
+        <Route element={<NotFound />} path="/*" />
         {/*
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/:id" element={<TourDetails />} />

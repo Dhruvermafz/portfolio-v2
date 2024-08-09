@@ -2,7 +2,13 @@ import React from "react";
 import profile from "../../assets/img/images/profile_1.jpg";
 import bgprofile from "../../assets/img/images/profile_1_bg.png";
 import { MdDownload } from "react-icons/md";
-
+import {
+  AiFillGithub,
+  AiOutlineTwitter,
+  AiFillInstagram,
+} from "react-icons/ai";
+import { SiLeetcode } from "react-icons/si";
+import { FaLinkedinIn } from "react-icons/fa";
 const ProfileCard = () => {
   return (
     <div className="col-xl-4">
@@ -86,24 +92,54 @@ const ProfileCard = () => {
             </div>
             <div className="social-media-icon">
               <ul className="list-unstyled">
-                <li>
-                  <a href="#">
-                    <i className="fab fa-facebook"></i>
+                <li className="social-icons">
+                  <a
+                    href="https://github.com/Dhruvermafz"
+                    style={{ color: "white" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <AiFillGithub />
                   </a>
                 </li>
-                <li>
-                  <a href="#">
-                    <i className="fab fa-pinterest"></i>
+                <li className="social-icons">
+                  <a
+                    href="https://twitter.com/thenerdy_guy"
+                    style={{ color: "white" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <AiOutlineTwitter />
                   </a>
                 </li>
-                <li>
-                  <a href="#">
-                    <i className="fab fa-github"></i>
+                <li className="social-icons">
+                  <a
+                    href="https://www.linkedin.com/in/dhruvermafz/"
+                    style={{ color: "white" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FaLinkedinIn />
                   </a>
                 </li>
-                <li>
-                  <a href="#">
-                    <i className="fab fa-youtube"></i>
+                <li className="social-icons">
+                  <a
+                    href="https://www.instagram.com/dhruvermafz/"
+                    style={{ color: "white" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <AiFillInstagram />
+                  </a>
+                </li>
+                <li className="social-icons">
+                  <a
+                    href="https://leetcode.com/u/thenerdy_guy/"
+                    style={{ color: "white" }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <SiLeetcode />
                   </a>
                 </li>
               </ul>

@@ -13,10 +13,12 @@ import { MdOutlineLightMode } from "react-icons/md";
 import { FaAppStoreIos } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { FaProjectDiagram } from "react-icons/fa";
+
+import { FaCertificate } from "react-icons/fa";
 const navItems = [
   { path: "/", label: "Home", icon: <MdHome /> },
   { path: "/about", label: "About", icon: <FaRegCircleUser /> },
-  { path: "/technologies", label: "Technologies", icon: <MdWorkOutline /> },
+  { path: "/certifications", label: "Certifications", icon: <FaCertificate /> },
   { path: "/projects", label: "Projects", icon: <FaProjectDiagram /> },
   { path: "/blog", label: "Blog", icon: <FaBlog /> },
   { path: "/contact", label: "Contact", icon: <MdContacts /> },
