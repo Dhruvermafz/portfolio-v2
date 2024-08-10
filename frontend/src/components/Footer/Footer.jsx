@@ -1,13 +1,17 @@
 import React from "react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear(); // Get the current year
+
   return (
-    <footer class="footer-area">
-      <div class="container">
-        <div class="text text-center">
+    <footer className="footer-area">
+      <div className="container">
+        <div className="text text-center">
           <p>
-            @ Dhruvermafz 2024, Developed By{" "}
-            <a href="https://dhruvermafz.vercel.app/">Dhruv Verma</a>
+            © Dhruvermafz {currentYear}, Designed & Developed By{" "}
+            <a className="link-btn" href="https://dhruvermafz.vercel.app/">
+              Dhruv Verma
+            </a>
           </p>
         </div>
       </div>

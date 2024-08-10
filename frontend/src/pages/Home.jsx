@@ -3,6 +3,7 @@ import ProfileCard from "../components/Cards/ProfileCard";
 import WorkExperience from "../components/Cards/WorkExperience";
 import TechnologiesIWorked from "../components/TechStack/TechnologiesIWorked";
 import Projects from "../components/Cards/Projects";
+import Academia from "../components/Cards/Academia";
 const Home = () => {
   return (
     <section class="home-area">

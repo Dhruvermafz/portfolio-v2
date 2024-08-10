@@ -1,15 +1,36 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import projects from "./projectsData";
+import React, { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import projects from "../../assets/data/projectsData";
 import HireMeSlider from "../HireMeSlider";
 
 const ProjectDetailsCard = () => {
   const { id } = useParams();
-  const project = projects.find((proj) => proj.id === id);
+  const navigate = useNavigate();
+  const projectIndex = projects.findIndex((proj) => proj.id === id);
+  const project = projects[projectIndex];
+
+  useEffect(() => {
+    // Scroll to the top of the page when the project changes
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (!project) {
     return <div>Project not found</div>;
   }
+
+  const handlePrevClick = () => {
+    if (projectIndex > 0) {
+      const prevProject = projects[projectIndex - 1];
+      navigate(`/project/${prevProject.id}`);
+    }
+  };
+
+  const handleNextClick = () => {
+    if (projectIndex < projects.length - 1) {
+      const nextProject = projects[projectIndex + 1];
+      navigate(`/project/${nextProject.id}`);
+    }
+  };
 
   return (
     <div className="col-xl-8">
@@ -96,8 +117,20 @@ const ProjectDetailsCard = () => {
               <p>{project.results}</p>
             </div>
             <div className="prev-and-next-btn">
-              <button className="btn btn-prev">Previous</button>
-              <button className="btn btn-next">Next</button>
+              <button
+                className="btn btn-prev"
+                onClick={handlePrevClick}
+                disabled={projectIndex === 0}
+              >
+                Previous
+              </button>
+              <button
+                className="btn btn-next"
+                onClick={handleNextClick}
+                disabled={projectIndex === projects.length - 1}
+              >
+                Next
+              </button>
             </div>
           </div>
           <HireMeSlider />

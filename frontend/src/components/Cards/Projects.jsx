@@ -1,16 +1,21 @@
 import React from "react";
+import projects from "../../assets/data/projectsData";
+import { Link } from "react-router-dom";
 
 const Projects = () => {
+  // Limit the projects array to the first 2 items
+  const limitedProjects = projects.slice(0, 2);
+
   return (
-    <div class="col-xl-4">
-      <div class="card card-projects">
-        <div class="card-body">
-          <h3 class="card-title">
+    <div className="col-xl-4">
+      <div className="card card-projects">
+        <div className="card-body">
+          <h3 className="card-title">
             Recent Projects{" "}
-            <a class="link-btn" href="portfolio.html">
+            <a className="link-btn" href="projects">
               All Projects
               <svg
-                class="icon"
+                className="icon"
                 width="20"
                 height="20"
                 viewBox="0 0 20 20"
@@ -20,91 +25,90 @@ const Projects = () => {
                 <path
                   d="M4.16699 10H15.8337"
                   stroke="#4770FF"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
                 <path
                   d="M10.833 15L15.833 10"
                   stroke="#4770FF"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
                 <path
                   d="M10.833 5L15.833 10"
                   stroke="#4770FF"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
             </a>
           </h3>
-          <div class="projects-main mt-24">
-            <div class="row g-4 parent-container">
-              <div class="col-lg-12">
-                <div class="project-item">
-                  <div class="image">
-                    <img
-                      src="assets/img/projects/project-1.png"
-                      alt="project-1"
-                      class="img-fluid w-100"
-                    />
-                    <a
-                      href="assets/img/projects/project-1.png"
-                      class="gallery-popup full-image-preview parent-container"
-                    >
-                      <svg
-                        class="icon"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="1.5"
+          <div className="portfolio-area">
+            <div className="row g-4 parent-container">
+              {limitedProjects.map((project) => (
+                <div className="col-lg-12" key={project.id}>
+                  <div className="portfolio-item">
+                    <div className="image">
+                      <img
+                        src={project.mainImage}
+                        alt={`project-${project.id}`}
+                        className="img-fluid w-100"
+                      />
+                      <a
+                        href={project.mainImage}
+                        className="gallery-popup full-image-preview parent-container"
                       >
-                        <path d="M10 4.167v11.666M4.167 10h11.666"></path>
-                      </svg>
-                    </a>
-                    <div class="info">
-                      <span class="category">Product Design</span>
+                        <svg
+                          className="icon"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                        >
+                          <path d="M10 4.167v11.666M4.167 10h11.666"></path>
+                        </svg>
+                      </a>
+                    </div>
+                    <div className="text">
+                      <div className="info">
+                        <Link to={`/project/${project.id}`} className="title">
+                          {project.title}
+                        </Link>
+                      </div>
+                      <div className="visite-btn">
+                        <Link to={`${project.website}`}>
+                          Visit Site
+                          <svg
+                            className="arrow-up"
+                            width="14"
+                            height="15"
+                            viewBox="0 0 14 15"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9.91634 4.5835L4.08301 10.4168"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            ></path>
+                            <path
+                              d="M4.66699 4.5835H9.91699V9.8335"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            ></path>
+                          </svg>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-lg-12">
-                <div class="project-item">
-                  <div class="image">
-                    <img
-                      src="assets/img/projects/project-2.png"
-                      alt="project-2"
-                      class="img-fluid w-100"
-                    />
-                    <a
-                      href="assets/img/projects/project-2.png"
-                      class="gallery-popup full-image-preview parent-container"
-                    >
-                      <svg
-                        class="icon"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="1.5"
-                      >
-                        <path d="M10 4.167v11.666M4.167 10h11.666"></path>
-                      </svg>
-                    </a>
-                    <div class="info">
-                      <span class="category">Product Design</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

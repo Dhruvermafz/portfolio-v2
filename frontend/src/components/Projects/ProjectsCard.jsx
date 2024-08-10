@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import projects from "./projectsData";
+import projects from "../../assets/data/projectsData";
 import Pagination from "../Pagination";
 import HireMeSlider from "../HireMeSlider";
 
