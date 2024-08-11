@@ -7,8 +7,8 @@ const NotFound = () => {
   return (
     <section className="content-box-area mt-4 text-center">
       <div className="container">
-        <div class="container">
-          <div class="row g-4">
+        <div className="container">
+          <div className="row g-4">
             <div className="card content-box-card p-4">
               <div className="card-body">
                 <Link to="/" className="btn btn-primary">

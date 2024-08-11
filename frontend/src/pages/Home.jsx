@@ -6,9 +6,9 @@ import Projects from "../components/Cards/Projects";
 import Academia from "../components/Cards/Academia";
 const Home = () => {
   return (
-    <section class="home-area">
-      <div class="container">
-        <div class="row g-4">
+    <section className="home-area">
+      <div className="container">
+        <div className="row g-4">
           <ProfileCard />
           <WorkExperience />
           <Projects />

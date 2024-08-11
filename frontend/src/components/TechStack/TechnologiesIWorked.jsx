@@ -28,42 +28,6 @@ const TechnologiesIWorked = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-3 col-sm-6 col-6">
-                    <div class="services-item text-center">
-                      <div class="image">
-                        <img src="assets/img/icons/app.svg" alt="app" />
-                      </div>
-                      <div class="text">
-                        <h3 class="title">Mobile App</h3>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-6 col-6">
-                    <div class="services-item text-center">
-                      <div class="image">
-                        <img
-                          src="assets/img/icons/prd-design.svg"
-                          alt="prd-design"
-                        />
-                      </div>
-                      <div class="text">
-                        <h3 class="title">Product Design</h3>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-3 col-sm-6 col-6">
-                    <div class="services-item text-center">
-                      <div class="image">
-                        <img
-                          src="assets/img/icons/branding.svg"
-                          alt="branding"
-                        />
-                      </div>
-                      <div class="text">
-                        <h3 class="title">Branding</h3>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

@@ -13,12 +13,12 @@ import { MdOutlineLightMode } from "react-icons/md";
 import { FaAppStoreIos } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { FaProjectDiagram } from "react-icons/fa";
-
+import { MdEngineering } from "react-icons/md";
 import { FaCertificate } from "react-icons/fa";
 const navItems = [
   { path: "/", label: "Home", icon: <MdHome /> },
   { path: "/about", label: "About", icon: <FaRegCircleUser /> },
-  { path: "/certifications", label: "Certifications", icon: <FaCertificate /> },
+  { path: "/resume", label: "Resume", icon: <MdEngineering /> },
   { path: "/projects", label: "Projects", icon: <FaProjectDiagram /> },
   { path: "/blog", label: "Blog", icon: <FaBlog /> },
   { path: "/contact", label: "Contact", icon: <MdContacts /> },
@@ -54,7 +54,7 @@ const Header = () => {
                   <li className="nav-item" key={item.path}>
                     <Link className="nav-link" to={item.path}>
                       {item.icon}
-                      <span>{item.label}</span>
+                      <span> {item.label}</span>
                     </Link>
                   </li>
                 ))}

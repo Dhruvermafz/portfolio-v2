@@ -14,6 +14,10 @@ import Projects from "../pages/Projects";
 import Blogs from "../pages/Blogs";
 import ProjectDetails from "../pages/ProjectDetails";
 import NotFound from "../pages/404";
+import Resume from "../pages/Resume";
+import CreateBlog from "../components/admin/Blogs/CreateBlog";
+import CreateBlogPage from "../pages/CreateBlog";
+import BlogDetails from "../components/Blogs/BlogDetails";
 // import Gallery from "../Pages/Gallery";
 // import PageNotFound from "../Pages/PageNotFound";
 // import Blogs from "../Pages/Blogs";
@@ -31,19 +35,9 @@ const Router = () => {
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/blog" element={<Blogs />} />
         <Route element={<NotFound />} path="/*" />
-        {/*
-      <Route path="/tours" element={<Tours />} />
-      <Route path="/tours/:id" element={<TourDetails />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/thank-you" element={<ThankYou />} />
-      <Route path="/search" element={<SearchResultList />} />
-      <Route path="/faq" element={<FAQ />} />
-      <Route path="/gallery" element={<Gallery />} />
-    
-      
-      <Route path="/blogs/:id" element={<BlogDetails />} />
-      <Route path="*" element={<PageNotFound />} /> */}
+        <Route path="/resume" element={<Resume />} />
+        <Route path="/blogs/:id" element={<BlogDetails />} />
+        <Route path="/admin" element={<CreateBlogPage />} />
       </Routes>
     </>
   );

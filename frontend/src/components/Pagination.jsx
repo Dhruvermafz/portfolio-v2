@@ -1,77 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
 
-const Pagination = () => {
+const Pagination = ({ totalPages, initialPage = 1, onPageChange }) => {
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    if (onPageChange) {
+      onPageChange(pageNumber);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(
+        <li key={i}>
+          <button
+            onClick={() => handlePageChange(i)}
+            className={currentPage === i ? "active" : ""}
+          >
+            {i}
+          </button>
+        </li>
+      );
+    }
+    return pages;
+  };
+
   return (
-    <div class="pagination">
-      <ul class="list-unstyled">
-        <li class="prev">
-          <button>
+    <div className="pagination">
+      <ul className="list-unstyled">
+        <li className="prev">
+          <button onClick={goToPreviousPage} disabled={currentPage === 1}>
             <svg
-              class="icon"
+              className="icon"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="2"
+              strokeWidth="2"
               stroke="currentColor"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
               ></path>
             </svg>
           </button>
         </li>
-        <li>
-          <button>1</button>
-        </li>
-        <li>
-          <button>2</button>
-        </li>
-        <li>
-          <button>3</button>
-        </li>
-        <li>
-          <button class="next-page-btn">
-            <span class="dots">
-              <i class="fas fa-ellipsis-h"></i>
-            </span>
-            <span class="next-page">
-              <svg
-                class="icon icon-arrow-right"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m6 17 5-5-5-5"></path>
-                <path d="m13 17 5-5-5-5"></path>
-              </svg>
-            </span>
-            <span class="next-page-number">Next 4 pages</span>
-          </button>
-        </li>
-        <li>
-          <button>100</button>
-        </li>
-        <li class="next">
-          <button>
+        {renderPageNumbers()}
+        <li className="next">
+          <button onClick={goToNextPage} disabled={currentPage === totalPages}>
             <svg
-              class="icon"
+              className="icon"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              stroke-width="2"
+              strokeWidth="2"
               stroke="currentColor"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
               ></path>
             </svg>
