@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import projects from "../../assets/data/projectsData";
 import HireMeSlider from "../HireMeSlider";
-
+import { FaLink } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa6";
 const ProjectDetailsCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -55,7 +56,37 @@ const ProjectDetailsCard = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {project.website}
+                    {" "}
+                    Check out the website <FaLink> {project.website}</FaLink>
+                    <svg
+                      className="arrow-up"
+                      width="14"
+                      height="15"
+                      viewBox="0 0 14 15"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M9.91634 4.5835L4.08301 10.4168"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                      <path
+                        d="M4.66699 4.5835H9.91699V9.8335"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      ></path>
+                    </svg>
+                  </a>
+                  <a
+                    href={project.ghLink}
+                    className="website"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {" "}
+                    Check out the source code{" "}
+                    <FaGithub> {project.ghLink}</FaGithub>
                     <svg
                       className="arrow-up"
                       width="14"

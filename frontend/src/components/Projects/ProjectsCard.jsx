@@ -15,9 +15,9 @@ const ProjectsCard = () => {
                 Check Out My Latest <span>Projects</span>
               </h1>
               <p>
-                I'm here to help if you're searching for a product designer to
-                bring your idea to life or a design partner to help take your
-                business to the next level.
+                These are the projects I worked just for my learning or worked
+                in my organisation where I Designed and Developed them as Full
+                Stack Developer.
               </p>
             </div>
           </div>
@@ -58,7 +58,7 @@ const ProjectsCard = () => {
                         <p className="subtitle">{project.services}</p>
                       </div>
                       <div className="visite-btn">
-                        <Link to={`/project/${project.id}`}>
+                        <a href={project.website} target="_blank">
                           Visit Site
                           <svg
                             className="arrow-up"
@@ -79,7 +79,7 @@ const ProjectsCard = () => {
                               strokeLinejoin="round"
                             ></path>
                           </svg>
-                        </Link>
+                        </a>
                       </div>
                     </div>
                   </div>

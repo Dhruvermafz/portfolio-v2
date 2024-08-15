@@ -11,6 +11,7 @@ import Resume from "../pages/Resume";
 import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import CreateBlogPage from "../pages/CreateBlog";
 import BlogDetails from "../components/Blogs/BlogDetails";
+import ComingSoon from "../pages/ComingSoon";
 
 const Router = () => {
   return (
@@ -21,7 +22,7 @@ const Router = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
-        <Route path="/blog" element={<Blogs />} />
+        <Route path="/blog" element={<ComingSoon />} />
         <Route element={<NotFound />} path="/*" />
         {/* <Route path="/resume" element={<Resume />} /> */}
         <Route path="/blogs/:id" element={<BlogDetails />} />

@@ -52,28 +52,30 @@ const Certifications = () => {
                     </h4>
                   </div>
                   <div className="project-btn">
-                    <span>
-                      View Certification
-                      <svg
-                        className="arrow-up"
-                        width="14"
-                        height="15"
-                        viewBox="0 0 14 15"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M9.91634 4.5835L4.08301 10.4168"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4.66699 4.5835H9.91699V9.8335"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
+                    <a href={award.link} target="_blank">
+                      <span>
+                        View Certification
+                        <svg
+                          className="arrow-up"
+                          width="14"
+                          height="15"
+                          viewBox="0 0 14 15"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M9.91634 4.5835L4.08301 10.4168"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M4.66699 4.5835H9.91699V9.8335"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </a>
                   </div>
                 </div>
               </a>
