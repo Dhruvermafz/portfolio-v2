@@ -1,14 +1,7 @@
 import React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Home from "../pages/Home";
-// import Tours from "../Pages/Tours";
-// import TourDetails from "../Pages/TourDetails";
-// import Login from "../Pages/Login";
-// import Register from "../Pages/Register";
-// import SearchResultList from "../Pages/SearchResultList";
-// import ThankYou from "../Pages/ThankYou";
 import About from "../pages/About";
-// import FAQ from "../Shared/FAQ";
 import Contact from "../pages/Contact";
 import Projects from "../pages/Projects";
 import Blogs from "../pages/Blogs";
@@ -18,11 +11,6 @@ import Resume from "../pages/Resume";
 import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import CreateBlogPage from "../pages/CreateBlog";
 import BlogDetails from "../components/Blogs/BlogDetails";
-// import Gallery from "../Pages/Gallery";
-// import PageNotFound from "../Pages/PageNotFound";
-// import Blogs from "../Pages/Blogs";
-// import BlogDetails from "../Pages/BlogDetails";
-// import ScrollToTop from "../utils/scrolltoTop";
 
 const Router = () => {
   return (
@@ -35,7 +23,7 @@ const Router = () => {
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/blog" element={<Blogs />} />
         <Route element={<NotFound />} path="/*" />
-        <Route path="/resume" element={<Resume />} />
+        {/* <Route path="/resume" element={<Resume />} /> */}
         <Route path="/blogs/:id" element={<BlogDetails />} />
         <Route path="/admin" element={<CreateBlogPage />} />
       </Routes>

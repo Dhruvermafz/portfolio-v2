@@ -1,5 +1,5 @@
 import React from "react";
-
+import GitHubCalendar from "react-github-calendar";
 import { FaArrowRight } from "react-icons/fa";
 const TechnologiesIWorked = () => {
   return (
@@ -18,16 +18,13 @@ const TechnologiesIWorked = () => {
               </h3>
               <div class="services-main mt-24">
                 <div class="row g-4">
-                  <div class="col-md-3 col-sm-6 col-6">
-                    <div class="services-item text-center">
-                      <div class="image">
-                        <img src="assets/img/icons/ui-ux.svg" alt="ui-ux" />
-                      </div>
-                      <div class="text">
-                        <h3 class="title">UI UX Design</h3>
-                      </div>
-                    </div>
-                  </div>
+                  {/* <GitHubCalendar
+                    username="Dhruvermafz"
+                    blockSize={15}
+                    blockMargin={5}
+                    color="#c084f5"
+                    fontSize={16}
+                  /> */}
                 </div>
               </div>
             </div>
@@ -39,16 +36,13 @@ const TechnologiesIWorked = () => {
               <div class="scrolling-info">
                 <div class="slider-item">
                   <p>
-                    Available For Hire 🚀 Crafting Digital Experiences 🎨
-                    Available For Hire 🚀 Crafting Digital Experiences 🎨
+                    Available For Hire 🚀 Available For Hire 🚀 Available For
+                    Hire 🚀
                   </p>
                 </div>
               </div>
-              <h3 class="card-title">
-                Let's👋
-                <span class="d-block">Work Together</span>
-              </h3>
-              <a class="link-btn" href="contact.html">
+              <h3 class="card-title">Hire👋 Me</h3>
+              <a class="link-btn" href="/contact">
                 {" "}
                 Let's Talk
                 <svg

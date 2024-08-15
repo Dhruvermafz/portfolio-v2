@@ -24,7 +24,7 @@ const ProjectsCard = () => {
           <div className="portfolio-area">
             <div className="row g-4 parent-container">
               {projects.map((project) => (
-                <div className="col-lg-12" key={project.id}>
+                <div className="col-lg-6" key={project.id}>
                   <div className="portfolio-item">
                     <div className="image">
                       <img
