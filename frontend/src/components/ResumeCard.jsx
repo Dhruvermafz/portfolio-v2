@@ -5,14 +5,7 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { Button } from "react-bootstrap";
 import pdf from "../assets/DhruvVerma_Resume.pdf";
-
-// Option 1: Local worker
-// import pdfWorker from "pdfjs-dist/build/pdf.worker.entry";
-
-// pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
-
-// Option 2: CDN worker (alternative)
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const ResumeCard = () => {
   const [width, setWidth] = useState(window.innerWidth);
@@ -30,20 +23,17 @@ const ResumeCard = () => {
           <div className="top-info">
             <div className="text">
               <h1 className="main-title">
-                <span>Download My Resume</span>
+                Download <span></span>
               </h1>
             </div>
           </div>
           <div className="contact-area">
             <div className="working-with-area">
+              <h2 className="main-common-title">
+                Working with technologies ✨ Worldwide
+              </h2>
               <div className="working-with-main">
                 <div className="resume d-flex justify-content-center">
-                  <iframe
-                    src={pdf}
-                    width="100%"
-                    height="600px"
-                    style={{ border: "none" }}
-                  ></iframe>
                   <Document
                     file={pdf}
                     onLoadError={(error) =>
@@ -52,6 +42,17 @@ const ResumeCard = () => {
                   >
                     <Page pageNumber={1} scale={width > 786 ? 1.7 : 0.6} />
                   </Document>
+                </div>
+                <div style={{ justifyContent: "center", position: "relative" }}>
+                  <Button
+                    variant="primary"
+                    href={pdf}
+                    target="_blank"
+                    style={{ maxWidth: "250px" }}
+                  >
+                    <AiOutlineDownload />
+                    &nbsp;Download CV
+                  </Button>
                 </div>
               </div>
             </div>
