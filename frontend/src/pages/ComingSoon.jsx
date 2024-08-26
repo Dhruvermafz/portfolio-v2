@@ -18,7 +18,7 @@ const ComingSoon = () => {
                 />
               </div>
               <p className="lead">
-                I'm working hard to code blog features on portfolio. Stay tuned!
+                I'm working hard to code features on portfolio. Stay tuned!
               </p>
               <p>
                 In the meantime, you can explore our other pages or contact us

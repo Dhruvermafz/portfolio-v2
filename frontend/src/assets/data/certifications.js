@@ -1,7 +1,16 @@
 import { SiReact } from "react-icons/si";
 import { FaUikit } from "react-icons/fa6";
 import { SiCsharp } from "react-icons/si";
+import { FaAws } from "react-icons/fa";
 const awards = [
+  {
+    icon: FaAws,
+    alt: "AWS",
+    title: "AWS Essentials",
+    year: "May 2024",
+    award: "Udemy",
+    link: "https://www.udemy.com/certificate/UC-526967d0-76c5-4bfe-accf-352107f73940/",
+  },
   {
     icon: SiReact,
     alt: "react",

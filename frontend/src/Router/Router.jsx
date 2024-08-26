@@ -12,6 +12,10 @@ import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import CreateBlogPage from "../pages/CreateBlog";
 import BlogDetails from "../components/Blogs/BlogDetails";
 import ComingSoon from "../pages/ComingSoon";
+import LoginIn from "../pages/LoginIn";
+import Admin from "../pages/Admin";
+import Article from "../pages/Article";
+import BlogPage from "../components/admin/Blogs/BlogPage";
 
 const Router = () => {
   return (
@@ -22,11 +26,14 @@ const Router = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
-        <Route path="/blog" element={<ComingSoon />} />
+        <Route path="/blogs" element={<Blogs />} />
         <Route element={<NotFound />} path="/*" />
+        <Route element={<LoginIn />} path="/login" />
         {/* <Route path="/resume" element={<Resume />} /> */}
-        <Route path="/blogs/:id" element={<BlogDetails />} />
-        <Route path="/admin" element={<CreateBlogPage />} />
+        <Route path="/blogs/:id" element={<Article />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin/blogs" element={<BlogPage />} />
+        <Route path="/admin/blogs/create" element={<CreateBlog />} />
       </Routes>
     </>
   );

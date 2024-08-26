@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import projects from "../../assets/data/projectsData";
 import Pagination from "../Pagination";
 import HireMeSlider from "../HireMeSlider";
+import Tags from "../Tags";
 
 const ProjectsCard = () => {
   return (

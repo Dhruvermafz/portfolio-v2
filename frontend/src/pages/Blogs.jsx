@@ -2,6 +2,7 @@ import React from "react";
 import ProfileCard from "../components/Cards/ProfileCard";
 import BlogsCard from "../components/Blogs/BlogsCard";
 import Pagination from "../components/Pagination";
+import ItsABlogCard from "../components/Blogs/ItsABlogCard";
 const Blogs = () => {
   return (
     <section className="content-box-area mt-4">
@@ -14,12 +15,11 @@ const Blogs = () => {
                 <div className="top-info">
                   <div className="text">
                     <h1 className="main-title">
-                      My Recent Article and Publications
+                      My Recent Article which i write here and on ITSABLOG.
                     </h1>
                     <p>
-                      I'm here to help if you're searching for a product
-                      designer to bring your idea to life or a design partner to
-                      help take your business to the next level.
+                      These are the recent blogs posts which got written for
+                      this website and for ITSABLOG.
                     </p>
                   </div>
                 </div>
@@ -27,6 +27,9 @@ const Blogs = () => {
                   <div className="article-publications-main">
                     <div className="row">
                       <BlogsCard />
+                    </div>
+                    <div className="row">
+                      <ItsABlogCard />
                     </div>
                   </div>
                 </div>

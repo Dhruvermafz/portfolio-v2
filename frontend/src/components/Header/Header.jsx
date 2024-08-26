@@ -16,11 +16,12 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import "./header.css";
+import logo from "../../assets/img/logo/logo@transparent.png";
 const navItems = [
   { path: "/", label: "Home", icon: <MdHome /> },
   { path: "/about", label: "About", icon: <FaRegCircleUser /> },
   { path: "/projects", label: "Projects", icon: <FaProjectDiagram /> },
-  { path: "/blog", label: "Blog", icon: <FaBlog /> },
+  { path: "/blogs", label: "Blog", icon: <FaBlog /> },
   { path: "/contact", label: "Contact", icon: <MdContacts /> },
 ];
 
@@ -39,7 +40,8 @@ const Header = () => {
           <div className="menu-container d-flex justify-content-between align-items-center">
             <div className="logo">
               <Link className="navbar-brand me-0" to="/">
-                <FaAppStoreIos color="yellow" />
+                {/* <FaAppStoreIos color="yellow" /> */}
+                {/* <img src={logo} style={{ width: "10%" }} alt="" /> */}
                 <span>
                   Dhruv<span className="primary"> Verma</span>
                 </span>

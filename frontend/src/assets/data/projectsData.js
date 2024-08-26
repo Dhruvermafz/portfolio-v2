@@ -54,6 +54,7 @@ const projects = [
     ],
     results:
       "The platform successfully attracted a diverse group of users, with high engagement levels and positive feedback on its real-time features and user experience.",
+    tags: ["MERN Stack", "Socket.io", "Blogging", "Real-time"],
   },
   {
     id: "live_auctions",
@@ -91,6 +92,7 @@ const projects = [
     ],
     results:
       "The platform became popular among users for its reliability and user-friendly interface, with multiple successful auctions held daily.",
+    tags: ["MERN Stack", "Socket.io", "Auctions", "Real-time"],
   },
   {
     id: "two_zero_four_eight",
@@ -129,6 +131,7 @@ const projects = [
     ],
     results:
       "The game received positive feedback for its addictive gameplay and smooth performance across various devices.",
+    tags: ["Next.Js", "Tailwind", "Game", "Puzzle"],
   },
   {
     id: "desi_discoveries",
@@ -165,6 +168,7 @@ const projects = [
     ],
     results:
       "The website received positive feedback from users for its ease of use and comprehensive travel offerings, leading to an increase in bookings.",
+    tags: ["MERN Stack", "Razorpay", "Travel", "Tourism"],
   },
   {
     id: "indus_education_world",
@@ -201,6 +205,7 @@ const projects = [
     ],
     results:
       "The platform successfully helped students improve their performance, with many achieving high ranks in competitive exams.",
+    tags: ["MERN Stack", "Education", "Online Learning", "NEET", "JEE"],
   },
 ];
 

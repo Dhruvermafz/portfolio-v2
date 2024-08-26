@@ -2,13 +2,8 @@ import React from "react";
 import profile from "../../assets/img/images/profile_1.jpg";
 import bgprofile from "../../assets/img/images/profile_1_bg.png";
 import { MdDownload } from "react-icons/md";
-import {
-  AiFillGithub,
-  AiOutlineTwitter,
-  AiFillInstagram,
-} from "react-icons/ai";
-import { SiLeetcode } from "react-icons/si";
-import { FaLinkedinIn } from "react-icons/fa";
+import resume from "../../assets/DhruvVerma_Resume.pdf";
+import socialLinks from "../../assets/data/socialLinks";
 const ProfileCard = () => {
   return (
     <div className="col-xl-4">
@@ -25,11 +20,7 @@ const ProfileCard = () => {
               Web Technologies and learning new technologies.
             </p>
             <div className="common-button-groups">
-              <a
-                className="btn btn-download"
-                href="path/to/resume.pdf"
-                download
-              >
+              <a className="btn btn-download" href={resume} download>
                 {/* <svg
                   className="icon"
                   width="25"
@@ -64,7 +55,7 @@ const ProfileCard = () => {
               </a>
               <button
                 className="btn btn-copy"
-                data-clipboard-text="example@example.com"
+                data-clipboard-text="vermadhruv09112002@gmail.com"
               >
                 <svg
                   className="icon"
@@ -92,56 +83,18 @@ const ProfileCard = () => {
             </div>
             <div className="social-media-icon">
               <ul className="list-unstyled">
-                <li className="social-icons">
-                  <a
-                    href="https://github.com/Dhruvermafz"
-                    style={{ color: "white" }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <AiFillGithub />
-                  </a>
-                </li>
-                <li className="social-icons">
-                  <a
-                    href="https://twitter.com/thenerdy_guy"
-                    style={{ color: "white" }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <AiOutlineTwitter />
-                  </a>
-                </li>
-                <li className="social-icons">
-                  <a
-                    href="https://www.linkedin.com/in/dhruvermafz/"
-                    style={{ color: "white" }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaLinkedinIn />
-                  </a>
-                </li>
-                <li className="social-icons">
-                  <a
-                    href="https://www.instagram.com/dhruvermafz/"
-                    style={{ color: "white" }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <AiFillInstagram />
-                  </a>
-                </li>
-                <li className="social-icons">
-                  <a
-                    href="https://leetcode.com/u/thenerdy_guy/"
-                    style={{ color: "white" }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <SiLeetcode />
-                  </a>
-                </li>
+                {socialLinks.map((link, index) => (
+                  <li key={index} className="social-icons">
+                    <a
+                      href={link.href}
+                      style={{ color: "white" }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.icon}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

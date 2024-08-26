@@ -4,6 +4,7 @@ import projects from "../../assets/data/projectsData";
 import HireMeSlider from "../HireMeSlider";
 import { FaLink } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa6";
+import Tags from "../Tags";
 const ProjectDetailsCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ const ProjectDetailsCard = () => {
                 <div className="info-item">
                   <p className="subtitle">Services:</p>
                   <h4 className="card-title">{project.services}</h4>
+                  <Tags tagName={project.tags} />
                   <a
                     href={project.website}
                     className="website"
