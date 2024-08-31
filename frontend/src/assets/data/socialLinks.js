@@ -4,7 +4,7 @@ import {
   AiOutlineTwitter,
   AiFillInstagram,
 } from "react-icons/ai";
-import { FaLinkedinIn, FaStackOverflow } from "react-icons/fa";
+import { FaDiscord, FaLinkedinIn, FaStackOverflow } from "react-icons/fa";
 import { SiLeetcode } from "react-icons/si";
 
 const socialLinks = [
@@ -31,6 +31,10 @@ const socialLinks = [
   {
     href: "https://stackoverflow.com/users/19765859/dhruv-verma",
     icon: <FaStackOverflow />,
+  },
+  {
+    href: "https://discord.gg/FBSB8ZWE",
+    icon: <FaDiscord />,
   },
 ];
 

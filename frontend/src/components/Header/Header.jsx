@@ -78,7 +78,11 @@ const Header = () => {
                     </span>
                   )}
                 </button>
-                <Link to="/contact" className="lets-talk-btn">
+                <Link
+                  to="https://discord.gg/FBSB8ZWE"
+                  target="_blank"
+                  className="lets-talk-btn"
+                >
                   Let's Talk
                   <FaArrowTrendUp />
                 </Link>
