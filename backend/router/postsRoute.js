@@ -6,7 +6,7 @@ const {
   getAllBlogs,
   getFeaturedBlogs,
   deleteBlog,
-} = require("../controllers/blogController");
+} = require("../controllers/postsController");
 
 const blogRouter = express.Router();
 

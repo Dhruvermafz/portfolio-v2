@@ -16,6 +16,7 @@ import LoginIn from "../pages/LoginIn";
 import Admin from "../pages/Admin";
 import Article from "../pages/Article";
 import BlogPage from "../components/admin/Blogs/BlogPage";
+import AllCategory from "../components/admin/Category/AllCategory";
 
 const Router = () => {
   return (
@@ -29,6 +30,7 @@ const Router = () => {
         <Route path="/blogs" element={<Blogs />} />
         <Route element={<NotFound />} path="/*" />
         <Route element={<LoginIn />} path="/login" />
+        <Route path="/admin/category" element={<AllCategory />} />
         {/* <Route path="/resume" element={<Resume />} /> */}
         <Route path="/blogs/:id" element={<Article />} />
         <Route path="/admin" element={<Admin />} />

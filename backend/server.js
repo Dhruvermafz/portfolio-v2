@@ -1,23 +1,43 @@
-require("dotenv").config();
+require("dotenv").config(); // Load environment variables from .env file
 const express = require("express");
-const loginRoute = require("./router/loginRoute");
+const mongoose = require("mongoose"); // Import mongoose
+const cors = require("cors");
+// Import routes
 const usersRoute = require("./router/usersRoute");
 const categoryRoute = require("./router/categoryRoute");
 const postsRoute = require("./router/postsRoute");
+const contactRoute = require("./router/contactRouter");
+
+const connectDB = require("./database/connectDb");
 
 const app = express();
-
 app.use(express.json());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://dhruvermafz.vercel.app",
+      "http://192.168.221.143:3000",
+    ],
+    credentials: true,
+    optionSuccessStatus: 200,
+  })
+);
 
-app.use("/login", loginRoute);
+// Set up routes
 app.use("/user", usersRoute);
 app.use("/categories", categoryRoute);
 app.use("/post", postsRoute);
+app.use("/contact", contactRoute);
+// Define the port
+const port = process.env.API_PORT || 4000;
 
-const port = process.env.API_PORT || 3000;
+connectDB();
 
+// Define a simple route
 app.get("/", (_request, response) => {
-  response.send();
+  response.send("Server is up and running!");
 });
 
+// Start the server
 app.listen(port, () => console.log("SERVER IS WORKING ON: ", port));

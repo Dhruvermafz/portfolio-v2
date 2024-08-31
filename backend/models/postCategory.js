@@ -1,26 +1,11 @@
-const CreatePostCategory = (sequelize, DataTypes) => {
-  const PostCategory = sequelize.define('PostCategory', {
-    postId: DataTypes.INTEGER,
-    categoryId: DataTypes.INTEGER,
-  }, {
-    timestamps: false,
-    tableName: 'PostCategories',
-  });
-  PostCategory.associate = (models) => {
-    models.BlogPost.belongsToMany(models.Category, {
-      as: 'categories',
-      through: PostCategory,
-      foreignKey: 'postId',
-      otherKey: 'categoryId',
-    });
-    models.Category.belongsToMany(models.BlogPost, {
-      as: 'BlogPosts',
-      through: PostCategory,
-      foreignKey: 'categoryId',
-      otherKey: 'postId',
-    });
-  };
-  return PostCategory;
-};
+const mongoose = require("mongoose");
 
-module.exports = CreatePostCategory;
+const blogPostSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+});
+
+const BlogPost = mongoose.model("BlogPost", blogPostSchema);
+
+module.exports = BlogPost;

@@ -1,13 +1,52 @@
-import React from "react";
-
+import React, { useState } from "react";
+import axios from "axios"; // Import axios if using it
+import { API_URL } from "../../config";
 const ContactForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+
+  const [responseMessage, setResponseMessage] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(`${API_URL}/contact/`, formData);
+      if (response.status === 200) {
+        setResponseMessage("Your message has been sent successfully!");
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        setResponseMessage("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      setResponseMessage("Error: " + error.message);
+    }
+  };
+
   return (
-    <div class="col-xl-8">
-      <div class="card content-box-card">
-        <div class="card-body portfolio-card contact-card">
-          <div class="top-info">
-            <div class="text">
-              <h1 class="main-title">
+    <div className="col-xl-8">
+      <div className="card content-box-card">
+        <div className="card-body portfolio-card contact-card">
+          <div className="top-info">
+            <div className="text">
+              <h1 className="main-title">
                 Let's 👋 <span>Work</span> Together
               </h1>
               <p>
@@ -17,68 +56,72 @@ const ContactForm = () => {
               </p>
             </div>
           </div>
-          <div class="contact-area">
-            <div class="leave-comments-area">
-              <div class="comments-box">
-                <form
-                  id="contact-form"
-                  action="https://marveltheme.com/tf/html/bentofolio-html/assets/mail.php"
-                  method="POST"
-                >
-                  <div class="row gx-3">
-                    <div class="col-md-6">
-                      <div class="mb-4">
-                        <label class="form-label">Name</label>
+          <div className="contact-area">
+            <div className="leave-comments-area">
+              <div className="comments-box">
+                <form id="contact-form" onSubmit={handleSubmit}>
+                  <div className="row gx-3">
+                    <div className="col-md-6">
+                      <div className="mb-4">
+                        <label className="form-label">Name</label>
                         <input
                           name="name"
                           required
                           type="text"
-                          class="form-control shadow-none"
+                          className="form-control shadow-none"
                           placeholder="Enter your name"
+                          value={formData.name}
+                          onChange={handleChange}
                         />
                       </div>
                     </div>
-                    <div class="col-md-6">
-                      <div class="mb-4">
-                        <label class="form-label">Email</label>
+                    <div className="col-md-6">
+                      <div className="mb-4">
+                        <label className="form-label">Email</label>
                         <input
                           name="email"
                           required
                           type="email"
-                          class="form-control shadow-none"
+                          className="form-control shadow-none"
                           placeholder="Enter your email"
+                          value={formData.email}
+                          onChange={handleChange}
                         />
                       </div>
                     </div>
-                    <div class="col-md-12">
-                      <div class="mb-4">
-                        <label class="form-label">Subject</label>
+                    <div className="col-md-12">
+                      <div className="mb-4">
+                        <label className="form-label">Subject</label>
                         <input
                           name="subject"
                           required
                           type="text"
-                          class="form-control shadow-none"
+                          className="form-control shadow-none"
                           placeholder="Subject"
+                          value={formData.subject}
+                          onChange={handleChange}
                         />
                       </div>
                     </div>
 
-                    <div class="col-md-12">
-                      <div class="mb-4">
-                        <label class="form-label">Message</label>
+                    <div className="col-md-12">
+                      <div className="mb-4">
+                        <label className="form-label">Message</label>
                         <textarea
                           name="message"
-                          class="form-control shadow-none"
+                          className="form-control shadow-none"
                           rows="4"
                           placeholder="Write your message........."
+                          value={formData.message}
+                          onChange={handleChange}
                         ></textarea>
                       </div>
                     </div>
-                    <div class="col-md-12">
-                      <button class="submit-btn" type="submit">
+                    <div className="col-md-12">
+                      <button className="submit-btn" type="submit">
                         Send Message
                         <svg
-                          class="icon"
+                          className="icon"
                           width="20"
                           height="20"
                           viewBox="0 0 20 20"
@@ -88,31 +131,31 @@ const ContactForm = () => {
                           <path
                             d="M17.5 11.6665V6.6665H12.5"
                             stroke="white"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           ></path>
                           <path
                             d="M17.5 6.6665L10 14.1665L2.5 6.6665"
                             stroke="white"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           ></path>
                         </svg>
                       </button>
                     </div>
                   </div>
                 </form>
-                <p class="ajax-response mb-0"></p>
+                <p className="ajax-response mb-0">{responseMessage}</p>
               </div>
             </div>
-            <div class="contact-map-area">
+            <div className="contact-map-area">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6985.968887242623!2d76.5786088044883!3d28.898810357701475!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d85beaa791cab%3A0x512a3aaccbc43a7f!2sPartap%20Chowk%20St%2C%20Babra%20Mohalla%2C%20Rohtak%2C%20Haryana%20124001!5e0!3m2!1sen!2sin!4v1723912441825!5m2!1sen!2sin"
-                allowfullscreen=""
+                allowFullScreen=""
                 loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
+                referrerPolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
           </div>

@@ -5,7 +5,6 @@ const {
   getSingleContact,
   deleteContact,
 } = require("../controllers/contactController");
-const { verifyAdmin } = require("../utils/verifyToken");
 
 const contactRouter = express.Router();
 

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const states = require("../data/state"); // This should be an array of valid states for the 'state' field
 
 // Define the schema for User
 const userSchema = new mongoose.Schema(
@@ -29,11 +28,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true, // Ensures no two users have the same mobile number
     },
-    state: {
-      type: String,
-      enum: states, // Limits the state field to the values in the 'states' array
-      required: true, // State is required
-    },
+
     role: {
       type: String,
       enum: ["user", "admin"], // Restricts the role to either 'user' or 'admin'
