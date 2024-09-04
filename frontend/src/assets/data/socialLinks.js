@@ -10,31 +10,31 @@ import { SiLeetcode } from "react-icons/si";
 const socialLinks = [
   {
     href: "https://github.com/Dhruvermafz",
-    icon: <AiFillGithub />,
+    icon: AiFillGithub,
   },
   {
     href: "https://twitter.com/thenerdy_guy",
-    icon: <AiOutlineTwitter />,
+    icon: AiOutlineTwitter,
   },
   {
     href: "https://www.linkedin.com/in/dhruvermafz/",
-    icon: <FaLinkedinIn />,
+    icon: FaLinkedinIn,
   },
   {
     href: "https://www.instagram.com/dhruvermafz/",
-    icon: <AiFillInstagram />,
+    icon: AiFillInstagram,
   },
   {
     href: "https://leetcode.com/u/thenerdy_guy/",
-    icon: <SiLeetcode />,
+    icon: SiLeetcode,
   },
   {
     href: "https://stackoverflow.com/users/19765859/dhruv-verma",
-    icon: <FaStackOverflow />,
+    icon: FaStackOverflow,
   },
   {
     href: "https://discord.gg/FBSB8ZWE",
-    icon: <FaDiscord />,
+    icon: FaDiscord,
   },
 ];
 

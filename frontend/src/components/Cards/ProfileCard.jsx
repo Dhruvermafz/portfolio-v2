@@ -91,7 +91,7 @@ const ProfileCard = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {link.icon}
+                      <link.icon />
                     </a>
                   </li>
                 ))}

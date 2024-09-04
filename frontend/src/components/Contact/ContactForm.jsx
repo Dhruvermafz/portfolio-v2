@@ -50,9 +50,9 @@ const ContactForm = () => {
                 Let's 👋 <span>Work</span> Together
               </h1>
               <p>
-                I'm here to help if you're searching for a product designer to
-                bring your idea to life or a design partner to help take your
-                business to the next level.
+                I'm here to help if you're searching for a Full Stack Developer
+                to bring your idea to life or a software enginner to be on your
+                valuable organisation.
               </p>
             </div>
           </div>

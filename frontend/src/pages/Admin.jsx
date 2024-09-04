@@ -1,5 +1,7 @@
 import React from "react";
 import AppBar from "../components/admin/AppBar/Appbar";
+import PopularCategories from "../components/admin/Dashboard/PopularCategories";
+import ProgressCard from "../components/admin/Dashboard/ProgressCard";
 const Admin = () => {
   return (
     <div className="admin-container">
@@ -12,6 +14,7 @@ const Admin = () => {
                 <div className="card-body">
                   {/* Main content will be added here */}
                   <AppBar />
+                  <ProgressCard />
                 </div>
               </div>
             </div>

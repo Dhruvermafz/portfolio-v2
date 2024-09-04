@@ -1,30 +1,36 @@
-import React, { useState } from "react";
-import { Button, Table } from "react-bootstrap"; // Import Bootstrap components
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Button, Table, Modal } from "react-bootstrap";
+import { FaReply } from "react-icons/fa";
+import AppBar from "../AppBar/Appbar";
 import ViewMessage from "./ViewMessage";
 import DeleteModal from "./DeleteModal";
-import { FaReply } from "react-icons/fa";
+import axios from "axios";
+
 const AllQueries = () => {
   const [showViewMessageModal, setShowViewMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [queryToDelete, setQueryToDelete] = useState(null);
+  const [queries, setQueries] = useState([]);
 
-  const [queries, setQueries] = useState([
-    {
-      name: "Math",
-      date: "21/12/2002",
-      email: "dfsf@gmail.com",
-      message: "Math category message",
-    },
-    {
-      name: "Science",
-      date: "21/12/2002",
-      email: "dfsf@gmail.com",
-      message: "Science category message",
-    },
-    // Add more queries as needed
-  ]);
+  // Fetch queries from the API when the component mounts
+  useEffect(() => {
+    const fetchQueries = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/contact/");
+        if (response.data.success && Array.isArray(response.data.data)) {
+          setQueries(response.data.data);
+        } else {
+          setQueries([]);
+        }
+      } catch (error) {
+        console.error("Error fetching queries:", error);
+        setQueries([]);
+      }
+    };
+
+    fetchQueries();
+  }, []);
 
   const handleViewMessageClick = (message) => {
     setSelectedMessage(message);
@@ -36,29 +42,31 @@ const AllQueries = () => {
     setSelectedMessage("");
   };
 
-  const handleDeleteClick = (category) => {
-    setCategoryToDelete(category);
+  const handleDeleteClick = (query) => {
+    setQueryToDelete(query);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    setQueries(queries.filter((cat) => cat !== categoryToDelete));
-    setShowDeleteModal(false);
+  const handleConfirmDelete = async () => {
+    try {
+      // Make an API call to delete the query
+      await axios.delete(`http://localhost:4000/contact/${queryToDelete._id}`);
+      // Update the state to remove the deleted query
+      setQueries(queries.filter((query) => query._id !== queryToDelete._id));
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error("Error deleting query:", error);
+    }
   };
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
-    setCategoryToDelete(null);
-  };
-
-  const handleStatusChange = (index) => {
-    const updatedQueries = [...queries];
-    updatedQueries[index].status = !updatedQueries[index].status;
-    setQueries(updatedQueries);
+    setQueryToDelete(null);
   };
 
   return (
     <section className="mt-4">
+      <AppBar />
       <div className="container">
         <div className="row g-4">
           <div className="col-xl-12">
@@ -83,18 +91,17 @@ const AllQueries = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {queries.map((category, index) => (
-                        <tr key={index}>
-                          <td>{category.name}</td>
-
-                          <td>{category.email}</td>
-                          <td>{category.date}</td>
+                      {queries.map((query) => (
+                        <tr key={query._id}>
+                          <td>{query.name}</td>
+                          <td>{query.email}</td>
+                          <td>{query.date}</td>
                           <td>
                             <Button
                               variant="info"
                               size="sm"
                               onClick={() =>
-                                handleViewMessageClick(category.message)
+                                handleViewMessageClick(query.message)
                               }
                             >
                               View Message
@@ -102,14 +109,14 @@ const AllQueries = () => {
                           </td>
                           <td>
                             <div className="d-flex gap-2">
-                              <a href="">
+                              <a href="#">
                                 <FaReply /> Reply
                               </a>
 
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(category)}
+                                onClick={() => handleDeleteClick(query)}
                               >
                                 <i className="ri-delete-bin-line"></i> Delete
                               </Button>

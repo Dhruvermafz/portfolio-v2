@@ -3,6 +3,7 @@ import DeleteModal from "./DeleteModal";
 import AddCategoryModal from "./AddCategoryModal"; // Import the AddCategoryModal component
 import { Link } from "react-router-dom";
 import { Button, Table } from "react-bootstrap";
+import AppBar from "../AppBar/Appbar";
 
 const AllCategory = () => {
   const [categories, setCategories] = useState([
@@ -45,7 +46,8 @@ const AllCategory = () => {
   return (
     <section className="mt-4">
       <div className="container">
-        <div className="row g-4">
+        <AppBar />
+        <div className="row g-4" style={{ width: "80%", marginLeft: "auto" }}>
           <div className="col-xl-12">
             <div className="card">
               <div className="card-body">
