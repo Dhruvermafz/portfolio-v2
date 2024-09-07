@@ -16,6 +16,25 @@ const blogPostSchema = new mongoose.Schema(
       ref: "User", // Reference to the User model
       required: true, // userId is required
     },
+    categories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category", // Reference to the Category model
+        required: true, // At least one category is required
+      },
+    ],
+    images: [
+      {
+        url: {
+          type: String, // Cloudinary URL for the image
+          required: true, // Image URL is required
+        },
+        public_id: {
+          type: String, // Cloudinary public ID for the image
+          required: true, // Public ID is required for managing the image on Cloudinary
+        },
+      },
+    ],
     published: {
       type: Date,
       default: Date.now, // Default to the current date

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 
 const Login = () => {
   // State to hold form data
@@ -10,8 +11,12 @@ const Login = () => {
     password: "",
   });
 
-  // State to handle errors
+  // State to handle errors and success messages
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // For navigation after successful login
+  const navigate = useNavigate();
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -22,6 +27,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear previous errors
+    setSuccess(""); // Clear previous success message
+
     try {
       const response = await axios.post(
         "http://localhost:4000/user/login",
@@ -29,7 +36,14 @@ const Login = () => {
       );
       // Handle successful response
       console.log("User logged in successfully:", response.data);
-      // Optionally redirect or handle successful login
+
+      // Set success message
+      setSuccess("User logged in successfully!");
+
+      // Redirect to home page after 2 seconds
+      setTimeout(() => {
+        navigate("/admin");
+      }, 2000);
     } catch (err) {
       // Handle error
       console.error("Login failed:", err);
@@ -53,6 +67,7 @@ const Login = () => {
             <h3>Login</h3>
             <p className="text-muted">Please enter your credentials</p>
             {error && <Alert variant="danger">{error}</Alert>}
+            {success && <Alert variant="success">{success}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="email">
                 <Form.Label>Email</Form.Label>

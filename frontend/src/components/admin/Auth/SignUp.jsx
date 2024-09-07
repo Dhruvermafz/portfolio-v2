@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
-
+import { useNavigate } from "react-router-dom";
 const SignUp = () => {
   // State to hold form data
   const [formData, setFormData] = useState({
@@ -10,7 +10,7 @@ const SignUp = () => {
     email: "",
     password: "",
   });
-
+  const navigate = useNavigate();
   // State to handle errors
   const [error, setError] = useState("");
 
@@ -30,6 +30,9 @@ const SignUp = () => {
       );
       // Handle successful response
       console.log("User registered successfully:", response.data);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (err) {
       // Handle error
       console.error("Registration failed:", err);

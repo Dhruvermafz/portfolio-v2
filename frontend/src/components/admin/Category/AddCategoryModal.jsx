@@ -1,15 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import axios from "axios";
 
 const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
   const [name, setName] = useState("");
   const [parentCategory, setParentCategory] = useState("");
-  const [icon, setIcon] = useState("");
+  const [parentCategories, setParentCategories] = useState([]);
   const [status, setStatus] = useState(true);
 
-  const handleSubmit = () => {
-    const newCategory = { name, parentCategory, icon, status };
-    onConfirm(newCategory);
+  useEffect(() => {
+    // Fetch parent categories for the dropdown
+    const fetchParentCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/categories");
+        setParentCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching parent categories", error);
+      }
+    };
+
+    fetchParentCategories();
+  }, []);
+
+  const handleSubmit = async () => {
+    try {
+      const newCategory = { name, parentCategory, isActive: status };
+      const response = await axios.post(
+        "http://localhost:4000/categories",
+        newCategory
+      );
+      onConfirm(response.data);
+      onClose();
+    } catch (error) {
+      console.error("Error adding category", error);
+    }
   };
 
   return (
@@ -31,20 +55,17 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
           <Form.Group controlId="parentCategory" className="mt-3">
             <Form.Label>Parent Category</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Enter parent category"
+              as="select"
               value={parentCategory}
               onChange={(e) => setParentCategory(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group controlId="icon" className="mt-3">
-            <Form.Label>Icon</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter icon class"
-              value={icon}
-              onChange={(e) => setIcon(e.target.value)}
-            />
+            >
+              <option value="">Select a parent category</option>
+              {parentCategories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </Form.Control>
           </Form.Group>
           <Form.Group controlId="status" className="mt-3">
             <Form.Check
