@@ -28,7 +28,7 @@ const AllCategory = () => {
   // Handle status change for a category
   const handleStatusChange = async (categoryId, currentStatus) => {
     try {
-      await axios.patch(`/categories/${categoryId}`, {
+      await axios.patch(`http://localhost:4000/categories/${categoryId}`, {
         isActive: !currentStatus,
       });
       setCategories((prevCategories) =>
@@ -49,7 +49,9 @@ const AllCategory = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(`/categories/${selectedCategory._id}`);
+      await axios.delete(
+        `http://localhost:4000//categories/${selectedCategory._id}`
+      );
       setCategories((prevCategories) =>
         prevCategories.filter((cat) => cat._id !== selectedCategory._id)
       );
@@ -62,7 +64,10 @@ const AllCategory = () => {
   // Handle add category
   const handleAddCategory = async (newCategory) => {
     try {
-      const response = await axios.post("/categories", newCategory);
+      const response = await axios.post(
+        "http://localhost:4000/categories",
+        newCategory
+      );
       setCategories([...categories, response.data]);
       setAddCategoryModalOpen(false);
     } catch (error) {
@@ -73,14 +78,13 @@ const AllCategory = () => {
   return (
     <section className="mt-4">
       <div className="container">
-        <AppBar />
-        <div className="row g-4" style={{ width: "80%", marginLeft: "auto" }}>
+        <div className="row g-4" style={{ width: "100%", marginLeft: "auto" }}>
           <div className="col-xl-12">
             <div className="card">
               <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
-                    <h1 className="h4">Course Category List</h1>
+                    <h1 className="h4">Category List</h1>
                     <p>All Categories Here</p>
                   </div>
                   <Button

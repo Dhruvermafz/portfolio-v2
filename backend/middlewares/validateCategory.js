@@ -1,15 +1,13 @@
-const Joi = require('joi');
+const Joi = require("joi");
 
-const validateCategory = (body) => {
+const validateCategory = (categoryData) => {
   const schema = Joi.object({
     name: Joi.string().required(),
+    parentCategory: Joi.string().allow(null), // Allow parent to be null
+    isActive: Joi.boolean().default(true), // Validate `isActive` field
   });
 
-  const { error, value } = schema.validate(body);
-
-  if (error) return { error: { code: 400, message: { message: error.details[0].message } } };
-
-  return value;
+  return schema.validate(categoryData);
 };
 
 module.exports = validateCategory;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Modal } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
 import { FaReply } from "react-icons/fa";
 import AppBar from "../AppBar/Appbar";
 import ViewMessage from "./ViewMessage";
@@ -66,7 +66,6 @@ const AllQueries = () => {
 
   return (
     <section className="mt-4">
-      <AppBar />
       <div className="container">
         <div className="row g-4">
           <div className="col-xl-12">
@@ -142,9 +141,9 @@ const AllQueries = () => {
 
       {/* Delete confirmation modal */}
       <DeleteModal
-        show={showDeleteModal}
+        isOpen={showDeleteModal}
         handleClose={handleCloseDeleteModal}
-        handleConfirm={handleConfirmDelete}
+        handleDelete={handleConfirmDelete}
       />
     </section>
   );

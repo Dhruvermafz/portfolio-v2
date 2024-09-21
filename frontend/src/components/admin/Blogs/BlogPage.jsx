@@ -1,6 +1,7 @@
 import React from "react";
 import Pagination from "../../Pagination";
 import { Link } from "react-router-dom";
+import AppBar from "../AppBar/Appbar";
 const BlogPage = () => {
   // Handler for the search input
   const handleSearchChange = (event) => {

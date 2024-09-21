@@ -1,74 +1,53 @@
-/* New container for the sidebar */
-.sidebar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 25%;
-  margin: 0 auto; /* Center the container */
-  padding: 20px; /* Padding for better layout */
-}
-
-/* Sidebar styles */
-.sidebar {
-  width: 200px; /* Reduced width for the sidebar */
-  background-color: #333; /* Dark background color */
-  border-radius: 8px; /* Rounded corners for the sidebar */
-  padding: 10px 0; /* Padding at the top and bottom */
-  overflow-y: auto; /* Scrollable content */
-  margin-right: 20px; /* Spacing between the sidebar and main content */
-}
-
-/* Sidebar content */
-.sidebar-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  color: #fff; /* White text color */
-}
-
-/* Sidebar title */
-.card-title {
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-  color: #fff; /* White text color */
-}
-
-/* Services item */
-.services-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
+/* Container for the navbar */
+.navbar-container {
   width: 100%;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.services-item:hover {
-  background-color: #444; /* Slightly lighter on hover */
+/* Navbar content styled as cards */
+.card-main {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  width: 64%;
 }
 
+/* Card styles */
+.card-item {
+  background-color: #333; /* Dark background */
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.card-item:hover {
+  transform: translateY(-5px); /* Lifting effect on hover */
+  background-color: #444; /* Change background on hover */
+}
+
+/* Icon and text within card */
 .icon {
-  margin-right: 10px;
-  font-size: 1.2rem;
-  color: #fff; /* White icon color */
+  font-size: 1.8rem;
+  margin-bottom: 10px;
 }
 
 .title {
-  font-size: 1rem;
-  color: #fff; /* White text color */
-  text-decoration: none;
+  font-size: 1.2rem;
+  margin: 0;
+  color: #fff;
 }
 
 .title a {
   color: inherit;
-  text-decoration: none; /* Remove underline from links */
+  text-decoration: none;
 }
 
 .title a:hover {
-  color: #ddd; /* Slight color change on hover */
-}
-
-/* Logout styling */
-.services-item:last-child {
-  margin-top: auto; /* Push logout button to the bottom */
+  color: #ddd;
 }

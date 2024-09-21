@@ -7,6 +7,7 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
   const [parentCategory, setParentCategory] = useState("");
   const [parentCategories, setParentCategories] = useState([]);
   const [status, setStatus] = useState(true);
+  const [isParentCategory, setIsParentCategory] = useState(false);
 
   useEffect(() => {
     // Fetch parent categories for the dropdown
@@ -24,7 +25,12 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
 
   const handleSubmit = async () => {
     try {
-      const newCategory = { name, parentCategory, isActive: status };
+      const newCategory = {
+        name,
+        parentCategory: isParentCategory ? null : parentCategory,
+        isActive: status,
+        isParent: isParentCategory,
+      };
       const response = await axios.post(
         "http://localhost:4000/categories",
         newCategory
@@ -52,21 +58,34 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
               onChange={(e) => setName(e.target.value)}
             />
           </Form.Group>
-          <Form.Group controlId="parentCategory" className="mt-3">
-            <Form.Label>Parent Category</Form.Label>
-            <Form.Control
-              as="select"
-              value={parentCategory}
-              onChange={(e) => setParentCategory(e.target.value)}
-            >
-              <option value="">Select a parent category</option>
-              {parentCategories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </Form.Control>
+
+          <Form.Group controlId="isParentCategory" className="mt-3">
+            <Form.Check
+              type="checkbox"
+              label="Is Parent Category"
+              checked={isParentCategory}
+              onChange={() => setIsParentCategory(!isParentCategory)}
+            />
           </Form.Group>
+
+          {!isParentCategory && (
+            <Form.Group controlId="parentCategory" className="mt-3">
+              <Form.Label>Parent Category</Form.Label>
+              <Form.Control
+                as="select"
+                value={parentCategory}
+                onChange={(e) => setParentCategory(e.target.value)}
+              >
+                <option value="">None</option>
+                {parentCategories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+          )}
+
           <Form.Group controlId="status" className="mt-3">
             <Form.Check
               type="checkbox"

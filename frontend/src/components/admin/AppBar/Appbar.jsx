@@ -8,12 +8,14 @@ import {
 } from "react-icons/fa"; // Importing icons
 import { Link } from "react-router-dom";
 import "./AppBar.css";
+
 const AppBar = () => {
   return (
-    <div className="sidebar">
+    <div className="navbar-container">
       <h3 className="card-title">Welcome Boss</h3>
-      <div className="services-main">
-        <div className="services-item">
+      <div className="card-main">
+        {/* Each card represents a link */}
+        <div className="card-item">
           <div className="icon">
             <FaTachometerAlt />
           </div>
@@ -23,7 +25,7 @@ const AppBar = () => {
             </h3>
           </div>
         </div>
-        <div className="services-item">
+        <div className="card-item">
           <div className="icon">
             <FaTags />
           </div>
@@ -33,7 +35,7 @@ const AppBar = () => {
             </h3>
           </div>
         </div>
-        <div className="services-item">
+        <div className="card-item">
           <div className="icon">
             <FaBlog />
           </div>
@@ -43,7 +45,7 @@ const AppBar = () => {
             </h3>
           </div>
         </div>
-        <div className="services-item">
+        <div className="card-item">
           <div className="icon">
             <FaPhone />
           </div>
@@ -53,8 +55,7 @@ const AppBar = () => {
             </h3>
           </div>
         </div>
-        {/* Additional Sidebar Items can be added here */}
-        <div className="services-item">
+        <div className="card-item">
           <div className="icon">
             <FaSignOutAlt />
           </div>

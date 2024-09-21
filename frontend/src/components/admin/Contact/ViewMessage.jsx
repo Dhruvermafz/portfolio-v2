@@ -1,19 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, Button } from "react-bootstrap"; // Import Bootstrap components
 
-const ViewMessage = () => {
-  const [show, setShow] = useState(false);
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
+const ViewMessage = ({ show, handleClose }) => {
   return (
     <>
-      {/* Trigger Button */}
-      <Button variant="primary" onClick={handleShow}>
-        View Message
-      </Button>
-
       {/* Modal */}
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>

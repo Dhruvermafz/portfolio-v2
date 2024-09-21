@@ -14,7 +14,6 @@ const Admin = () => {
                 <div className="card-body">
                   {/* Main content will be added here */}
                   <AppBar />
-                  <ProgressCard />
                 </div>
               </div>
             </div>

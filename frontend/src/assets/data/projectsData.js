@@ -1,21 +1,24 @@
-import itsablog from "../../assets/img/projects/itsablog.png";
-import instadownloader from "../../assets/img/projects/instadownloader.png";
-import todolist from "../../assets/img/projects/todolist.png";
-import tictactoe from "../../assets/img/projects/tictactoe.png";
-import two from "../../assets/img/projects/2048.png";
-import two2 from "../../assets/img/projects/two_2.png";
-import two3 from "../../assets/img/projects/two_3.png";
-import itsablog2 from "../../assets/img/projects/itsablog_1.png";
-import itsablog3 from "../../assets/img/projects/itsablog_2.png";
-import desi1 from "../../assets/img/projects/desi-1.png";
-import desi2 from "../../assets/img/projects/deis-2.png";
-import desi3 from "../../assets/img/projects/desi-3.png";
-import live1 from "../../assets/img/projects/live_auctions.png";
-import live2 from "../../assets/img/projects/live_auctions_2.png";
-import live3 from "../../assets/img/projects/live_auctions_3.png";
-import indus1 from "../../assets/img/projects/indus_1.png";
-import indus2 from "../../assets/img/projects/indus_2.png";
-import indus3 from "../../assets/img/projects/indus-3.png";
+import itsablog from "../img/projects/itsablog.png";
+import instadownloader from "../img/projects/instadownloader.png";
+import todolist from "../img/projects/todolist.png";
+import tictactoe from "../img/projects/tictactoe.png";
+import two from "../img/projects/2048.png";
+import two2 from "../img/projects/two_2.png";
+import two3 from "../img/projects/two_3.png";
+import itsablog2 from "../img/projects/itsablog_1.png";
+import itsablog3 from "../img/projects/itsablog_2.png";
+import desi1 from "../img/projects/desi-1.png";
+import desi2 from "../img/projects/deis-2.png";
+import desi3 from "../img/projects/desi-3.png";
+import live1 from "../img/projects/live_auctions.png";
+import live2 from "../img/projects/live_auctions_2.png";
+import live3 from "../img/projects/live_auctions_3.png";
+import indus1 from "../img/projects/indus_1.png";
+import indus2 from "../img/projects/indus_2.png";
+import indus3 from "../img/projects/indus-3.png";
+import codeshield_main from "../img/projects/codeshield_main.png";
+import codeshield_image1 from "../img/projects/codeshield_image1.png";
+import codeshield_image2 from "../img/projects/codeshield_image2.png";
 // projectsData.js
 const projects = [
   {
@@ -55,6 +58,50 @@ const projects = [
     results:
       "The platform successfully attracted a diverse group of users, with high engagement levels and positive feedback on its real-time features and user experience.",
     tags: ["MERN Stack", "Socket.io", "Blogging", "Real-time"],
+  },
+  {
+    id: "codeshield",
+    title: "CodeShield",
+    client: "Self",
+    services: "Next.Js, TypeScript, Firebase",
+    website: "https://codeshield-pass.vercel.app",
+    ghLink: "https://github.com/Dhruvermafz/codeshield",
+    overview:
+      "CodeShield is a security-focused application designed to store and manage passwords securely. Built with Next.js, TypeScript, and Firebase, the platform ensures that user credentials are encrypted and protected from unauthorized access.",
+    mainImage: codeshield_main,
+    images: [codeshield_image1, codeshield_image2],
+    challenges: [
+      {
+        title: "Password Encryption",
+        challenge:
+          "Ensuring the secure encryption and storage of user passwords.",
+        solution:
+          "Implemented strong encryption algorithms to secure passwords before storing them in Firebase.",
+      },
+      {
+        title: "User Authentication",
+        challenge:
+          "Providing a seamless yet secure authentication system for users.",
+        solution:
+          "Integrated Firebase Authentication to handle user sign-ups, logins, and account management.",
+      },
+      {
+        title: "Real-Time Database Updates",
+        challenge:
+          "Keeping password data up-to-date across multiple devices in real-time.",
+        solution:
+          "Utilized Firebase's real-time database to ensure instant updates and synchronization across user sessions.",
+      },
+    ],
+    results:
+      "CodeShield effectively provides users with a secure and user-friendly way to store and manage passwords. Feedback has been positive, particularly around the ease of use and security features.",
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "Firebase",
+      "Security",
+      "Password Management",
+    ],
   },
   {
     id: "live_auctions",
