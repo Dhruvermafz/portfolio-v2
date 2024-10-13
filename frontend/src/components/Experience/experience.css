@@ -1,0 +1,21 @@
+.expand-btn {
+  margin-top: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.expand-btn:hover {
+  background-color: #2980b9;
+}
+
+.timeline-details {
+  margin-top: 10px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+}

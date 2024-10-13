@@ -51,7 +51,7 @@ const ProjectDetailsCard = () => {
                 <div className="info-item">
                   <p className="subtitle">Services:</p>
                   <h4 className="card-title">{project.services}</h4>
-                  <Tags tagName={project.tags} />
+
                   <a
                     href={project.website}
                     className="website"
@@ -59,7 +59,7 @@ const ProjectDetailsCard = () => {
                     rel="noopener noreferrer"
                   >
                     {" "}
-                    Check out the website <FaLink> {project.website}</FaLink>
+                    Live Link <FaLink> {project.website}</FaLink>
                     <svg
                       className="arrow-up"
                       width="14"
@@ -87,8 +87,7 @@ const ProjectDetailsCard = () => {
                     rel="noopener noreferrer"
                   >
                     {" "}
-                    Check out the source code{" "}
-                    <FaGithub> {project.ghLink}</FaGithub>
+                    Source Code <FaGithub> {project.ghLink}</FaGithub>
                     <svg
                       className="arrow-up"
                       width="14"
@@ -148,6 +147,8 @@ const ProjectDetailsCard = () => {
               ))}
               <h3 className="more-info-title">Results/Conclusion:</h3>
               <p>{project.results}</p>
+
+              <Tags tagName={project.tags} />
             </div>
             <div className="prev-and-next-btn">
               <button

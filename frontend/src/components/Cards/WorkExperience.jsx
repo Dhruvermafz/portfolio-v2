@@ -1,5 +1,5 @@
 import React from "react";
-import workExperiences from "../../assets/data/workExperiences";
+import { workExperiences } from "../../assets/data/workExperiences";
 import Projects from "./Projects";
 import TechnologiesIWorked from "./TechnologiesIWorked";
 import Academia from "./Academia";

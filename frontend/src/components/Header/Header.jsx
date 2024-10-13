@@ -37,7 +37,7 @@ const Header = () => {
     <header className="header-area">
       <nav className="navbar">
         <div className="container">
-          <div className="menu-container d-flex justify-content-between align-items-center">
+          <div className="menu-container ">
             <div className="logo">
               <Link className="navbar-brand me-0" to="/">
                 {/* <FaAppStoreIos color="yellow" /> */}

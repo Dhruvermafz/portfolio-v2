@@ -21,6 +21,7 @@ const categoriesController = {
       const result = await categoriesService.findAll();
       res.status(200).json(result);
     } catch (error) {
+      console.error("Error fetching categories: ", error);
       res.status(500).json({ message: "Server error", error });
     }
   },

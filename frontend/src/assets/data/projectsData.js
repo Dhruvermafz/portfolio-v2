@@ -104,6 +104,51 @@ const projects = [
     ],
   },
   {
+    id: "teamoffice",
+    title: "Team Office",
+    client: "Chptronics Solutions",
+    services: "React.Js, Node.Js, MySQl, Docker",
+    website: "https://teamoffice.in",
+    ghLink: "https://github.com/Dhruvermafz/teamoffice",
+    overview:
+      "CodeShield is a security-focused application designed to store and manage passwords securely. Built with Next.js, TypeScript, and Firebase, the platform ensures that user credentials are encrypted and protected from unauthorized access.",
+    mainImage: codeshield_main,
+    images: [codeshield_image1, codeshield_image2],
+    challenges: [
+      {
+        title: "Password Encryption",
+        challenge:
+          "Ensuring the secure encryption and storage of user passwords.",
+        solution:
+          "Implemented strong encryption algorithms to secure passwords before storing them in Firebase.",
+      },
+      {
+        title: "User Authentication",
+        challenge:
+          "Providing a seamless yet secure authentication system for users.",
+        solution:
+          "Integrated Firebase Authentication to handle user sign-ups, logins, and account management.",
+      },
+      {
+        title: "Real-Time Database Updates",
+        challenge:
+          "Keeping password data up-to-date across multiple devices in real-time.",
+        solution:
+          "Utilized Firebase's real-time database to ensure instant updates and synchronization across user sessions.",
+      },
+    ],
+    results:
+      "CodeShield effectively provides users with a secure and user-friendly way to store and manage passwords. Feedback has been positive, particularly around the ease of use and security features.",
+    tags: [
+      "Next.js",
+      "TypeScript",
+      "Firebase",
+      "Security",
+      "Password Management",
+    ],
+  },
+
+  {
     id: "live_auctions",
     title: "Live Auctions",
     client: "Self",

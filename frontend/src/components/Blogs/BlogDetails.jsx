@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Or use fetch API
+import axios from "axios";
+import { useParams } from "react-router-dom"; // Import useParams to access route parameters
 
 const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
-  const blogId = "65f6f5f9ddf303a9a1b51273"; // Replace with an actual blog ID for testing
+
+  // Get the blogId from the URL
+  const { blogId } = useParams();
 
   useEffect(() => {
     const fetchBlogDetails = async () => {
       try {
         const response = await axios.get(
-          `https://social-api-w6xb.onrender.com/api/posts/${_id}`
+          `https://social-api-w6xb.onrender.com/api/posts/${blogId}` // Use the dynamic blogId
         );
         setBlog(response.data);
       } catch (error) {
@@ -17,14 +20,16 @@ const BlogDetails = () => {
       }
     };
 
-    fetchBlogDetails();
-  }, [blogId]);
+    if (blogId) {
+      fetchBlogDetails(); // Fetch details only if blogId exists
+    }
+  }, [blogId]); // Ensure the effect runs when blogId changes
 
   if (!blog) {
     return <p>Loading...</p>;
   }
 
-  // Fallback values if properties are missing
+  // Destructure the blog details with default values
   const {
     _id,
     imageUrl = "",

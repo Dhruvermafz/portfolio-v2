@@ -1,0 +1,27 @@
+.tags {
+  display: inline-flex; /* Makes each tag appear as an individual box */
+  padding: 10px 15px; /* Adds padding to create a box-like feel */
+  margin: 8px; /* Creates space between each tag */
+  border-radius: 25px; /* Makes the corners fully rounded */
+  background-color: var(
+    --bg-color,
+    #f0f0f0
+  ); /* Off-white background, adjustable */
+  color: var(--text-color, #6a0dad); /* Purple text, adjustable */
+  text-decoration: none; /* Removes underline */
+  font-size: 14px; /* Font size adjustment */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for box effect */
+  transition: all 0.3s ease; /* Smooth transitions for hover effects */
+}
+
+.tags:hover {
+  background-color: var(
+    --hover-bg-color,
+    #6a0dad
+  ); /* Purple background on hover */
+  color: var(--hover-text-color, #ffffff); /* White text on hover */
+}
+
+.tags:not(:last-child) {
+  margin-right: 10px; /* Adds spacing between tags if they appear inline */
+}

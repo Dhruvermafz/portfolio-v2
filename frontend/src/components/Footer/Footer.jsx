@@ -9,9 +9,7 @@ const Footer = () => {
         <div className="text text-center">
           <p>
             © Dhruvermafz {currentYear}, Designed & Developed By{" "}
-            <a className="link-btn" href="https://dhruvermafz.vercel.app/">
-              Dhruv Verma
-            </a>
+            <a href="https://dhruvermafz.vercel.app/">Dhruv Verma</a>
           </p>
         </div>
       </div>

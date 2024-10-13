@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import About from "../pages/About";
 import Contact from "../pages/Contact";
@@ -7,11 +7,6 @@ import Projects from "../pages/Projects";
 import Blogs from "../pages/Blogs";
 import ProjectDetails from "../pages/ProjectDetails";
 import NotFound from "../pages/404";
-import Resume from "../pages/Resume";
-import CreateBlog from "../components/admin/Blogs/CreateBlog";
-import CreateBlogPage from "../pages/CreateBlog";
-import BlogDetails from "../components/Blogs/BlogDetails";
-import ComingSoon from "../pages/ComingSoon";
 import LoginIn from "../pages/LoginIn";
 import Admin from "../pages/Admin";
 import Article from "../pages/Article";
@@ -19,29 +14,49 @@ import BlogPage from "../components/admin/Blogs/BlogPage";
 import AllCategory from "../components/admin/Category/AllCategory";
 import AllQueries from "../components/admin/Contact/AllQueries";
 import SignUp from "../components/admin/Auth/SignUp";
+import CreateBlog from "../components/admin/Blogs/CreateBlog";
+import PrivateRoute from "./PrivateRoute"; // Assuming you have the PrivateRoute component
+
+// Public routes array
+const publicRoutes = [
+  { path: "/", element: <Home /> },
+  { path: "/about", element: <About /> },
+  { path: "/contact", element: <Contact /> },
+  { path: "/projects", element: <Projects /> },
+  { path: "/project/:id", element: <ProjectDetails /> },
+  { path: "/blogs", element: <Blogs /> },
+  { path: "/blogs/:id", element: <Article /> },
+  { path: "/login", element: <LoginIn /> },
+  { path: "/signup", element: <SignUp /> },
+  { path: "*", element: <NotFound /> },
+];
+
+// Admin routes array
+const adminRoutes = [
+  { path: "/admin", element: <Admin /> },
+  { path: "/admin/blogs", element: <BlogPage /> },
+  { path: "/admin/blogs/create", element: <CreateBlog /> },
+  { path: "/admin/category", element: <AllCategory /> },
+  { path: "/admin/contact", element: <AllQueries /> },
+];
 
 const Router = () => {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/project/:id" element={<ProjectDetails />} />
-        <Route path="/blogs" element={<Blogs />} />
-        <Route element={<NotFound />} path="/*" />
-        <Route element={<LoginIn />} path="/login" />
-        <Route element={<SignUp />} path="/signup" />
-        <Route path="/admin/category" element={<AllCategory />} />
-        <Route path="/admin/contact" element={<AllQueries />} />
-        {/* <Route path="/resume" element={<Resume />} /> */}
-        <Route path="/blogs/:id" element={<Article />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/admin/blogs" element={<BlogPage />} />
-        <Route path="/admin/blogs/create" element={<CreateBlog />} />
-      </Routes>
-    </>
+    <Routes>
+      {/* Map through publicRoutes and create Route components */}
+      {publicRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
+      ))}
+
+      {/* Map through adminRoutes and wrap them in PrivateRoute */}
+      {adminRoutes.map((route) => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={<PrivateRoute>{route.element}</PrivateRoute>}
+        />
+      ))}
+    </Routes>
   );
 };
 

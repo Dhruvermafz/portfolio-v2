@@ -4,6 +4,7 @@ import WorkExperience from "../components/Cards/WorkExperience";
 import TechnologiesIWorked from "../components/TechStack/TechnologiesIWorked";
 import Projects from "../components/Cards/Projects";
 import Academia from "../components/Cards/Academia";
+import ExperienceTimeline from "../components/Experience/ExperienceTimeline";
 const Home = () => {
   return (
     <section className="home-area">
@@ -13,7 +14,8 @@ const Home = () => {
           <WorkExperience />
           <Projects />
 
-          {/* <TechnologiesIWorked /> */}
+          <TechnologiesIWorked />
+     
         </div>
       </div>
     </section>
