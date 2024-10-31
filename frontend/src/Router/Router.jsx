@@ -16,6 +16,7 @@ import AllQueries from "../components/admin/Contact/AllQueries";
 import SignUp from "../components/admin/Auth/SignUp";
 import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import PrivateRoute from "./PrivateRoute"; // Assuming you have the PrivateRoute component
+import BlogDetails from "../pages/BlogDetails";
 
 // Public routes array
 const publicRoutes = [
@@ -25,7 +26,8 @@ const publicRoutes = [
   { path: "/projects", element: <Projects /> },
   { path: "/project/:id", element: <ProjectDetails /> },
   { path: "/blogs", element: <Blogs /> },
-  { path: "/blogs/:id", element: <Article /> },
+  { path: "/blogsOfItsABlog/:id", element: <Article /> },
+  { path: "/blogs/:id", element: <BlogDetails /> },
   { path: "/login", element: <LoginIn /> },
   { path: "/signup", element: <SignUp /> },
   { path: "*", element: <NotFound /> },

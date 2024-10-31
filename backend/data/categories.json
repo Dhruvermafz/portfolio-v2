@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Programming",
+    "parentCategory": null
+  },
+  {
+    "name": "Web Development",
+    "parentCategory": "Programming"
+  },
+  {
+    "name": "React.Js",
+    "parentCategory": "Programming"
+  },
+  {
+    "name": "MERN Stack",
+    "parentCategory": null
+  },
+  {
+    "name": "MySQL",
+    "parentCategory": null
+  }
+]

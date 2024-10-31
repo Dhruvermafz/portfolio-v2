@@ -109,11 +109,7 @@ const AllCategory = () => {
                       {categories.map((category) => (
                         <tr key={category._id}>
                           <td>{category.name}</td>
-                          <td>
-                            {category.parentCategory
-                              ? category.parentCategory.name
-                              : "None"}
-                          </td>
+                          <td>{category.parentCategory}</td>
                           <td>
                             <input
                               type="checkbox"

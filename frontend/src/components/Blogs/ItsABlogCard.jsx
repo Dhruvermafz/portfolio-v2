@@ -29,7 +29,7 @@ const ItsABlogCard = () => {
         <div key={blog._id} className="col-xl-6 col-lg-4 col-md-6">
           <div className="article-publications-item">
             <div className="text">
-              <Link to={`/blogs/${blog._id}`}>
+              <Link to={`/blogsOfItsABlog/${blog._id}`}>
                 <a className="title">{blog.title}</a>
               </Link>
 

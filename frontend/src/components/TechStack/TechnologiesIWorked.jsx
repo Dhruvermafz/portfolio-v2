@@ -104,7 +104,7 @@ const TechnologiesIWorked = () => {
                       </div>
                       <div className="text">
                         <h3 className="title">
-                          {twitterFollowers} Followers{" "}
+                          15 Followers{" "}
                           <a
                             className="link-btn"
                             href="https://twitter.com/thenerdy_guy"
@@ -126,7 +126,7 @@ const TechnologiesIWorked = () => {
                       </div>
                       <div className="text">
                         <h3 className="title">
-                          {linkedinConnections} Connections{" "}
+                          764 Connections{" "}
                           <a
                             className="link-btn"
                             href="https://linkedin.com/in/Dhruvermafz"
