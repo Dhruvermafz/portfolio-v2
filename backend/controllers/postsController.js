@@ -16,30 +16,45 @@ cloudinary.config({
 const createBlog = asyncHandler(async (req, res) => {
   const { title, content, userId, categories } = req.body;
 
+  // Validate the required fields
+  if (!title || !content || !userId) {
+    return res
+      .status(400)
+      .json({ message: "Title, content, and userId are required." });
+  }
+
   try {
     let images = [];
-    if (req.files) {
+
+    // Check if files are uploaded and process them
+    if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path);
         images.push({ url: result.secure_url, public_id: result.public_id });
-        fs.unlinkSync(file.path); // Remove local file after upload
+        fs.unlinkSync(file.path); // Remove the local file to save storage
       }
     }
 
+    // Create a new blog post
     const newBlog = await BlogPost.create({
       title,
       content,
       userId,
-      categories,
+      categories: categories ? JSON.parse(categories) : [], // Parse categories if sent as a string
       images,
-      published: new Date(), // Set published date to now
+      published: new Date(), // Automatically set the publish date
     });
 
-    res.status(201).json(newBlog);
-  } catch (error) {
+    // Return the created blog as a response
     res
-      .status(400)
-      .json({ message: "Failed to create blog", error: error.message });
+      .status(201)
+      .json({ message: "Blog created successfully.", blog: newBlog });
+  } catch (error) {
+    console.error("Error creating blog:", error.message);
+    res.status(500).json({
+      message: "Failed to create blog.",
+      error: error.message,
+    });
   }
 });
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   // State to hold form data
@@ -34,18 +34,22 @@ const Login = () => {
         "http://localhost:4000/user/login",
         formData
       );
-      // Handle successful response
-      console.log("User logged in successfully:", response.data);
 
-      // Set success message
-      setSuccess("User logged in successfully!");
+      if (response.data?.token) {
+        // Store token in localStorage or sessionStorage
+        localStorage.setItem("authToken", response.data.token);
 
-      // Redirect to home page after 2 seconds
-      setTimeout(() => {
-        navigate("/admin");
-      }, 2000);
+        // Set success message
+        setSuccess("User logged in successfully!");
+
+        // Redirect to the admin page
+        setTimeout(() => {
+          navigate("/admin");
+        }, 2000);
+      } else {
+        setError("Login failed. Token not received.");
+      }
     } catch (err) {
-      // Handle error
       console.error("Login failed:", err);
       setError("Login failed. Please check your email and password.");
     }

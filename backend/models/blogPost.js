@@ -1,59 +1,63 @@
 const mongoose = require("mongoose");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 // Define the schema for BlogPost
 const blogPostSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true, // Title is required
+      required: true,
     },
     content: {
       type: String,
-      required: true, // Content is required
+      required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the User model
-      required: true, // userId is required
+      ref: "User",
+      required: true,
     },
     categories: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Category", // Reference to the Category model
-        required: true, // At least one category is required
+        ref: "Category",
+        required: true,
       },
     ],
     images: [
       {
         url: {
-          type: String, // Cloudinary URL for the image
-          required: true, // Image URL is required
+          type: String,
+          required: true,
         },
         public_id: {
-          type: String, // Cloudinary public ID for the image
-          required: true, // Public ID is required for managing the image on Cloudinary
+          type: String,
+          required: true,
         },
       },
     ],
     published: {
       type: Date,
-      default: Date.now, // Default to the current date
+      default: Date.now,
     },
     updated: {
       type: Date,
-      default: Date.now, // Default to the current date
+      default: Date.now,
     },
   },
   {
-    timestamps: false, // Disable automatic timestamps (if not needed)
+    timestamps: false,
   }
 );
 
 // Add a pre-save hook to update the `updated` field on every save
 blogPostSchema.pre("save", function (next) {
-  this.updated = Date.now(); // Update the `updated` field
+  this.updated = Date.now();
   next();
 });
+
+// Apply the pagination plugin
+blogPostSchema.plugin(mongoosePaginate);
 
 // Create the BlogPost model using the schema
 const BlogPost = mongoose.model("BlogPost", blogPostSchema);

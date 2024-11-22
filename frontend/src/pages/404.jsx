@@ -12,7 +12,12 @@ const NotFound = () => {
           <div className="row g-4">
             <div className="card content-box-card p-4">
               <Link to="/">
-                <button className="btn btn-copy">Go Back Home</button>
+                <button className="btn btn-copy">
+                  <AiOutlineHome
+                    style={{ color: "white" }}
+                    size={30} // Adjust size as needed
+                  />
+                </button>
               </Link>
               <div className="card-body">
                 <img

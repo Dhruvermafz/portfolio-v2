@@ -87,7 +87,6 @@ const ProfileCard = () => {
                   <li key={index} className="social-icons">
                     <a
                       href={link.href}
-                      style={{ color: "white" }}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

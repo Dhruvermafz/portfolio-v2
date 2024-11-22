@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./CreateBlog.css"; // Assuming you have a separate CSS file for the styles
-
+import "./CreateBlog.css";
+import useAuth from "../../../context/auth";
 const CreateBlog = () => {
+  const user = useAuth(); // Fetch user data from the token
   const [selectedCategories, setSelectedCategories] = useState(["technology"]);
   const [blogTitle, setBlogTitle] = useState("");
   const [blogContent, setBlogContent] = useState("");
-  const [thumbnail, setThumbnail] = useState(null); // For handling the file upload
+  const [thumbnail, setThumbnail] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Handle category selection change
   const handleCategoryChange = (event) => {
     const options = event.target.options;
     const selectedValues = [];
@@ -22,28 +22,31 @@ const CreateBlog = () => {
     setSelectedCategories(selectedValues);
   };
 
-  // Handle thumbnail upload
   const handleThumbnailChange = (event) => {
     setThumbnail(event.target.files[0]);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset any previous errors
-    setSuccess(""); // Reset any previous success messages
+    setError("");
+    setSuccess("");
 
     if (!thumbnail) {
       setError("Please upload a thumbnail.");
       return;
     }
 
-    // Create form data to send in the API request
+    if (!user) {
+      setError("Unauthorized: Please log in to create a blog.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", blogTitle);
     formData.append("categories", selectedCategories);
     formData.append("content", blogContent);
     formData.append("thumbnail", thumbnail);
+    formData.append("userId", user.id); // Add the userId from token
 
     try {
       const response = await axios.post(
@@ -52,14 +55,13 @@ const CreateBlog = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Add token to headers
           },
         }
       );
-      // Handle success response
       setSuccess("Blog created successfully!");
       console.log(response.data);
     } catch (err) {
-      // Handle error response
       setError("An error occurred while creating the blog. Please try again.");
       console.error(err);
     }
@@ -67,6 +69,7 @@ const CreateBlog = () => {
 
   return (
     <form onSubmit={handleSubmit} className="create-blog-container">
+      {/* Form Fields */}
       <div className="main-content card">
         <h6 className="card-title">Create New Blog</h6>
         <div className="form-group">
@@ -120,7 +123,7 @@ const CreateBlog = () => {
           />
         </div>
       </div>
-
+      {/* Thumbnail Section */}
       <div className="thumbnail-section card">
         <h6 className="card-title">Add Blog Thumbnail</h6>
         <div className="thumbnail-upload">

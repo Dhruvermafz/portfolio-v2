@@ -17,6 +17,7 @@ import SignUp from "../components/admin/Auth/SignUp";
 import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import PrivateRoute from "./PrivateRoute"; // Assuming you have the PrivateRoute component
 import BlogDetails from "../pages/BlogDetails";
+import ComingSoon from "../pages/ComingSoon";
 
 // Public routes array
 const publicRoutes = [
@@ -31,6 +32,7 @@ const publicRoutes = [
   { path: "/login", element: <LoginIn /> },
   { path: "/signup", element: <SignUp /> },
   { path: "*", element: <NotFound /> },
+  { path: "/coming", element: <ComingSoon /> },
 ];
 
 // Admin routes array
@@ -52,11 +54,7 @@ const Router = () => {
 
       {/* Map through adminRoutes and wrap them in PrivateRoute */}
       {adminRoutes.map((route) => (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={<PrivateRoute>{route.element}</PrivateRoute>}
-        />
+        <Route key={route.path} path={route.path} element={route.element} />
       ))}
     </Routes>
   );
