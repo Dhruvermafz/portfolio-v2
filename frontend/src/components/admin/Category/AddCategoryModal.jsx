@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { API_URL } from "../../../config";
 
 const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
   const [name, setName] = useState("");
@@ -13,7 +14,7 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
     // Fetch parent categories for the dropdown
     const fetchParentCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/categories");
+        const response = await axios.get(`${API_URL}/categories`);
         setParentCategories(response.data);
       } catch (error) {
         console.error("Error fetching parent categories", error);
@@ -31,10 +32,7 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
         isActive: status,
         isParent: isParentCategory,
       };
-      const response = await axios.post(
-        "http://localhost:4000/categories",
-        newCategory
-      );
+      const response = await axios.post(`${API_URL}/categories`, newCategory);
       onConfirm(response.data);
       onClose();
     } catch (error) {

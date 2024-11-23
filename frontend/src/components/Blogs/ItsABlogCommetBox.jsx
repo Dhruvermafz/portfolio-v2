@@ -1,4 +1,5 @@
 import React from "react";
+import { ITSABLOG_URL } from "../../config";
 
 const ItsABlogCommetBox = ({ id }) => {
   return (
@@ -6,7 +7,7 @@ const ItsABlogCommetBox = ({ id }) => {
       <h2 className="main-common-title">To Leave a Comment, Visit ItsABlog</h2>
       <div className="comments-box">
         <div className="row gx-3">
-          <a href={`https://itsablog.vercel.app/blog/${id}`} target="_blank">
+          <a href={`${ITSABLOG_URL}/blog/${id}`} target="_blank">
             <div className="col-md-12">
               <button className="submit-btn">
                 Visit ItsABlog

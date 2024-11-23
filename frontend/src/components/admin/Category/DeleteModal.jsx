@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-
+import { RiDeleteBin2Fill } from "react-icons/ri";
 const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
   return (
     <Modal show={isOpen} onHide={onClose} centered>
@@ -8,12 +8,13 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
         <Modal.Title>Confirm Deletion</Modal.Title>
       </Modal.Header>
       <Modal.Body className="text-center">
-        <img
+        {/* <img
           src="assets/images/icons/delete-record.png"
           alt="delete"
           className="img-fluid mb-3"
           style={{ height: "80px" }}
-        />
+        /> */}
+        <RiDeleteBin2Fill />
         <h5 className="mb-3">Are you sure?</h5>
         <p className="text-muted">
           Are you certain you want to delete this record?

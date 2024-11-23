@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./CreateBlog.css";
 import useAuth from "../../../context/auth";
+import { API_URL } from "../../../config";
 const CreateBlog = () => {
   const user = useAuth(); // Fetch user data from the token
   const [selectedCategories, setSelectedCategories] = useState(["technology"]);
@@ -49,16 +50,12 @@ const CreateBlog = () => {
     formData.append("userId", user.id); // Add the userId from token
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/post",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Add token to headers
-          },
-        }
-      );
+      const response = await axios.post(`${API_URL}/post`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Add token to headers
+        },
+      });
       setSuccess("Blog created successfully!");
       console.log(response.data);
     } catch (err) {

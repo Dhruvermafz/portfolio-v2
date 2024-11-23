@@ -1,4 +1,5 @@
 import React from "react";
+import { PORTFOLIO_URL } from "../../config";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear(); // Get the current year
@@ -9,7 +10,7 @@ const Footer = () => {
         <div className="text text-center">
           <p>
             © Dhruvermafz {currentYear}, Designed & Developed By{" "}
-            <a href="https://dhruvermafz.vercel.app/">Dhruv Verma</a>
+            <a href={PORTFOLIO_URL}>Dhruv Verma</a>
           </p>
         </div>
       </div>

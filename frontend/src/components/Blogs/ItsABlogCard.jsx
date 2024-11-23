@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { BLOG_API_URL } from "../../config";
 const ItsABlogCard = () => {
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
-    fetch("https://social-api-w6xb.onrender.com/api/posts?trial123")
+    fetch(`${BLOG_API_URL}/api/posts?trial123`)
       .then((response) => response.json())
       .then((data) => {
         console.log("Fetched data:", data); // Log the entire response

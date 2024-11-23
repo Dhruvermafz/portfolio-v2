@@ -5,6 +5,7 @@ import AppBar from "../AppBar/Appbar";
 import ViewMessage from "./ViewMessage";
 import DeleteModal from "./DeleteModal";
 import axios from "axios";
+import { API_URL } from "../../../config";
 
 const AllQueries = () => {
   const [showViewMessageModal, setShowViewMessageModal] = useState(false);
@@ -17,7 +18,7 @@ const AllQueries = () => {
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/contact/");
+        const response = await axios.get(`${API_URL}/contact/`);
         if (response.data.success && Array.isArray(response.data.data)) {
           setQueries(response.data.data);
         } else {
@@ -50,7 +51,7 @@ const AllQueries = () => {
   const handleConfirmDelete = async () => {
     try {
       // Make an API call to delete the query
-      await axios.delete(`http://localhost:4000/contact/${queryToDelete._id}`);
+      await axios.delete(`${API_URL}/contact/${queryToDelete._id}`);
       // Update the state to remove the deleted query
       setQueries(queries.filter((query) => query._id !== queryToDelete._id));
       setShowDeleteModal(false);

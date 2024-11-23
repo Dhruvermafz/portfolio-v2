@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ItsABlogCommetBox from "./ItsABlogCommetBox";
+import { BLOG_API_URL } from "../../config";
 
 const BlogDetails = () => {
   const [blog, setBlog] = useState(null);
@@ -13,7 +14,7 @@ const BlogDetails = () => {
       try {
         console.log("Fetching blog with ID:", id); // Debugging ID
         const response = await axios.get(
-          `https://social-api-w6xb.onrender.com/api/posts/${id}` // Use the specific endpoint
+          `${BLOG_API_URL}/posts/${id}` // Use the specific endpoint
         );
         console.log(id);
         console.log("Fetched blog data:", response.data); // Log the fetched blog data

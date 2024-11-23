@@ -3,6 +3,7 @@ import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../../config";
 const SignUp = () => {
   // State to hold form data
   const [formData, setFormData] = useState({
@@ -24,10 +25,7 @@ const SignUp = () => {
     e.preventDefault();
     setError(""); // Clear previous errors
     try {
-      const response = await axios.post(
-        "http://localhost:4000/user/register",
-        formData
-      );
+      const response = await axios.post(`${API_URL}/user/register`, formData);
       // Handle successful response
       console.log("User registered successfully:", response.data);
       setTimeout(() => {

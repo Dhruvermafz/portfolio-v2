@@ -3,6 +3,7 @@ import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../../config";
 
 const Login = () => {
   // State to hold form data
@@ -30,10 +31,7 @@ const Login = () => {
     setSuccess(""); // Clear previous success message
 
     try {
-      const response = await axios.post(
-        "http://localhost:4000/user/login",
-        formData
-      );
+      const response = await axios.post(`${API_URL}/user/login`, formData);
 
       if (response.data?.token) {
         // Store token in localStorage or sessionStorage

@@ -5,6 +5,7 @@ import AddCategoryModal from "./AddCategoryModal"; // Import the AddCategoryModa
 import { Link } from "react-router-dom";
 import { Button, Table } from "react-bootstrap";
 import AppBar from "../AppBar/Appbar";
+import { API_URL } from "../../../config";
 
 const AllCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -16,7 +17,7 @@ const AllCategory = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/categories");
+        const response = await axios.get(`${API_URL}/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories", error);
@@ -28,7 +29,7 @@ const AllCategory = () => {
   // Handle status change for a category
   const handleStatusChange = async (categoryId, currentStatus) => {
     try {
-      await axios.patch(`http://localhost:4000/categories/${categoryId}`, {
+      await axios.patch(`${API_URL}/categories/${categoryId}`, {
         isActive: !currentStatus,
       });
       setCategories((prevCategories) =>
@@ -49,9 +50,7 @@ const AllCategory = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await axios.delete(
-        `http://localhost:4000//categories/${selectedCategory._id}`
-      );
+      await axios.delete(`${API_URL}/categories/${selectedCategory._id}`);
       setCategories((prevCategories) =>
         prevCategories.filter((cat) => cat._id !== selectedCategory._id)
       );
@@ -64,10 +63,7 @@ const AllCategory = () => {
   // Handle add category
   const handleAddCategory = async (newCategory) => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/categories",
-        newCategory
-      );
+      const response = await axios.post(`${API_URL}/categories`, newCategory);
       setCategories([...categories, response.data]);
       setAddCategoryModalOpen(false);
     } catch (error) {

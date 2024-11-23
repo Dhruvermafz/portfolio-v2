@@ -75,7 +75,7 @@ const AboutCard = () => {
             <div className="working-with-main">
               {expertiseAreas.map((expertise, index) => (
                 <div className="items" key={index}>
-                  <expertise.icon size={40} color="white" />
+                  <expertise.icon size={40} color="grey" />
                 </div>
               ))}
             </div>
