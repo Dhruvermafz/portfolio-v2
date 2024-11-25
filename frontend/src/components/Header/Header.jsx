@@ -75,7 +75,8 @@ const Header = () => {
                 {navItems.map((item) => (
                   <li className="nav-item" key={item.path}>
                     <Link className="nav-link" to={item.path}>
-                      {item.icon}
+                      <a class="nav-icon"> {item.icon}</a>
+
                       <span> {item.label}</span>
                     </Link>
                   </li>
@@ -87,14 +88,17 @@ const Header = () => {
                   {isDarkMode ? (
                     <MdOutlineLightMode
                       title="Switch to Light Mode"
-                      style={{ color: "yellow" }}
+                      style={{ color: "black" }}
                     />
                   ) : (
-                    <MdDarkMode title="Switch to Dark Mode" />
+                    <MdDarkMode
+                      title="Switch to Dark Mode"
+                      style={{ color: "white" }}
+                    />
                   )}
                 </button>
 
-                <a href="contact.html" class="lets-talk-btn">
+                <a href="/contact" class="lets-talk-btn">
                   Let's Talk
                   <svg
                     class="icon"
@@ -122,31 +126,36 @@ const Header = () => {
                 </a>
               </div>
             </div>
-            <button
-              className="mobile-menu-control-bar d-block d-xl-none"
-              onClick={toggleMobileMenu}
+            <div
+              className={`mobile-menu ${
+                isMobileMenuOpen ? "open" : ""
+              } d-xl-none`}
             >
-              <FaBars />
-            </button>
+              <ul className="navbar-info mx-auto">
+                {navItems.map((item) => (
+                  <li className="nav-item" key={item.path}>
+                    <Link
+                      className="nav-link"
+                      to={item.path}
+                      onClick={toggleMobileMenu}
+                    >
+                      {item.icon}
+                      <span> {item.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div class="mobile-menu-overlay d-block d-lg-none"></div>
+            <div class="mobile-menu-control-bar d-block d-xl-none">
+              <button
+                className="mobile-menu-control-bar d-block d-xl-none"
+                onClick={toggleMobileMenu}
+              >
+                <FaBars />
+              </button>
+            </div>
           </div>
-        </div>
-        <div
-          className={`mobile-menu ${isMobileMenuOpen ? "open" : ""} d-xl-none`}
-        >
-          <ul className="mobile-nav">
-            {navItems.map((item) => (
-              <li className="nav-item" key={item.path}>
-                <Link
-                  className="nav-link"
-                  to={item.path}
-                  onClick={toggleMobileMenu}
-                >
-                  {item.icon}
-                  <span> {item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
         </div>
       </nav>
     </header>

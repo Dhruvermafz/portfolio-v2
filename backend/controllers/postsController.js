@@ -1,15 +1,116 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
 const BlogPost = require("../models/blogPost");
-const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const fs = require("fs");
+const path = require("path");
+const matter = require("gray-matter");
+const firebaseAdmin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
+
+// Firebase configuration
+const serviceAccount = require("../config/firebase-service-account.json");
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(serviceAccount),
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+});
+const bucket = firebaseAdmin.storage().bucket();
+
 const upload = multer({ dest: "uploads/" });
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+// Function to upload image to Firebase
+const uploadToFirebase = async (filePath, filename) => {
+  const uniqueFileName = `${uuidv4()}_${filename}`;
+  const uploadTask = bucket.upload(filePath, {
+    destination: `blog${blog._id}blog_images/${uniqueFileName}`,
+    metadata: {
+      metadata: {
+        firebaseStorageDownloadTokens: uuidv4(),
+      },
+    },
+  });
+  await uploadTask;
+  const file = bucket.file(`blog${blog._id}blog_images/${uniqueFileName}`);
+  const [url] = await file.getSignedUrl({
+    action: "read",
+    expires: "03-01-2030", // Set expiration date far into the future
+  });
+  return url;
+};
+
+// Create a blog with Markdown
+const createBlogWithMD = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "Markdown file is required." });
+  }
+
+  const markdownFilePath = req.file.path;
+
+  try {
+    // Read and parse the Markdown file
+    const fileContent = fs.readFileSync(markdownFilePath, "utf8");
+    const { content, data } = matter(fileContent);
+
+    // Validate required fields
+    const { title, tags, userId } = data;
+    if (!title || !userId) {
+      return res.status(400).json({
+        message:
+          "Markdown file must include title and userId in the frontmatter.",
+      });
+    }
+
+    // Extract image paths from the content
+    const imageRegex = /!\[.*?\]\((.*?)\)/g; // Matches Markdown image syntax ![alt](path)
+    const images = [];
+    let match;
+    while ((match = imageRegex.exec(content)) !== null) {
+      images.push(match[1]); // Extracted image path
+    }
+
+    // Upload images to Firebase
+    const uploadedImages = [];
+    for (const imagePath of images) {
+      const absolutePath = path.resolve(
+        path.dirname(markdownFilePath),
+        imagePath
+      );
+      const fileName = path.basename(imagePath);
+      const firebaseUrl = await uploadToFirebase(absolutePath, fileName);
+      uploadedImages.push({ url: firebaseUrl });
+      fs.unlinkSync(absolutePath); // Remove the local image after upload
+    }
+
+    // Create a new blog post
+    const newBlog = await BlogPost.create({
+      title,
+      content, // Save the parsed content from the Markdown
+      userId,
+      categories: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+      images: uploadedImages,
+      published: new Date(),
+    });
+
+    // Cleanup: Remove the uploaded Markdown file
+    fs.unlinkSync(markdownFilePath);
+
+    // Return the created blog as a response
+    res
+      .status(201)
+      .json({ message: "Blog created successfully.", blog: newBlog });
+  } catch (error) {
+    console.error("Error creating blog with Markdown:", error.message);
+
+    // Cleanup on error
+    if (fs.existsSync(markdownFilePath)) {
+      fs.unlinkSync(markdownFilePath);
+    }
+
+    res.status(500).json({
+      message: "Failed to create blog with Markdown.",
+      error: error.message,
+    });
+  }
 });
 
 // Create a new blog
@@ -165,4 +266,5 @@ module.exports = {
   getAllBlogs,
   getFeaturedBlogs,
   deleteBlog,
+  createBlogWithMD,
 };

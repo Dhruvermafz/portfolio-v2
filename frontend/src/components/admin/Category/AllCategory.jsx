@@ -72,94 +72,99 @@ const AllCategory = () => {
   };
 
   return (
-    <section className="mt-4">
-      <div className="container">
-        <div className="row g-4" style={{ width: "100%", marginLeft: "auto" }}>
-          <div className="col-xl-12">
-            <div className="card">
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <div>
-                    <h1 className="h4">Category List</h1>
-                    <p>All Categories Here</p>
+    <>
+      <section className="mt-4">
+        <div className="container">
+          <div
+            className="row g-4"
+            style={{ width: "100%", marginLeft: "auto" }}
+          >
+            <div className="col-xl-12">
+              <div className="card">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <h1 className="h4">Category List</h1>
+                      <p>All Categories Here</p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={() => setAddCategoryModalOpen(true)}
+                    >
+                      Add Category
+                    </Button>
                   </div>
-                  <Button
-                    variant="primary"
-                    onClick={() => setAddCategoryModalOpen(true)}
-                  >
-                    Add Category
-                  </Button>
-                </div>
 
-                <div className="table-responsive">
-                  <Table bordered hover>
-                    <thead>
-                      <tr>
-                        <th>Category Name</th>
-                        <th>Parent Category</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categories.map((category) => (
-                        <tr key={category._id}>
-                          <td>{category.name}</td>
-                          <td>{category.parentCategory}</td>
-                          <td>
-                            <input
-                              type="checkbox"
-                              checked={category.isActive}
-                              onChange={() =>
-                                handleStatusChange(
-                                  category._id,
-                                  category.isActive
-                                )
-                              }
-                            />
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Link
-                                to={`/categories/edit/${category._id}`}
-                                className="btn btn-sm btn-warning"
-                              >
-                                Edit
-                              </Link>
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(category)}
-                              >
-                                Delete
-                              </Button>
-                            </div>
-                          </td>
+                  <div className="table-responsive">
+                    <Table bordered hover>
+                      <thead>
+                        <tr>
+                          <th>Category Name</th>
+                          <th>Parent Category</th>
+                          <th>Status</th>
+                          <th>Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+                      </thead>
+                      <tbody>
+                        {categories.map((category) => (
+                          <tr key={category._id}>
+                            <td>{category.name}</td>
+                            <td>{category.parentCategory}</td>
+                            <td>
+                              <input
+                                type="checkbox"
+                                checked={category.isActive}
+                                onChange={() =>
+                                  handleStatusChange(
+                                    category._id,
+                                    category.isActive
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Link
+                                  to={`/categories/edit/${category._id}`}
+                                  className="btn btn-sm btn-warning"
+                                >
+                                  Edit
+                                </Link>
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(category)}
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Delete Modal */}
-      <DeleteModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-      />
+        {/* Delete Modal */}
+        <DeleteModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleDeleteConfirm}
+        />
 
-      {/* Add Category Modal */}
-      <AddCategoryModal
-        isOpen={isAddCategoryModalOpen}
-        onClose={() => setAddCategoryModalOpen(false)}
-        onConfirm={handleAddCategory}
-      />
-    </section>
+        {/* Add Category Modal */}
+        <AddCategoryModal
+          isOpen={isAddCategoryModalOpen}
+          onClose={() => setAddCategoryModalOpen(false)}
+          onConfirm={handleAddCategory}
+        />
+      </section>
+    </>
   );
 };
 

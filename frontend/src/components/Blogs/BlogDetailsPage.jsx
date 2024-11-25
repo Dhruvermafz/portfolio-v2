@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import ItsABlogCommetBox from "./ItsABlogCommetBox";
-import { BLOG_API_URL } from "../../config";
+import { API_URL } from "../../config";
 
-const BlogDetails = () => {
+const BlogDetailsPage = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
@@ -12,17 +12,13 @@ const BlogDetails = () => {
   useEffect(() => {
     const fetchBlogDetails = async () => {
       try {
-        console.log("Fetching blog with ID:", id); // Debugging ID
-        const response = await axios.get(
-          `${BLOG_API_URL}/posts/${id}` // Use the specific endpoint
-        );
-        console.log(id);
-        console.log("Fetched blog data:", response.data); // Log the fetched blog data
-        setBlog(response.data); // Set the blog state directly
+        const response = await axios.get(`${API_URL}/posts/${id}`);
+        const post = response.data; // Adjust based on API response
+        setBlog(post);
       } catch (error) {
         console.error("Error fetching blog details:", error);
       } finally {
-        setLoading(false); // Set loading to false once data is fetched
+        setLoading(false);
       }
     };
 
@@ -30,27 +26,23 @@ const BlogDetails = () => {
       fetchBlogDetails();
     }
   }, [id]);
-  console.log(id);
+
   if (loading) {
-    return <p>Loading...</p>; // Display loading state while fetching
+    return <p>Loading...</p>;
   }
 
   if (!blog) {
-    return <p>Blog post not found.</p>; // Display a message if blog is null
+    return <p>Blog post not found.</p>;
   }
 
-  // Destructure the blog details with default values
+  // Destructure the blog details
   const {
-    _id,
-    content = "",
-    title = "",
-    createdAt = "",
-    poster = {},
-    likeCount = 0,
-    commentCount = 0,
+    title = "Untitled",
+    content = "No content available.",
+    published,
+    updated,
+    userId = "Unknown Author",
   } = blog;
-
-  const { username = "Unknown Author" } = poster;
 
   return (
     <div className="col-xl-8">
@@ -58,10 +50,9 @@ const BlogDetails = () => {
         <div className="card-body portfolio-card article-details-card">
           <div className="article-details-area">
             <ul className="list-unstyled article-tags">
-              <li>Written at: {new Date(createdAt).toLocaleDateString()}</li>
-              <li>Author: {username}</li>
-              <li>Likes: {likeCount}</li>
-              <li>Comments: {commentCount}</li>
+              <li>Published: {new Date(published).toLocaleDateString()}</li>
+              <li>Updated: {new Date(updated).toLocaleDateString()}</li>
+              <li>Author: {userId}</li>
             </ul>
             <div className="article-details-text">
               <h3 className="main-title">{title}</h3>
@@ -75,4 +66,4 @@ const BlogDetails = () => {
   );
 };
 
-export default BlogDetails;
+export default BlogDetailsPage;

@@ -32,10 +32,10 @@ const CreateBlog = () => {
     setError("");
     setSuccess("");
 
-    if (!thumbnail) {
-      setError("Please upload a thumbnail.");
-      return;
-    }
+    // if (!thumbnail) {
+    //   setError("Please upload a thumbnail.");
+    //   return;
+    // }
 
     if (!user) {
       setError("Unauthorized: Please log in to create a blog.");
@@ -46,7 +46,7 @@ const CreateBlog = () => {
     formData.append("title", blogTitle);
     formData.append("categories", selectedCategories);
     formData.append("content", blogContent);
-    formData.append("thumbnail", thumbnail);
+    // formData.append("thumbnail", thumbnail);
     formData.append("userId", user.id); // Add the userId from token
 
     try {

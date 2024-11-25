@@ -1,9 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProfileCard from "../components/Cards/ProfileCard";
 import BlogsCard from "../components/Blogs/BlogsCard";
 import Pagination from "../components/Pagination";
 import ItsABlogCard from "../components/Blogs/ItsABlogCard";
+
 const Blogs = () => {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.time("Page Load Time");
+    setLoading(true);
+
+    // Simulate API load (use actual API calls in real usage)
+    setTimeout(() => {
+      setLoading(false);
+      console.timeEnd("Page Load Time");
+    }, 1000); // Replace with actual API loading time
+  }, []);
+
   return (
     <section className="content-box-area mt-4">
       <div className="container">
@@ -15,23 +29,27 @@ const Blogs = () => {
                 <div className="top-info">
                   <div className="text">
                     <h1 className="main-title">
-                      My Recent Article which i write here and on ITSABLOG.
+                      My Recent Article which I write here and on ITSABLOG.
                     </h1>
                     <p>
-                      These are the recent blogs posts which got written for
-                      this website and for ITSABLOG.
+                      These are the recent blog posts written for this website
+                      and ITSABLOG.
                     </p>
                   </div>
                 </div>
                 <div className="article-publications article-area">
-                  <div className="article-publications-main">
-                    <div className="row">
-                      <BlogsCard />
+                  {loading ? (
+                    <p>Loading articles...</p> // Replace with Skeleton Loader
+                  ) : (
+                    <div className="article-publications-main">
+                      <div className="row">
+                        <BlogsCard />
+                      </div>
+                      <div className="row">
+                        <ItsABlogCard />
+                      </div>
                     </div>
-                    <div className="row">
-                      <ItsABlogCard />
-                    </div>
-                  </div>
+                  )}
                 </div>
                 <Pagination />
               </div>

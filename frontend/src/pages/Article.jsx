@@ -1,6 +1,6 @@
 import React from "react";
 import ProfileCard from "../components/Cards/ProfileCard";
-import BlogDetails from "../components/Blogs/BlogDetails";
+import ItsBlogDetails from "../components/Blogs/ItsABlogDetails";
 
 const Article = () => {
   return (
@@ -8,7 +8,7 @@ const Article = () => {
       <div className="container">
         <div className="row g-4">
           <ProfileCard />
-          <BlogDetails />
+          <ItsBlogDetails />
         </div>
       </div>
     </section>

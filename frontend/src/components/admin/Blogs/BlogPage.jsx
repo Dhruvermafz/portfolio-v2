@@ -2,6 +2,8 @@ import React from "react";
 import Pagination from "../../Pagination";
 import { Link } from "react-router-dom";
 import AppBar from "../AppBar/Appbar";
+import BlogsCard from "../../Blogs/BlogsCard";
+import AdminBlogCard from "./AdminBlogCard";
 const BlogPage = () => {
   // Handler for the search input
   const handleSearchChange = (event) => {
@@ -22,7 +24,7 @@ const BlogPage = () => {
                 <div className="top-info d-flex justify-content-between align-items-center">
                   <div className="text">
                     <h1 className="main-title">Blogs Manage</h1>
-                    <p></p>
+                    <p>Manage the blogs.</p>
                   </div>
                   <div className="search-and-add d-flex">
                     <a href="#" className="d-block w-100">
@@ -74,7 +76,9 @@ const BlogPage = () => {
                 </div>
                 <div className="article-publications article-area">
                   <div className="article-publications-main">
-                    <div className="row"></div>
+                    <div className="row">
+                      <AdminBlogCard />
+                    </div>
                   </div>
                 </div>
                 <Pagination />
