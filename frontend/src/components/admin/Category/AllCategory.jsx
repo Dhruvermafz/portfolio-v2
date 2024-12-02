@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DeleteModal from "./DeleteModal";
-import AddCategoryModal from "./AddCategoryModal"; // Import the AddCategoryModal component
+import AddCategoryModal from "./AddCategoryModal";
+import EditCategoryModal from "./EditCategoryModal"; // Import EditCategoryModal
 import { Link } from "react-router-dom";
 import { Button, Table } from "react-bootstrap";
 import AppBar from "../AppBar/Appbar";
@@ -11,6 +12,7 @@ const AllCategory = () => {
   const [categories, setCategories] = useState([]);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setAddCategoryModalOpen] = useState(false);
+  const [isEditCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Fetch categories from API
@@ -71,6 +73,21 @@ const AllCategory = () => {
     }
   };
 
+  // Handle edit category
+  const handleEditClick = (category) => {
+    setSelectedCategory(category);
+    setEditCategoryModalOpen(true);
+  };
+
+  const handleEditConfirm = (updatedCategory) => {
+    setCategories((prevCategories) =>
+      prevCategories.map((cat) =>
+        cat._id === updatedCategory._id ? updatedCategory : cat
+      )
+    );
+    setEditCategoryModalOpen(false);
+  };
+
   return (
     <>
       <section className="mt-4">
@@ -124,12 +141,13 @@ const AllCategory = () => {
                             </td>
                             <td>
                               <div className="d-flex gap-2">
-                                <Link
-                                  to={`/categories/edit/${category._id}`}
-                                  className="btn btn-sm btn-warning"
+                                <Button
+                                  variant="warning"
+                                  size="sm"
+                                  onClick={() => handleEditClick(category)}
                                 >
                                   Edit
-                                </Link>
+                                </Button>
                                 <Button
                                   variant="danger"
                                   size="sm"
@@ -162,6 +180,14 @@ const AllCategory = () => {
           isOpen={isAddCategoryModalOpen}
           onClose={() => setAddCategoryModalOpen(false)}
           onConfirm={handleAddCategory}
+        />
+
+        {/* Edit Category Modal */}
+        <EditCategoryModal
+          isOpen={isEditCategoryModalOpen}
+          onClose={() => setEditCategoryModalOpen(false)}
+          onConfirm={handleEditConfirm}
+          categoryToEdit={selectedCategory}
         />
       </section>
     </>

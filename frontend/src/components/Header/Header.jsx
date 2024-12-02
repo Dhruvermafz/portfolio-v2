@@ -87,12 +87,12 @@ const Header = () => {
                 <button className="theme-control-btn" onClick={toggleTheme}>
                   {isDarkMode ? (
                     <MdOutlineLightMode
-                      title="Switch to Light Mode"
+                      title="Light Mode"
                       style={{ color: "black" }}
                     />
                   ) : (
                     <MdDarkMode
-                      title="Switch to Dark Mode"
+                      title="Folks prefer Dark Mode"
                       style={{ color: "white" }}
                     />
                   )}

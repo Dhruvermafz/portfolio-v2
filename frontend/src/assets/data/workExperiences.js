@@ -11,7 +11,7 @@ export const workExperiences = [
     company: "PickVibe LLP",
     position: "Full Stack Developer Intern",
     description:
-      "aasdasDLKsadgasldglasDGlasDGaLSD   asdsaldhsalduhasLDuaSDhasODhasODUaISUDh",
+      "Developed and maintained advanced infrastructure tools for Travel Agency using React.js, NodeJs ensuring industry-standard compliance. Skilled in system development, AWS, GraphQl, and problem-solving",
   },
   {
     id: "CodeClause",
@@ -20,7 +20,8 @@ export const workExperiences = [
     icon: codeclause,
     company: "CodeClause",
     position: "Frontend Intern",
-    description: "dddfsdfsfsdfsd",
+    description:
+      "Assisted in the development of the front end of the website and worked on various frontend projects.",
   },
 ];
 

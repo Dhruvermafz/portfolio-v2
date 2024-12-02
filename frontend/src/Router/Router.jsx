@@ -15,7 +15,7 @@ import AllCategory from "../components/admin/Category/AllCategory";
 import AllQueries from "../components/admin/Contact/AllQueries";
 import SignUp from "../components/admin/Auth/SignUp";
 import CreateBlog from "../components/admin/Blogs/CreateBlog";
-import PrivateRoute from "./PrivateRoute"; // Assuming you have the PrivateRoute component
+import PrivateRoute from "./PrivateRoute";
 import BlogDetails from "../pages/BlogDetails";
 import ComingSoon from "../pages/ComingSoon";
 
@@ -54,7 +54,11 @@ const Router = () => {
 
       {/* Map through adminRoutes and wrap them in PrivateRoute */}
       {adminRoutes.map((route) => (
-        <Route key={route.path} path={route.path} element={route.element} />
+        <Route
+          key={route.path}
+          path={route.path}
+          element={<PrivateRoute>{route.element}</PrivateRoute>}
+        />
       ))}
     </Routes>
   );

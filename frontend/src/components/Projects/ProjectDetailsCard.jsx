@@ -148,7 +148,7 @@ const ProjectDetailsCard = () => {
               <h3 className="more-info-title">Results/Conclusion:</h3>
               <p>{project.results}</p>
 
-              <Tags tagName={project.tags} />
+              <Tags tags={project.tags} />
             </div>
             <div className="prev-and-next-btn">
               <button

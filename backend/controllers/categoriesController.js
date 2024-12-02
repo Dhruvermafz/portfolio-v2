@@ -41,23 +41,27 @@ const categoriesController = {
   },
 
   update: async (req, res) => {
-    const validatedBody = validateCategory(req.body);
+    const validatedBody = validateCategory(req.body); // Validate input data
     if (validatedBody.error) {
       return res
-        .status(validatedBody.error.code)
-        .json(validatedBody.error.message);
+        .status(400)
+        .json({ message: validatedBody.error.details[0].message }); // Proper error handling
     }
 
-    const categoryId = req.params.id;
+    const categoryId = req.params.id; // Extract category ID from the request parameters
     try {
-      const result = await categoriesService.update(categoryId, validatedBody);
+      const result = await categoriesService.updateById(
+        categoryId,
+        validatedBody.value
+      ); // Pass validated data
       if (result) {
-        res.status(200).json(result);
+        res.status(200).json(result); // Return updated category
       } else {
-        res.status(404).json({ message: "Category not found" });
+        res.status(404).json({ message: "Category not found" }); // Handle category not found
       }
     } catch (error) {
-      res.status(500).json({ message: "Server error", error });
+      console.error("Error updating category:", error); // Log the error for debugging
+      res.status(500).json({ message: "Server error", error }); // Return server error
     }
   },
 

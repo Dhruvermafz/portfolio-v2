@@ -42,7 +42,7 @@ const BlogsCard = () => {
           <div key={_id} className="col-xl-6 col-lg-4 col-md-6">
             <div className="article-publications-item">
               <div className="image position-relative">
-                <a href={`blogs/${_id}`} className="d-block w-100">
+                <a href={`/blogs/${_id}`} className="d-block w-100">
                   <img
                     src={placeholder}
                     alt="blog-img-placeholder"
@@ -51,7 +51,7 @@ const BlogsCard = () => {
                 </a>
               </div>
               <div className="text">
-                <a href={`${PORTFOLIO_URL}blogs/${_id}`} className="title">
+                <a href={`/blogs/${_id}`} className="title">
                   {title}
                 </a>
                 <ul className="list-unstyled">

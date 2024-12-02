@@ -30,7 +30,7 @@ app.use("/categories", categoryRoute);
 app.use("/post", postsRoute);
 app.use("/contact", contactRoute);
 // Define the port
-const port = process.env.API_PORT || 4000;
+const port = process.env.API_PORT || 8000;
 
 connectDB();
 

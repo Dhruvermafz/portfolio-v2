@@ -9,7 +9,7 @@ const firebaseAdmin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 
 // Firebase configuration
-const serviceAccount = require("../config/firebase-service-account.json");
+const serviceAccount = require("../database/firebase-service-account.json");
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(serviceAccount),
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
@@ -22,7 +22,7 @@ const upload = multer({ dest: "uploads/" });
 const uploadToFirebase = async (filePath, filename) => {
   const uniqueFileName = `${uuidv4()}_${filename}`;
   const uploadTask = bucket.upload(filePath, {
-    destination: `blog${blog._id}blog_images/${uniqueFileName}`,
+    destination: `blog_${blog._id}blog_images/${uniqueFileName}`,
     metadata: {
       metadata: {
         firebaseStorageDownloadTokens: uuidv4(),
@@ -47,28 +47,23 @@ const createBlogWithMD = asyncHandler(async (req, res) => {
   const markdownFilePath = req.file.path;
 
   try {
-    // Read and parse the Markdown file
     const fileContent = fs.readFileSync(markdownFilePath, "utf8");
     const { content, data } = matter(fileContent);
 
-    // Validate required fields
-    const { title, tags, userId } = data;
-    if (!title || !userId) {
+    const { title, tags } = data;
+    if (!title) {
       return res.status(400).json({
-        message:
-          "Markdown file must include title and userId in the frontmatter.",
+        message: "Markdown file must include a title in the frontmatter.",
       });
     }
 
-    // Extract image paths from the content
-    const imageRegex = /!\[.*?\]\((.*?)\)/g; // Matches Markdown image syntax ![alt](path)
+    const imageRegex = /!\[.*?\]\((.*?)\)/g;
     const images = [];
     let match;
     while ((match = imageRegex.exec(content)) !== null) {
-      images.push(match[1]); // Extracted image path
+      images.push(match[1]);
     }
 
-    // Upload images to Firebase
     const uploadedImages = [];
     for (const imagePath of images) {
       const absolutePath = path.resolve(
@@ -78,34 +73,28 @@ const createBlogWithMD = asyncHandler(async (req, res) => {
       const fileName = path.basename(imagePath);
       const firebaseUrl = await uploadToFirebase(absolutePath, fileName);
       uploadedImages.push({ url: firebaseUrl });
-      fs.unlinkSync(absolutePath); // Remove the local image after upload
+      fs.unlinkSync(absolutePath);
     }
 
-    // Create a new blog post
     const newBlog = await BlogPost.create({
       title,
-      content, // Save the parsed content from the Markdown
-      userId,
+      content,
+      userId: req.user.id, // Use authenticated user's ID
       categories: tags ? tags.split(",").map((tag) => tag.trim()) : [],
       images: uploadedImages,
       published: new Date(),
     });
 
-    // Cleanup: Remove the uploaded Markdown file
     fs.unlinkSync(markdownFilePath);
 
-    // Return the created blog as a response
     res
       .status(201)
       .json({ message: "Blog created successfully.", blog: newBlog });
   } catch (error) {
     console.error("Error creating blog with Markdown:", error.message);
-
-    // Cleanup on error
     if (fs.existsSync(markdownFilePath)) {
       fs.unlinkSync(markdownFilePath);
     }
-
     res.status(500).json({
       message: "Failed to create blog with Markdown.",
       error: error.message,
@@ -115,24 +104,21 @@ const createBlogWithMD = asyncHandler(async (req, res) => {
 
 // Create a new blog
 const createBlog = asyncHandler(async (req, res) => {
-  const { title, content, userId, categories } = req.body;
+  const { title, content, categories } = req.body;
 
-  // Validate the required fields
-  if (!title || !content || !userId) {
-    return res
-      .status(400)
-      .json({ message: "Title, content, and userId are required." });
+  if (!title || !content) {
+    return res.status(400).json({ message: "Title and content are required." });
   }
 
   try {
     let images = [];
 
-    // Check if files are uploaded and process them
+    // Process uploaded files if any
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path);
         images.push({ url: result.secure_url, public_id: result.public_id });
-        fs.unlinkSync(file.path); // Remove the local file to save storage
+        fs.unlinkSync(file.path); // Cleanup local file
       }
     }
 
@@ -140,13 +126,12 @@ const createBlog = asyncHandler(async (req, res) => {
     const newBlog = await BlogPost.create({
       title,
       content,
-      userId,
-      categories: categories ? JSON.parse(categories) : [], // Parse categories if sent as a string
+      userId: req.user.id, // Use authenticated user's ID
+      categories: categories ? JSON.parse(categories) : [],
       images,
-      published: new Date(), // Automatically set the publish date
+      published: new Date(),
     });
 
-    // Return the created blog as a response
     res
       .status(201)
       .json({ message: "Blog created successfully.", blog: newBlog });
@@ -161,17 +146,22 @@ const createBlog = asyncHandler(async (req, res) => {
 
 // Update an existing blog
 const updateBlog = asyncHandler(async (req, res) => {
-  const { title, content, userId, categories } = req.body;
+  const { title, content, categories } = req.body;
 
   try {
     const blog = await BlogPost.findById(req.params.id);
 
     if (!blog) {
-      res.status(404).json({ message: "Blog not found" });
-      return;
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // Check ownership
+    if (blog.userId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized action." });
     }
 
     let updatedImages = blog.images;
+
     if (req.files) {
       for (const file of req.files) {
         const result = await cloudinary.uploader.upload(file.path);
@@ -188,7 +178,6 @@ const updateBlog = asyncHandler(async (req, res) => {
       {
         title,
         content,
-        userId,
         categories,
         images: updatedImages,
         updated: new Date(),
