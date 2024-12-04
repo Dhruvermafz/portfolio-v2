@@ -1,26 +1,18 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap"; // Import Bootstrap components
 
-const ViewMessage = ({ show, handleClose }) => {
+const ViewMessage = ({ show, handleClose, message }) => {
   return (
     <>
       {/* Modal */}
       <Modal show={show} onHide={handleClose} centered>
         <Modal.Header closeButton>
-          <Modal.Title>New Private Course Published</Modal.Title>
+          <Modal.Title>View Message</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="text-center">
-            <h5 className="card-title text-lg mb-2">
-              New Private Course Published
-            </h5>
-            <span className="badge bg-secondary text-light mb-2">
-              2018-08-26
-            </span>
-            <p className="text-muted">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-              dolores, cumque rerum adipisci corporis ad!
-            </p>
+            <h5 className="card-title text-lg mb-2">Message Details</h5>
+            <p className="text-muted">{message || "No message available."}</p>
           </div>
         </Modal.Body>
         <Modal.Footer>

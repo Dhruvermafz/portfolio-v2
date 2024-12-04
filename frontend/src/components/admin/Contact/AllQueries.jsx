@@ -48,18 +48,6 @@ const AllQueries = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    try {
-      // Make an API call to delete the query
-      await axios.delete(`${API_URL}/contact/${queryToDelete._id}`);
-      // Update the state to remove the deleted query
-      setQueries(queries.filter((query) => query._id !== queryToDelete._id));
-      setShowDeleteModal(false);
-    } catch (error) {
-      console.error("Error deleting query:", error);
-    }
-  };
-
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setQueryToDelete(null);
@@ -95,7 +83,9 @@ const AllQueries = () => {
                         <tr key={query._id}>
                           <td>{query.name}</td>
                           <td>{query.email}</td>
-                          <td>{query.date}</td>
+                          <td>
+                            {new Date(query.createdAt).toLocaleDateString()}
+                          </td>
                           <td>
                             <Button
                               variant="info"
@@ -109,10 +99,17 @@ const AllQueries = () => {
                           </td>
                           <td>
                             <div className="d-flex gap-2">
-                              <a href="#">
+                              {/* "Reply" using mailto */}
+                              <a
+                                href={`mailto:${query.email}?subject=Re: ${query.subject}&body=Hi ${query.name},%0A%0A`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-secondary btn-sm"
+                              >
                                 <FaReply /> Reply
                               </a>
 
+                              {/* Delete query button */}
                               <Button
                                 variant="danger"
                                 size="sm"
@@ -144,7 +141,10 @@ const AllQueries = () => {
       <DeleteModal
         isOpen={showDeleteModal}
         handleClose={handleCloseDeleteModal}
-        handleDelete={handleConfirmDelete}
+        handleDelete={() => {
+          setQueries(queries.filter((q) => q._id !== queryToDelete._id));
+          handleCloseDeleteModal();
+        }}
       />
     </section>
   );

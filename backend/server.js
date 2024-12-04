@@ -16,6 +16,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
+      "http://localhost:3001",
       "https://dhruvermafz.vercel.app",
       "http://192.168.221.143:3000",
     ],

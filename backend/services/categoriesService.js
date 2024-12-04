@@ -3,47 +3,85 @@ const Category = require("../models/category");
 const categoriesService = {
   // Create a new category
   create: async (body) => {
-    const category = await Category.create(body);
-    return category.toJSON(); // Converts the Mongoose document to a plain JSON object
+    try {
+      const category = await Category.create(body);
+      return category.toJSON(); // Converts the Mongoose document to a plain JSON object
+    } catch (error) {
+      console.error("Error creating category:", error);
+      throw new Error("Error creating category");
+    }
   },
 
   // Find all categories
   findAll: async () => {
-    return await Category.find({});
+    try {
+      return await Category.find({});
+    } catch (error) {
+      console.error("Error fetching all categories:", error);
+      throw new Error("Error fetching categories");
+    }
   },
 
   // Find a category by ID
   findById: async (id) => {
-    return await Category.findById(id);
+    try {
+      return await Category.findById(id);
+    } catch (error) {
+      console.error(`Error fetching category by ID (${id}):`, error);
+      throw new Error("Error fetching category");
+    }
   },
 
   // Update a category by ID
   updateById: async (id, updateData) => {
-    const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    return updatedCategory ? updatedCategory.toJSON() : null;
+    try {
+      const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
+        new: true,
+      });
+      return updatedCategory ? updatedCategory.toJSON() : null;
+    } catch (error) {
+      console.error(`Error updating category by ID (${id}):`, error);
+      throw new Error("Error updating category");
+    }
   },
 
   // Delete a category by ID
   deleteById: async (id) => {
-    const deletedCategory = await Category.findByIdAndDelete(id);
-    return deletedCategory ? deletedCategory.toJSON() : null;
+    try {
+      const deletedCategory = await Category.findByIdAndDelete(id);
+      return deletedCategory ? deletedCategory.toJSON() : null;
+    } catch (error) {
+      console.error(`Error deleting category by ID (${id}):`, error);
+      throw new Error("Error deleting category");
+    }
   },
 
   // Find categories by parent category (useful for hierarchical structures)
   findByParentCategory: async (parentCategoryId) => {
-    return await Category.find({ parentCategory: parentCategoryId });
+    try {
+      return await Category.find({ parentCategory: parentCategoryId });
+    } catch (error) {
+      console.error(
+        `Error fetching categories by parent ID (${parentCategoryId}):`,
+        error
+      );
+      throw new Error("Error fetching categories by parent category");
+    }
   },
 
   // Deactivate a category (sets `isActive` to false)
   deactivateById: async (id) => {
-    const updatedCategory = await Category.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
-    return updatedCategory ? updatedCategory.toJSON() : null;
+    try {
+      const updatedCategory = await Category.findByIdAndUpdate(
+        id,
+        { isActive: false },
+        { new: true }
+      );
+      return updatedCategory ? updatedCategory.toJSON() : null;
+    } catch (error) {
+      console.error(`Error deactivating category by ID (${id}):`, error);
+      throw new Error("Error deactivating category");
+    }
   },
 };
 

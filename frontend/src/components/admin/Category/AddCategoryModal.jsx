@@ -30,7 +30,6 @@ const AddCategoryModal = ({ isOpen, onClose, onConfirm }) => {
         name,
         parentCategory: isParentCategory ? null : parentCategory,
         isActive: status,
-        isParent: isParentCategory,
       };
       const response = await axios.post(`${API_URL}/categories`, newCategory);
       onConfirm(response.data);

@@ -68,7 +68,7 @@ const categoriesController = {
   delete: async (req, res) => {
     const categoryId = req.params.id;
     try {
-      const result = await categoriesService.delete(categoryId);
+      const result = await categoriesService.deleteById(categoryId);
       if (result) {
         res.status(200).json({ message: "Category deleted successfully" });
       } else {

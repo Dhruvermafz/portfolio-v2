@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "./CreateBlog.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { Form, Button, Card, Alert, Image, Spinner } from "react-bootstrap";
 import useAuth from "../../../context/auth";
 import { API_URL } from "../../../config";
 import upload from "../../../assets/img/upload.png";
-
+import "./CreateBlog.css";
 const CreateBlog = () => {
   const user = useAuth();
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -18,7 +20,6 @@ const CreateBlog = () => {
   const [success, setSuccess] = useState("");
   const [categories, setCategories] = useState([]);
 
-  // Fetch categories on component mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -49,30 +50,6 @@ const CreateBlog = () => {
       setThumbnail(file);
       setThumbnailPreview(URL.createObjectURL(file));
     }
-  };
-
-  const handleMarkdownUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const text = await file.text(); // Read file content as text
-        setMarkdownContent(text);
-        setUseMarkdown(true); // Switch to Markdown mode
-      } catch (err) {
-        setError("Failed to read the Markdown file. Please try again.");
-        console.error(err);
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setBlogTitle("");
-    setBlogContent("");
-    setMarkdownContent("");
-    setSelectedCategories([]);
-    setThumbnail(null);
-    setThumbnailPreview(null);
-    setUseMarkdown(false);
   };
 
   const handleSubmit = async (e) => {
@@ -122,124 +99,119 @@ const CreateBlog = () => {
     }
   };
 
+  const resetForm = () => {
+    setBlogTitle("");
+    setBlogContent("");
+    setMarkdownContent("");
+    setSelectedCategories([]);
+    setThumbnail(null);
+    setThumbnailPreview(null);
+    setUseMarkdown(false);
+  };
+
   return (
-    <div className="col-lg-10" style={{ display: "contents" }}>
-      <div className="card content-box-card" style={{ display: "contents" }}>
-        <div className="card-body">
-          <form onSubmit={handleSubmit} className="create-blog-container">
-            <div className="main-content card">
-              <h6 className="card-title">Create New Blog</h6>
-              <div className="form-group">
-                <label htmlFor="blog-title" className="form-label">
-                  Blog Title *
-                </label>
-                <input
-                  type="text"
-                  id="blog-title"
-                  placeholder="Title"
-                  className="form-input"
-                  autoComplete="off"
-                  value={blogTitle}
-                  onChange={(e) => setBlogTitle(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Blog Category *</label>
-                <select
-                  className="form-select"
-                  multiple
-                  value={selectedCategories}
-                  onChange={handleCategoryChange}
-                  required
-                >
-                  {categories.length > 0 ? (
-                    categories.map((category) => (
-                      <option key={category._id} value={category.name}>
-                        {category.name}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>Loading categories...</option>
-                  )}
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Blog Content *</label>
-                {useMarkdown ? (
-                  <textarea
-                    className="form-textarea"
-                    value={markdownContent}
-                    readOnly
-                  />
-                ) : (
-                  <textarea
-                    className="form-textarea"
-                    placeholder="Write your blog content here..."
-                    value={blogContent}
-                    onChange={(e) => setBlogContent(e.target.value)}
+    <div className="col-lg-10">
+      <Card className="content-box-card">
+        <Card.Body>
+          <Form onSubmit={handleSubmit} className="create-blog-container">
+            <Card className="main-content">
+              <Card.Header>Create New Blog</Card.Header>
+              <Card.Body>
+                <Form.Group className="mb-3">
+                  <Form.Label>Blog Title *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Title"
+                    value={blogTitle}
+                    onChange={(e) => setBlogTitle(e.target.value)}
                     required
                   />
-                )}
-              </div>
-              <div className="form-group">
-                <label className="form-label">Or Upload Markdown File</label>
-                <input
-                  type="file"
-                  accept=".md"
-                  onChange={handleMarkdownUpload}
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => setUseMarkdown(!useMarkdown)}
-                className="toggle-btn"
-              >
-                {useMarkdown
-                  ? "Switch to Manual Input"
-                  : "Use Markdown Content"}
-              </button>
-            </div>
+                </Form.Group>
 
-            <div className="thumbnail-section card">
-              <h6 className="card-title">Add Blog Thumbnail</h6>
-              <div className="thumbnail-upload">
-                <label htmlFor="thumbnailsrc" className="file-container">
-                  <input
-                    type="file"
-                    id="thumbnailsrc"
-                    onChange={handleThumbnailChange}
-                    hidden
-                    className="file-input"
-                  />
-                  <span className="upload-icon">
-                    <img
-                      src={upload}
-                      alt="icon"
-                      className="upload-icon-image"
+                <Form.Group className="mb-3">
+                  <Form.Label>Blog Category *</Form.Label>
+                  <Form.Select
+                    multiple
+                    value={selectedCategories}
+                    onChange={handleCategoryChange}
+                    required
+                  >
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <option key={category._id} value={category.name}>
+                          {category.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Loading categories...</option>
+                    )}
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Blog Content *</Form.Label>
+                  {useMarkdown ? (
+                    <ReactQuill theme="snow" value={markdownContent} readOnly />
+                  ) : (
+                    <ReactQuill
+                      theme="snow"
+                      value={blogContent}
+                      onChange={setBlogContent}
                     />
-                    <span className="upload-text">Choose file</span>
-                  </span>
-                </label>
-                {thumbnailPreview && (
-                  <img
-                    src={thumbnailPreview}
-                    alt="Thumbnail Preview"
-                    className="thumbnail-preview"
-                  />
-                )}
-              </div>
+                  )}
+                </Form.Group>
 
-              {error && <div className="alert alert-danger">{error}</div>}
-              {success && <div className="alert alert-success">{success}</div>}
+                <Button
+                  variant="primary"
+                  onClick={() => setUseMarkdown(!useMarkdown)}
+                >
+                  {useMarkdown
+                    ? "Switch to Rich Text Editor"
+                    : "Switch to Markdown"}
+                </Button>
+              </Card.Body>
+            </Card>
 
-              <button type="submit" className="submit-btn">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+            <Card className="thumbnail-section mt-4">
+              <Card.Header>Add Blog Thumbnail</Card.Header>
+              <Card.Body>
+                <Form.Group className="thumbnail-upload">
+                  <Form.Label className="file-container">
+                    <Form.Control
+                      type="file"
+                      onChange={handleThumbnailChange}
+                      hidden
+                    />
+                    <span className="upload-icon">
+                      <Image
+                        src={upload}
+                        alt="icon"
+                        className="upload-icon-image"
+                      />
+                      <span className="upload-text">Choose file</span>
+                    </span>
+                  </Form.Label>
+                  {thumbnailPreview && (
+                    <Image
+                      src={thumbnailPreview}
+                      alt="Thumbnail Preview"
+                      className="thumbnail-preview mt-3"
+                      fluid
+                    />
+                  )}
+                </Form.Group>
+
+                {error && <Alert variant="danger">{error}</Alert>}
+                {success && <Alert variant="success">{success}</Alert>}
+
+                <Button type="submit" className="mt-3">
+                  Submit
+                </Button>
+              </Card.Body>
+            </Card>
+          </Form>
+        </Card.Body>
+      </Card>
     </div>
   );
 };
