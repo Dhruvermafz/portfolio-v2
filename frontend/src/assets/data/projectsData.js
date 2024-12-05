@@ -19,6 +19,9 @@ import indus3 from "../img/projects/indus-3.png";
 import codeshield_main from "../img/projects/codeshield_main.png";
 import codeshield_image1 from "../img/projects/codeshield_image1.png";
 import codeshield_image2 from "../img/projects/codeshield_image2.png";
+import teamoffice_1 from "../img/projects/teamoffice-1.png";
+import teamoffice_2 from "../img/projects/teamoffice-2.png";
+import teamoffice_3 from "../img/projects/teamoffice-3.png";
 // projectsData.js
 const projects = [
   {
@@ -106,46 +109,40 @@ const projects = [
   {
     id: "teamoffice",
     title: "Team Office",
-    client: "Chptronics Solutions",
-    services: "React.Js, Node.Js, MySQl, Docker",
+    client: "Chiptronics Solutions",
     website: "https://teamoffice.in",
     ghLink: "https://github.com/Dhruvermafz/teamoffice",
     overview:
-      "CodeShield is a security-focused application designed to store and manage passwords securely. Built with Next.js, TypeScript, and Firebase, the platform ensures that user credentials are encrypted and protected from unauthorized access.",
-    mainImage: codeshield_main,
-    images: [codeshield_image1, codeshield_image2],
+      "Team Office is an e-commerce platform designed for Chiptronics Solutions, showcasing their range of smart security and access control products including door locks, brackets, biometric attendance systems, and more. The platform emphasizes quality through BIS Certification and custom solutions tailored to diverse client requirements.",
+    services: ["React.js, Node.js, MySQL, Docker"],
+    mainImage: teamoffice_1,
+    images: [teamoffice_2, teamoffice_3],
     challenges: [
       {
-        title: "Password Encryption",
+        title: "E-commerce Platform Complexity",
         challenge:
-          "Ensuring the secure encryption and storage of user passwords.",
+          "Implementing a robust and scalable backend for managing high-volume data.",
         solution:
-          "Implemented strong encryption algorithms to secure passwords before storing them in Firebase.",
+          "Utilized MySQL for reliable database management and Docker for scalable deployment.",
       },
       {
-        title: "User Authentication",
+        title: "Real-time Synchronization",
         challenge:
-          "Providing a seamless yet secure authentication system for users.",
+          "Ensuring real-time updates across user interactions, including inventory changes.",
         solution:
-          "Integrated Firebase Authentication to handle user sign-ups, logins, and account management.",
+          "Developed APIs that synchronize product data and cart information seamlessly.",
       },
       {
-        title: "Real-Time Database Updates",
+        title: "Secure Transactions",
         challenge:
-          "Keeping password data up-to-date across multiple devices in real-time.",
+          "Protecting sensitive customer information and ensuring safe payments.",
         solution:
-          "Utilized Firebase's real-time database to ensure instant updates and synchronization across user sessions.",
+          "Incorporated best practices for securing payment gateways and user data storage.",
       },
     ],
     results:
-      "CodeShield effectively provides users with a secure and user-friendly way to store and manage passwords. Feedback has been positive, particularly around the ease of use and security features.",
-    tags: [
-      "Next.js",
-      "TypeScript",
-      "Firebase",
-      "Security",
-      "Password Management",
-    ],
+      "Team Office provides a user-friendly and secure shopping experience for both domestic and international clients. Customers have praised the platform's ease of use and seamless experience, which highlights high product visibility and efficient transaction management.",
+    tags: ["React.js", "Node.js", "MySQL", "Docker", "E-commerce"],
   },
 
   {
