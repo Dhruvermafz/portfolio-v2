@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import projects from "../../assets/data/projectsData";
 import Pagination from "../Pagination";
 import HireMeSlider from "../HireMeSlider";
-import Tags from "../Tags";
 
 const ProjectsCard = () => {
+  const projectsPerPage = 6; // Number of projects per page
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Calculate the projects to display for the current page
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const currentProjects = projects.slice(
+    startIndex,
+    startIndex + projectsPerPage
+  );
+
   return (
     <div className="col-xl-8">
       <div className="card content-box-card">
@@ -16,15 +29,14 @@ const ProjectsCard = () => {
                 Check Out My Latest <span>Projects</span>
               </h1>
               <p>
-                These are the projects I worked just for my learning or worked
-                in my organisation where I Designed and Developed them as Full
-                Stack Developer.
+                These are the projects I worked on for learning or in my
+                organization as a Full Stack Developer.
               </p>
             </div>
           </div>
           <div className="portfolio-area">
             <div className="row g-4 parent-container">
-              {projects.map((project) => (
+              {currentProjects.map((project) => (
                 <div className="col-lg-6" key={project.id}>
                   <div className="portfolio-item">
                     <div className="image">
@@ -59,7 +71,11 @@ const ProjectsCard = () => {
                         <p className="subtitle">{project.services}</p>
                       </div>
                       <div className="visite-btn">
-                        <a href={project.website} target="_blank">
+                        <a
+                          href={project.website}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           Visit Site
                           <svg
                             className="arrow-up"
@@ -87,9 +103,12 @@ const ProjectsCard = () => {
                 </div>
               ))}
             </div>
-            <Pagination />
+            <Pagination
+              totalPages={Math.ceil(projects.length / projectsPerPage)}
+              initialPage={currentPage - 1}
+              onPageChange={handlePageChange}
+            />
           </div>
-
           <HireMeSlider />
         </div>
       </div>

@@ -91,13 +91,16 @@ const ExperienceTimeline = () => {
           <Modal.Body>
             <div className="modal-content">
               <h4>Company: {selectedExperience.company}</h4>
+
               <p>Date Range: {selectedExperience.date}</p>
               <div className="rating mb-3">
                 {[...Array(5)].map((_, i) => (
                   <i key={i} className="fas fa-star"></i>
                 ))}
               </div>
-
+              <div class="details">
+                <p>{selectedExperience.description}</p>
+              </div>
               <div className="website">
                 <a
                   href={selectedExperience.website}

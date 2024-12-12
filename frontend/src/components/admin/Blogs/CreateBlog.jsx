@@ -62,21 +62,22 @@ const CreateBlog = () => {
       return;
     }
 
-    if (!blogTitle || !selectedCategories.length || !thumbnail) {
-      setError("All fields are required.");
-      return;
-    }
-
     const content = useMarkdown ? markdownContent : blogContent;
-    if (!content) {
-      setError("Blog content is required.");
+
+    if (
+      !blogTitle.trim() ||
+      !content.trim() ||
+      !selectedCategories.length ||
+      !thumbnail
+    ) {
+      setError("All fields are required.");
       return;
     }
 
     const formData = new FormData();
     formData.append("title", blogTitle);
-    formData.append("categories", JSON.stringify(selectedCategories));
     formData.append("content", content);
+    formData.append("categories", JSON.stringify(selectedCategories));
     formData.append("thumbnail", thumbnail);
     formData.append("userId", user.id);
 
@@ -127,25 +128,56 @@ const CreateBlog = () => {
                     required
                   />
                 </Form.Group>
-
                 <Form.Group className="mb-3">
-                  <Form.Label>Blog Category *</Form.Label>
-                  <Form.Select
-                    multiple
-                    value={selectedCategories}
-                    onChange={handleCategoryChange}
-                    required
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((category) => (
-                        <option key={category._id} value={category.name}>
-                          {category.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>Loading categories...</option>
-                    )}
-                  </Form.Select>
+                  <Form.Label>Blog Categories *</Form.Label>
+                  <div className="categories-container">
+                    {/* Display selected categories as tags */}
+                    {selectedCategories.map((category, index) => (
+                      <span key={index} className="category-tag">
+                        {category}
+                        <span
+                          className="delete-icon"
+                          onClick={() =>
+                            setSelectedCategories(
+                              selectedCategories.filter((_, i) => i !== index)
+                            )
+                          }
+                        >
+                          &times;
+                        </span>
+                      </span>
+                    ))}
+
+                    {/* Dropdown to select categories */}
+                    <Form.Select
+                      onChange={(e) => {
+                        const selectedValue = e.target.value;
+                        if (
+                          selectedValue &&
+                          !selectedCategories.includes(selectedValue)
+                        ) {
+                          setSelectedCategories([
+                            ...selectedCategories,
+                            selectedValue,
+                          ]);
+                        }
+                        e.target.value = ""; // Reset dropdown
+                      }}
+                    >
+                      <option value="" disabled>
+                        Select a category
+                      </option>
+                      {categories.length > 0 ? (
+                        categories.map((category) => (
+                          <option key={category._id} value={category.name}>
+                            {category.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled>Loading categories...</option>
+                      )}
+                    </Form.Select>
+                  </div>
                 </Form.Group>
 
                 <Form.Group className="mb-3">

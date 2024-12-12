@@ -12,7 +12,7 @@ const BlogDetailsPage = () => {
   useEffect(() => {
     const fetchBlogDetails = async () => {
       try {
-        const response = await axios.get(`${API_URL}/posts/${id}`);
+        const response = await axios.get(`${API_URL}/post/${id}`);
         const post = response.data; // Adjust based on API response
         setBlog(post);
       } catch (error) {
@@ -41,8 +41,11 @@ const BlogDetailsPage = () => {
     content = "No content available.",
     published,
     updated,
-    userId = "Unknown Author",
+    userId = {},
   } = blog;
+
+  // Extract user information
+  const authorName = userId.username || "Unknown Author";
 
   return (
     <div className="col-xl-8">
@@ -52,7 +55,7 @@ const BlogDetailsPage = () => {
             <ul className="list-unstyled article-tags">
               <li>Published: {new Date(published).toLocaleDateString()}</li>
               <li>Updated: {new Date(updated).toLocaleDateString()}</li>
-              <li>Author: {userId}</li>
+              <li>Author: {authorName}</li>
             </ul>
             <div className="article-details-text">
               <h3 className="main-title">{title}</h3>

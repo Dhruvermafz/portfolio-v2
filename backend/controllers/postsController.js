@@ -109,7 +109,12 @@ const createBlog = asyncHandler(async (req, res) => {
   if (!title || !content) {
     return res.status(400).json({ message: "Title and content are required." });
   }
-
+  if (!content) {
+    return res.status(400).json({ message: " content are required." });
+  }
+  if (!title) {
+    return res.status(400).json({ message: "Title  are required." });
+  }
   try {
     let images = [];
 
