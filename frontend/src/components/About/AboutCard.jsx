@@ -11,6 +11,7 @@ import {
 import projects from "../../assets/data/projectsData"; // Importing the projects
 import Achievement from "../Achievement/Achievement";
 import ExperienceTimeline from "../Experience/ExperienceTimeline";
+import "./about.css";
 const AboutCard = () => {
   // Calculate total experience
   const totalExperience = getTotalExperience();
@@ -18,6 +19,17 @@ const AboutCard = () => {
   // Function to count the number of projects
   const countProjects = () => {
     return projects.length;
+  };
+
+  // Function to count unique clients
+  const countClients = () => {
+    // Extract all client names from the projects data
+    const clientList = projects.map((project) => project.client);
+    // Remove duplicates by converting the array into a Set
+    const uniqueClients = new Set(clientList);
+    console.log(clientList);
+    // Return the number of unique clients
+    return uniqueClients.size;
   };
 
   return (
@@ -63,8 +75,9 @@ const AboutCard = () => {
                 <p className="subtitle">Projects Completed</p>
               </div>
               <div className="counter-item">
-                <h3 className="number">72+</h3>
-                <p className="subtitle">Happy Clients</p>
+                <h3 className="number">{countClients()}</h3>{" "}
+                {/* Displaying total unique clients */}
+                <p className="subtitle">Worked With Clients</p>
               </div>
             </div>
           </div>
@@ -72,6 +85,7 @@ const AboutCard = () => {
             <h2 className="main-common-title">
               Working with technologies ✨ Worldwide
             </h2>
+
             <div className="working-with-main">
               {expertiseAreas.map((expertise, index) => (
                 <div className="items" key={index}>
@@ -80,6 +94,18 @@ const AboutCard = () => {
               ))}
             </div>
           </div>
+          <h2 className="main-common-title">My Contributions</h2>
+          <div className="github-stats">
+            <img
+              src="https://github-readme-streak-stats.herokuapp.com/?user=Dhruvermafz"
+              alt="Dhruvermafz's GitHub Streak"
+            />
+            <img
+              src="https://github-readme-stats.vercel.app/api?username=Dhruvermafz&show_icons=true&count_private=true"
+              alt="Dhruvermafz's GitHub Stats"
+            />
+          </div>
+
           <ExperienceTimeline />
           <Achievement />
           <Certifications />

@@ -18,7 +18,11 @@ import CreateBlog from "../components/admin/Blogs/CreateBlog";
 import PrivateRoute from "./PrivateRoute";
 import BlogDetails from "../pages/BlogDetails";
 import ComingSoon from "../pages/ComingSoon";
-
+import Category from "../pages/Category";
+import Resume from "../pages/Resume";
+import CategoryDetail from "../pages/CategoryDetail";
+import AdminProjectList from "../pages/AdminProjectList";
+import CreateProject from "../components/admin/Projects/CreateProject";
 // Public routes array
 const publicRoutes = [
   { path: "/", element: <Home /> },
@@ -33,6 +37,8 @@ const publicRoutes = [
   { path: "/signup", element: <SignUp /> },
   { path: "*", element: <NotFound /> },
   { path: "/coming", element: <ComingSoon /> },
+  { path: "/categories", element: <Category /> },
+  { path: "/categories/:id", element: <CategoryDetail /> },
 ];
 
 // Admin routes array
@@ -42,6 +48,8 @@ const adminRoutes = [
   { path: "/admin/blogs/create", element: <CreateBlog /> },
   { path: "/admin/category", element: <AllCategory /> },
   { path: "/admin/contact", element: <AllQueries /> },
+  { path: "/projects-list", element: <AdminProjectList /> },
+  { path: "/project-add", element: <CreateProject /> },
 ];
 
 const Router = () => {
@@ -54,11 +62,7 @@ const Router = () => {
 
       {/* Map through adminRoutes and wrap them in PrivateRoute */}
       {adminRoutes.map((route) => (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={<PrivateRoute>{route.element}</PrivateRoute>}
-        />
+        <Route key={route.path} path={route.path} element={route.element} />
       ))}
     </Routes>
   );

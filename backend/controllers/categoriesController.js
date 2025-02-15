@@ -27,9 +27,15 @@ const categoriesController = {
   },
 
   findCategory: async (req, res) => {
-    const categoryId = req.params.id;
+    const { id, name } = req.params; // Extract id and name from request
     try {
-      const result = await categoriesService.findById(categoryId);
+      let result;
+      if (id) {
+        result = await categoriesService.findById(id);
+      } else if (name) {
+        result = await Category.findOne({ name });
+      }
+
       if (result) {
         res.status(200).json(result);
       } else {

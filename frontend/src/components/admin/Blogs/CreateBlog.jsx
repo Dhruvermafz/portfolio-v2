@@ -64,12 +64,16 @@ const CreateBlog = () => {
 
     const content = useMarkdown ? markdownContent : blogContent;
 
-    if (
-      !blogTitle.trim() ||
-      !content.trim() ||
-      !selectedCategories.length ||
-      !thumbnail
-    ) {
+    const trimmedTitle = blogTitle.trim();
+    const trimmedContent = content.trim();
+
+    if (!trimmedTitle || !trimmedContent) {
+      console.log("Title or content is empty after trimming.");
+      setError("Title and content are required.");
+      return;
+    }
+
+    if (!selectedCategories.length || !thumbnail) {
       setError("All fields are required.");
       return;
     }
@@ -79,27 +83,36 @@ const CreateBlog = () => {
     formData.append("content", content);
     formData.append("categories", JSON.stringify(selectedCategories));
     formData.append("thumbnail", thumbnail);
-    formData.append("userId", user.id);
+    formData.append("userId", user.userId || "");
+
+    // Debug FormData
+    formData.forEach((value, key) => {
+      console.log(`${key}:`, value);
+    });
 
     try {
+      const token = localStorage.getItem("authToken");
+      axios
+        .post("http://localhost:8000/post", formData)
+        .then((response) => console.log(response))
+        .catch((error) => console.error("Error:", error.response || error));
+
       const response = await axios.post(`${API_URL}/post`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       setSuccess("Blog created successfully!");
       resetForm();
-      console.log(response.data);
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "An error occurred while creating the blog. Please try again."
+          "An error occurred while creating the blog."
       );
       console.error(err);
     }
   };
-
   const resetForm = () => {
     setBlogTitle("");
     setBlogContent("");

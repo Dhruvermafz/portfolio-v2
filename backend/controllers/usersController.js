@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("../middlewares/jwt"); // Update the path as needed
 const User = require("../models/user");
 
+// Register a new user
 const registerUser = async (req, res) => {
   const { username, email, password, photo } = req.body;
 
@@ -31,6 +32,7 @@ const registerUser = async (req, res) => {
   }
 };
 
+// Login a user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -42,11 +44,12 @@ const loginUser = async (req, res) => {
     if (!isPasswordCorrect)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.createToken({ userId: user._id, role: user.username });
+    const token = jwt.createToken({ userId: user._id, role: user.role });
     res.status(200).json({
       id: user._id,
       username: user.username,
       email: user.email,
+      role: user.role, // Include role in the response
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       token,
@@ -57,6 +60,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+// Get a single user by ID
 const getUserById = async (req, res) => {
   const { id } = req.params;
 
@@ -64,23 +68,43 @@ const getUserById = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json(user);
+    res.status(200).json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role, // Include role in the response
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      photo: user.photo,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to retrieve user" });
   }
 };
 
+// Get all users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.status(200).json(users);
+    const formattedUsers = users.map((user) => ({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role, // Include role in the response
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      photo: user.photo,
+    }));
+
+    res.status(200).json(formattedUsers);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to retrieve users" });
   }
 };
 
+// Delete a user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   const token = req.headers.authorization?.split(" ")[1]; // Assuming the token is sent in the Authorization header
@@ -91,7 +115,7 @@ const deleteUser = async (req, res) => {
       return res.status(decoded.error.code).json(decoded.error.message);
 
     const requestingUser = await User.findById(decoded.userId);
-    if (!isAdmin(requestingUser))
+    if (requestingUser.role !== "admin")
       return res.status(403).json({ message: "Forbidden" });
 
     const user = await User.findByIdAndDelete(id);
@@ -104,9 +128,10 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Update a user
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { username, email, password, photo } = req.body;
+  const { username, email, password, photo, role } = req.body;
   const token = req.headers.authorization?.split(" ")[1]; // Assuming the token is sent in the Authorization header
 
   try {
@@ -115,7 +140,7 @@ const updateUser = async (req, res) => {
       return res.status(decoded.error.code).json(decoded.error.message);
 
     const requestingUser = await User.findById(decoded.userId);
-    if (!isAdmin(requestingUser))
+    if (requestingUser.role !== "admin")
       return res.status(403).json({ message: "Forbidden" });
 
     // Optionally hash the new password if it's being updated
@@ -123,7 +148,7 @@ const updateUser = async (req, res) => {
       ? await bcrypt.hash(password, 10)
       : undefined;
 
-    const updateFields = { username, email, photo };
+    const updateFields = { username, email, photo, role };
     if (hashedPassword) updateFields.password = hashedPassword;
 
     const updatedUser = await User.findByIdAndUpdate(id, updateFields, {
@@ -132,7 +157,15 @@ const updateUser = async (req, res) => {
     if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
 
-    res.status(200).json(updatedUser);
+    res.status(200).json({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      role: updatedUser.role, // Include role in the response
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+      photo: updatedUser.photo,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to update user" });

@@ -6,10 +6,23 @@ import {
   FaPhone,
   FaSignOutAlt,
 } from "react-icons/fa"; // Importing icons
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./AppBar.css";
 
 const AppBar = () => {
+  const navigate = useNavigate(); // Hook for navigation
+
+  // Logout function
+  const handleLogout = () => {
+    // Remove the token from localStorage/sessionStorage
+    localStorage.removeItem("authToken"); // or sessionStorage.removeItem("token");
+
+    // Optionally, clear any other user-related state (e.g., Redux or Context)
+
+    // Redirect to login or home page
+    navigate("/login"); // Update to the path of your login page
+  };
+
   return (
     <div className="navbar-container">
       <h3 className="card-title">Welcome Boss</h3>
@@ -55,7 +68,11 @@ const AppBar = () => {
             </h3>
           </div>
         </div>
-        <div className="card-item">
+        <div
+          className="card-item"
+          onClick={handleLogout}
+          style={{ cursor: "pointer" }}
+        >
           <div className="icon">
             <FaSignOutAlt />
           </div>

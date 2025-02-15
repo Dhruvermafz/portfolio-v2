@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios"; // Import axios if using it
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../config";
+
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -8,8 +11,6 @@ const ContactForm = () => {
     subject: "",
     message: "",
   });
-
-  const [responseMessage, setResponseMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +26,9 @@ const ContactForm = () => {
     try {
       const response = await axios.post(`${API_URL}/contact/`, formData);
       if (response.status === 200) {
-        setResponseMessage("Your message has been sent successfully!");
+        toast.success("Your message has been sent successfully!", {
+          position: "top-right",
+        });
         setFormData({
           name: "",
           email: "",
@@ -33,16 +36,21 @@ const ContactForm = () => {
           message: "",
         });
       } else {
-        setResponseMessage("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.", {
+          position: "top-right",
+        });
       }
     } catch (error) {
-      setResponseMessage("Error: " + error.message);
+      toast.error("Error: " + error.message, {
+        position: "top-right",
+      });
       console.log(error.message);
     }
   };
 
   return (
     <div className="col-xl-8">
+      <ToastContainer />
       <div className="card content-box-card">
         <div className="card-body portfolio-card contact-card">
           <div className="top-info">
@@ -52,8 +60,8 @@ const ContactForm = () => {
               </h1>
               <p>
                 I'm here to help if you're searching for a Full Stack Developer
-                to bring your idea to life or a software enginner to be on your
-                valuable organisation.
+                to bring your idea to life or a software engineer to be on your
+                valuable organization.
               </p>
             </div>
           </div>
@@ -148,7 +156,6 @@ const ContactForm = () => {
                     </div>
                   </div>
                 </form>
-                <p className="ajax-response mb-0">{responseMessage}</p>
               </div>
             </div>
             <div className="contact-map-area">

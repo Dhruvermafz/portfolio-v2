@@ -26,7 +26,9 @@ const Tags = ({ tags = [] }) => {
         <ul className="list-unstyled">
           {tags.map((tag, index) => (
             <li key={index}>
-              <a href={`/category/${tag}`}>{tag}</a>
+              <a className="fab" href={`/category/${tag}`}>
+                {tag}
+              </a>
             </li>
           ))}
         </ul>

@@ -8,10 +8,10 @@ export const workExperiences = [
     website: "https://pickyvibe.com/",
     date: "July 2024 - Present",
     icon: pickyvibe,
-    company: "PickVibe LLP",
-    position: "Full Stack Developer Intern",
+    company: "PickyVibe LLP",
+    position: "Full Stack Developer",
     description:
-      "Developed and maintained advanced infrastructure tools for Travel Agency using React.js, NodeJs ensuring industry-standard compliance. Skilled in system development, AWS, GraphQl, and problem-solving",
+      "Developed and maintained advanced infrastructure tools for Travel Agency using React.js, NodeJs ensuring industry-standard compliance. Skilled in system development, AWS, GraphQl, and problem-solving.",
   },
   {
     id: "CodeClause",
@@ -31,16 +31,34 @@ export const getTotalExperience = () => {
   let totalMonths = 0;
 
   workExperiences.forEach((exp) => {
-    const startDate = new Date(exp.date.split(" - ")[0]);
+    const [startMonth, startYear] = exp.date
+      .split(" - ")[0]
+      .split(" ")
+      .map((item, index) =>
+        index === 0 ? new Date(`${item} 1`).getMonth() : parseInt(item)
+      );
+    const startDate = new Date(startYear, startMonth, 1);
+
     const endDate = exp.date.includes("Present")
       ? now
-      : new Date(exp.date.split(" - ")[1]);
+      : (() => {
+          const [endMonth, endYear] = exp.date
+            .split(" - ")[1]
+            .split(" ")
+            .map((item, index) =>
+              index === 0 ? new Date(`${item} 1`).getMonth() : parseInt(item)
+            );
+          return new Date(endYear, endMonth, 1);
+        })();
+
     const months =
       (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-      endDate.getMonth() -
-      startDate.getMonth();
+      (endDate.getMonth() - startDate.getMonth());
     totalMonths += months;
   });
 
-  return (totalMonths / 12).toFixed(1); // Return total years with 1 decimal place
+  // Convert months to years and round to 1 decimal place
+  const totalYears = totalMonths / 12;
+  console.log(totalYears);
+  return totalYears.toFixed(1); // Ensure 1 decimal place
 };

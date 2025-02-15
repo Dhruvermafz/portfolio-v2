@@ -7,7 +7,8 @@ const usersRoute = require("./router/usersRoute");
 const categoryRoute = require("./router/categoryRoute");
 const postsRoute = require("./router/postsRoute");
 const contactRoute = require("./router/contactRouter");
-
+const projectRoute = require("./router/projectRoute");
+const achivementRoute = require("./router/achivementRoute");
 const connectDB = require("./database/connectDb");
 
 const app = express();
@@ -30,6 +31,8 @@ app.use("/user", usersRoute);
 app.use("/categories", categoryRoute);
 app.use("/post", postsRoute);
 app.use("/contact", contactRoute);
+app.use("/projects", projectRoute);
+app.use("/achievements", achivementRoute);
 // Define the port
 const port = process.env.API_PORT || 8000;
 

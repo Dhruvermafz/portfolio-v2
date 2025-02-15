@@ -15,7 +15,6 @@ const Home = () => {
           <Projects />
 
           <TechnologiesIWorked />
-     
         </div>
       </div>
     </section>
