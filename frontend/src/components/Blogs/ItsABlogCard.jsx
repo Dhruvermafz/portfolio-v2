@@ -3,20 +3,19 @@ import { Link } from "react-router-dom";
 import { BLOG_API_URL } from "../../config";
 const ItsABlogCard = () => {
   const [blogs, setBlogs] = useState([]);
+  console.log("Fetching from:", `${BLOG_API_URL}/posts?trial123`);
 
   useEffect(() => {
-    fetch(`${BLOG_API_URL}/api/posts?trial123`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched data:", data); // Log the entire response
-
-        // Access the array of blog posts from the 'data' field
-        if (data && Array.isArray(data.data)) {
-          setBlogs(data.data);
-        } else {
-          console.error("Unexpected response format:", data);
-        }
+    fetch(`${BLOG_API_URL}/posts?trial123`)
+      .then((response) => {
+        console.log("Response status:", response.status);
+        return response.text();
       })
+      .then((text) => {
+        console.log("Raw response:", text);
+        return JSON.parse(text); // This will throw an error if it's HTML
+      })
+      .then((data) => setBlogs(data.data))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
 

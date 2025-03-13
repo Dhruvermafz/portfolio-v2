@@ -28,7 +28,7 @@ export const workExperiences = [
     company: "Rocklime Media",
     position: "Full Stack Developer",
     description:
-      "Developed dashboards and website with inventory and quotations system using different technologies.",
+      "Developed dashboards and website with inventory and quotations system using different technologies. Updated websites and refactured old written codebases with more code complexity.",
   },
   {
     id: "Pickyvibe",
