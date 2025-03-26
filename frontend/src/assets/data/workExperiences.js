@@ -23,7 +23,7 @@ export const workExperiences = [
   {
     id: "Rocklime",
     website: "https://rocklime.com",
-    date: "Jan 2025 - Present",
+    date: "Feb 2025 - Present",
     icon: rocklime,
     company: "Rocklime Media",
     position: "Full Stack Developer",
@@ -33,7 +33,7 @@ export const workExperiences = [
   {
     id: "Pickyvibe",
     website: "https://pickyvibe.com/",
-    date: "Jul 2024 - Jan 2025",
+    date: "Jul 2024 - Feb 2025",
     icon: pickyvibe,
     company: "PickyVibe LLP",
     position: "Full Stack Developer Intern",
@@ -64,7 +64,7 @@ export const getTotalExperience = () => {
     // Start date parsing
     const [startMonthAbbr, startYearRaw] = dateRange[0].split(" ");
     const startMonth = monthMap[startMonthAbbr]; // Convert abbreviation to month index
-    const startYear = parseInt(startYearRaw);
+    const startYear = parseInt(startYearRaw, 10);
 
     if (isNaN(startYear) || startMonth === undefined) {
       console.error(`Invalid start date: ${exp.date}`);
@@ -75,10 +75,10 @@ export const getTotalExperience = () => {
 
     // End date parsing
     let endDate = now; // Default to "Present"
-    if (dateRange[1] !== "Present") {
+    if (dateRange[1] && dateRange[1].trim().toLowerCase() !== "present") {
       const [endMonthAbbr, endYearRaw] = dateRange[1].split(" ");
       const endMonth = monthMap[endMonthAbbr];
-      const endYear = parseInt(endYearRaw);
+      const endYear = parseInt(endYearRaw, 10);
 
       if (!isNaN(endYear) && endMonth !== undefined) {
         endDate = new Date(endYear, endMonth, 1);
@@ -92,11 +92,11 @@ export const getTotalExperience = () => {
       (endDate.getFullYear() - startDate.getFullYear()) * 12 +
       (endDate.getMonth() - startDate.getMonth());
 
-    totalMonths += months;
+    totalMonths += Math.max(0, months); // Ensure no negative values
   });
 
   // Convert months to years (1 decimal place)
-  const totalYears = totalMonths / 12;
-  console.log(`Total Experience: ${totalYears.toFixed(1)} years`);
-  return totalYears.toFixed(1);
+  const totalYears = (totalMonths / 12).toFixed(1);
+  console.log(`Total Experience: ${totalYears} years`);
+  return totalYears;
 };

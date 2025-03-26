@@ -5,6 +5,7 @@ import {
   FaTags,
   FaPhone,
   FaSignOutAlt,
+  FaRProject,
 } from "react-icons/fa"; // Importing icons
 import { Link, useNavigate } from "react-router-dom";
 import "./AppBar.css";
@@ -30,11 +31,11 @@ const AppBar = () => {
         {/* Each card represents a link */}
         <div className="card-item">
           <div className="icon">
-            <FaTachometerAlt />
+            <FaRProject />
           </div>
           <div className="text">
             <h3 className="title">
-              <Link to="/admin">Admin Dashboard</Link>
+              <Link to="/projects-list">Projects</Link>
             </h3>
           </div>
         </div>
