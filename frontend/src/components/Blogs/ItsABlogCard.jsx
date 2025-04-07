@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import { BLOG_API_URL } from "../../config";
+
 const ItsABlogCard = () => {
   const [blogs, setBlogs] = useState([]);
-  console.log("Fetching from:", `${BLOG_API_URL}/posts?trial123`);
 
   useEffect(() => {
-    fetch(`${BLOG_API_URL}/posts?trial123`)
+    axios
+      .get(`${BLOG_API_URL}/posts?trial123`)
       .then((response) => {
-        console.log("Response status:", response.status);
-        return response.text();
+        setBlogs(response.data.data);
       })
-      .then((text) => {
-        console.log("Raw response:", text);
-        return JSON.parse(text); // This will throw an error if it's HTML
-      })
-      .then((data) => setBlogs(data.data))
-      .catch((error) => console.error("Error fetching data:", error));
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   if (!blogs.length) {
@@ -29,12 +27,14 @@ const ItsABlogCard = () => {
         <div key={blog._id} className="col-xl-6 col-lg-4 col-md-6">
           <div className="article-publications-item">
             <div className="text">
-              <Link to={`/blogsOfItsABlog/${blog._id}`}>
-                <a className="title">{blog.title}</a>
+              <Link to={`/blogsOfItsABlog/${blog._id}`} className="title">
+                {blog.title}
               </Link>
 
-              <ul className="list-unstyled">
-                <li>{new Date(blog.createdAt).toLocaleDateString()}</li>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                <li style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {new Date(blog.createdAt).toLocaleDateString()}
+                </li>
               </ul>
             </div>
           </div>

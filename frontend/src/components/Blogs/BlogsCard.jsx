@@ -54,9 +54,17 @@ const BlogsCard = () => {
                 <a href={`/blogs/${_id}`} className="title">
                   {title}
                 </a>
-                <ul className="list-unstyled">
-                  <li>{readingTime} min read</li>
-                  <li>{formattedDate}</li>
+                <ul
+                  style={{ listStyle: "none", padding: 0, margin: 0 }}
+                  className="list-unstyled"
+                >
+                  <li style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                    {readingTime} min read
+                  </li>
+
+                  <li style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                    {formattedDate}
+                  </li>
                 </ul>
               </div>
             </div>

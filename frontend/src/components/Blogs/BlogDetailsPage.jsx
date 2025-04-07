@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import ItsABlogCommetBox from "./ItsABlogCommetBox";
 import { API_URL } from "../../config";
-
+import "./blogdetail.css";
 const BlogDetailsPage = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
