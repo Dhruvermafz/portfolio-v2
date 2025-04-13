@@ -1,4 +1,6 @@
 const Category = require("../models/category");
+const Post = require("../models/blogPost");
+const Project = require("../models/project");
 
 const categoriesService = {
   // Create a new category
@@ -81,6 +83,20 @@ const categoriesService = {
     } catch (error) {
       console.error(`Error deactivating category by ID (${id}):`, error);
       throw new Error("Error deactivating category");
+    }
+  },
+
+  getItemsByCategory: async (categoryId) => {
+    try {
+      const [posts, projects] = await Promise.all([
+        Post.find({ category: categoryId }),
+        Project.find({ category: categoryId }),
+      ]);
+
+      return [...posts, ...projects]; // Combine both
+    } catch (error) {
+      console.error("Error fetching posts/projects by category:", error);
+      throw new Error("Error fetching items by category");
     }
   },
 };

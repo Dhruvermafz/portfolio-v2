@@ -5,7 +5,7 @@ const CategoryItem = ({ category }) => {
     <div className="col-md-3 col-sm-6 col-6">
       <div className="services-item text-center">
         <div className="text">
-          <Link to={`/categories/${category.name}`}>
+          <Link to={`/categories/${category._id}`}>
             <h3 className="title">{category.name}</h3>
           </Link>
         </div>

@@ -84,6 +84,21 @@ const categoriesController = {
       res.status(500).json({ message: "Server error", error });
     }
   },
+  findByIdWithItems: async (idOrSlug) => {
+    try {
+      const category = await categoriesService.findById(idOrSlug);
+      if (!category) return null;
+
+      const items = await getItemsByCategory(category._id);
+      return {
+        ...category.toObject(), // convert Mongoose doc to plain object
+        items,
+      };
+    } catch (error) {
+      console.error(`Error fetching category with items (${idOrSlug}):`, error);
+      throw new Error("Error fetching category with items");
+    }
+  },
 };
 
 module.exports = categoriesController;
