@@ -55,6 +55,8 @@ export const workExperiences = [
 // Function to calculate total experience
 export const getTotalExperience = () => {
   const now = new Date();
+  now.setMonth(now.getMonth() + 1); // Include current month in experience
+
   let totalMonths = 0;
 
   workExperiences.forEach((exp) => {
@@ -63,7 +65,7 @@ export const getTotalExperience = () => {
 
     // Start date parsing
     const [startMonthAbbr, startYearRaw] = dateRange[0].split(" ");
-    const startMonth = monthMap[startMonthAbbr]; // Convert abbreviation to month index
+    const startMonth = monthMap[startMonthAbbr];
     const startYear = parseInt(startYearRaw, 10);
 
     if (isNaN(startYear) || startMonth === undefined) {
@@ -74,7 +76,7 @@ export const getTotalExperience = () => {
     const startDate = new Date(startYear, startMonth, 1);
 
     // End date parsing
-    let endDate = now; // Default to "Present"
+    let endDate = now;
     if (dateRange[1] && dateRange[1].trim().toLowerCase() !== "present") {
       const [endMonthAbbr, endYearRaw] = dateRange[1].split(" ");
       const endMonth = monthMap[endMonthAbbr];
@@ -82,20 +84,19 @@ export const getTotalExperience = () => {
 
       if (!isNaN(endYear) && endMonth !== undefined) {
         endDate = new Date(endYear, endMonth, 1);
+        endDate.setMonth(endDate.getMonth() + 1); // Include end month
       } else {
         console.error(`Invalid end date: ${exp.date}`);
       }
     }
 
-    // Calculate months of experience
     const months =
       (endDate.getFullYear() - startDate.getFullYear()) * 12 +
       (endDate.getMonth() - startDate.getMonth());
 
-    totalMonths += Math.max(0, months); // Ensure no negative values
+    totalMonths += Math.max(0, months);
   });
 
-  // Convert months to years (1 decimal place)
   const totalYears = (totalMonths / 12).toFixed(1);
   console.log(`Total Experience: ${totalYears} years`);
   return totalYears;
