@@ -9,3 +9,6 @@
 :root {
   --tw-text-opacity: 1;
 }
+li {
+  list-style: none;
+}

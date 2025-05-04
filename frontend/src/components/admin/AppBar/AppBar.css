@@ -1,9 +1,0 @@
-/* Wrapper to center AppBar */
-.main-wrapper {
-  height: auto;
-
-  display: content;
-  justify-content: center;
-  background-color: #222;
-  padding: 10px 0;
-}

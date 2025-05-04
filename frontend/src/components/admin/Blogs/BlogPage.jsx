@@ -1,93 +1,82 @@
-import React from "react";
-import Pagination from "../../Pagination";
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Form, Button, Pagination } from "react-bootstrap";
+import axios from "axios";
 import { Link } from "react-router-dom";
-import AppBar from "../AppBar/Appbar";
-import BlogsCard from "../../Blogs/BlogsCard";
 import AdminBlogCard from "./AdminBlogCard";
-const BlogPage = () => {
-  // Handler for the search input
-  const handleSearchChange = (event) => {
-    const searchQuery = event.target.value;
-    // Implement search logic here
-    console.log(searchQuery);
-  };
+import { API_URL } from "../../../config";
 
-  // Handler for "Add Blog" button click
+const BlogPage = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 6;
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/post`);
+        setBlogs(res.data.docs || []);
+      } catch (err) {
+        console.error("Failed to fetch blogs:", err);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
+  const filteredBlogs = blogs.filter((blog) =>
+    blog.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
+  const paginatedBlogs = filteredBlogs.slice(
+    (currentPage - 1) * blogsPerPage,
+    currentPage * blogsPerPage
+  );
 
   return (
-    <section className="content-box-area mt-4">
-      <div className="container">
-        <div className="row g-4">
-          <div className="col-xl-12">
-            <div className="card content-box-card">
-              <div className="card-body portfolio-card">
-                <div className="top-info d-flex justify-content-between align-items-center">
-                  <div className="text">
-                    <h1 className="main-title">Blogs Manage</h1>
-                    <p>Manage the blogs.</p>
-                  </div>
-                  <div className="search-and-add d-flex">
-                    <a href="#" className="d-block w-100">
-                      <div className="awards-item">
-                        <input
-                          type="text"
-                          className="form-control me-2"
-                          placeholder="Search blogs..."
-                          onChange={handleSearchChange}
-                        />
-                      </div>
-                    </a>
-                    <div className="project-btn">
-                      <Link to="/admin/blogs/create">
-                        <button
-                          className="btn b-outline btn-secondary-outline"
-                          style={{
-                            backgroundColor: "rgba(118, 212, 102, 0.2)", // Corrected inline style
-                            color:
-                              "rgba(118, 212, 102, var(--tw-text-opacity))", // Moved to inline style
-                          }}
-                        >
-                          <span>
-                            Add Blog
-                            <svg
-                              className="arrow-up"
-                              width="14"
-                              height="15"
-                              viewBox="0 0 14 15"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M9.91634 4.5835L4.08301 10.4168"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M4.66699 4.5835H9.91699V9.8335"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <div className="article-publications article-area">
-                  <div className="article-publications-main">
-                    <div className="row">
-                      <AdminBlogCard />
-                    </div>
-                  </div>
-                </div>
-                <Pagination />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <Container>
+      <Row className="mb-4 align-items-center">
+        <Col md={6}>
+          <h1 className="main-title">Blogs Manage</h1>
+          <p>Manage the blogs.</p>
+        </Col>
+        <Col
+          md={6}
+          className="text-end d-flex justify-content-end align-items-center gap-2"
+        >
+          <Form.Control
+            type="text"
+            placeholder="Search blogs..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-50"
+          />
+          <Link to="/admin/blogs/create">
+            <Button variant="success">+ Add Blog</Button>
+          </Link>
+        </Col>
+      </Row>
+
+      <Row>
+        {paginatedBlogs.map((blog) => (
+          <AdminBlogCard key={blog._id} post={blog} />
+        ))}
+      </Row>
+
+      {totalPages > 1 && (
+        <Pagination className="justify-content-center mt-4">
+          {[...Array(totalPages).keys()].map((page) => (
+            <Pagination.Item
+              key={page + 1}
+              active={page + 1 === currentPage}
+              onClick={() => setCurrentPage(page + 1)}
+            >
+              {page + 1}
+            </Pagination.Item>
+          ))}
+        </Pagination>
+      )}
+    </Container>
   );
 };
 

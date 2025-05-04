@@ -1,8 +1,8 @@
 {
-  "short_name": "Dhruv Verma Portfolio",
-  "name": "Dhruv Verma Portfolio",
+  "short_name": "Dhruv Verma - Software Engineer",
+  "name": "Dhruv Verma - Software Engineer",
   "author": "Dhruv Verma",
-  "version": "1.9",
+  "version": "2.0",
   "description": "Full Stack Developer - Software Enginner",
   "icons": [
     {
@@ -22,7 +22,7 @@
   "background_color": "#ffffff",
   "developer": {
     "name": "Dhruv Verma",
-    "url": "https://dhruvermafz.vercel.app/"
+    "url": "https://dhruvermafz.in/"
   },
   "manifest_version": 3
 }

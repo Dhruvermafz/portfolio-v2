@@ -23,7 +23,8 @@ import Resume from "../pages/Resume";
 import CategoryDetail from "../pages/CategoryDetail";
 import AdminProjectList from "../pages/AdminProjectList";
 import CreateProject from "../components/admin/Projects/CreateProject";
-// Public routes array
+
+// Public routes
 const publicRoutes = [
   { path: "/", element: <Home /> },
   { path: "/about", element: <About /> },
@@ -41,7 +42,7 @@ const publicRoutes = [
   { path: "/categories/:id", element: <CategoryDetail /> },
 ];
 
-// Admin routes array
+// Admin routes
 const adminRoutes = [
   { path: "/admin", element: <Admin /> },
   { path: "/admin/blogs", element: <BlogPage /> },
@@ -55,14 +56,18 @@ const adminRoutes = [
 const Router = () => {
   return (
     <Routes>
-      {/* Map through publicRoutes and create Route components */}
+      {/* Public routes */}
       {publicRoutes.map((route) => (
         <Route key={route.path} path={route.path} element={route.element} />
       ))}
 
-      {/* Map through adminRoutes and wrap them in PrivateRoute */}
+      {/* Admin routes inside PrivateRoute */}
       {adminRoutes.map((route) => (
-        <Route key={route.path} path={route.path} element={route.element} />
+        <Route
+          key={route.path}
+          path={route.path}
+          element={<PrivateRoute>{route.element}</PrivateRoute>}
+        />
       ))}
     </Routes>
   );

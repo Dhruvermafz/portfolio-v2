@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import AppBar from "../components/admin/AppBar/Appbar";
 import PopularCategories from "../components/admin/Dashboard/PopularCategories";
 import ProgressCard from "../components/admin/Dashboard/ProgressCard";
 import LatestBlogs from "../components/admin/Dashboard/LatestBlogs";

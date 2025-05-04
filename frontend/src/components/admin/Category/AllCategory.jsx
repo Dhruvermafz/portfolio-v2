@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DeleteModal from "./DeleteModal";
 import AddCategoryModal from "./AddCategoryModal";
-import EditCategoryModal from "./EditCategoryModal"; // Import EditCategoryModal
-import { Link } from "react-router-dom";
-import { Button, Table } from "react-bootstrap";
-import AppBar from "../AppBar/Appbar";
+import EditCategoryModal from "./EditCategoryModal";
+import { Button, Card, Row, Col, Form } from "react-bootstrap";
 import { API_URL } from "../../../config";
 
 const AllCategory = () => {
@@ -15,7 +13,6 @@ const AllCategory = () => {
   const [isEditCategoryModalOpen, setEditCategoryModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -28,14 +25,13 @@ const AllCategory = () => {
     fetchCategories();
   }, []);
 
-  // Handle status change for a category
   const handleStatusChange = async (categoryId, currentStatus) => {
     try {
       await axios.patch(`${API_URL}/categories/${categoryId}`, {
         isActive: !currentStatus,
       });
-      setCategories((prevCategories) =>
-        prevCategories.map((cat) =>
+      setCategories((prev) =>
+        prev.map((cat) =>
           cat._id === categoryId ? { ...cat, isActive: !cat.isActive } : cat
         )
       );
@@ -44,7 +40,6 @@ const AllCategory = () => {
     }
   };
 
-  // Handle delete category
   const handleDeleteClick = (category) => {
     setSelectedCategory(category);
     setDeleteModalOpen(true);
@@ -53,8 +48,8 @@ const AllCategory = () => {
   const handleDeleteConfirm = async () => {
     try {
       await axios.delete(`${API_URL}/categories/${selectedCategory._id}`);
-      setCategories((prevCategories) =>
-        prevCategories.filter((cat) => cat._id !== selectedCategory._id)
+      setCategories((prev) =>
+        prev.filter((cat) => cat._id !== selectedCategory._id)
       );
       setDeleteModalOpen(false);
     } catch (error) {
@@ -62,7 +57,6 @@ const AllCategory = () => {
     }
   };
 
-  // Handle add category
   const handleAddCategory = async (newCategory) => {
     try {
       const response = await axios.post(`${API_URL}/categories`, newCategory);
@@ -73,15 +67,14 @@ const AllCategory = () => {
     }
   };
 
-  // Handle edit category
   const handleEditClick = (category) => {
     setSelectedCategory(category);
     setEditCategoryModalOpen(true);
   };
 
   const handleEditConfirm = (updatedCategory) => {
-    setCategories((prevCategories) =>
-      prevCategories.map((cat) =>
+    setCategories((prev) =>
+      prev.map((cat) =>
         cat._id === updatedCategory._id ? updatedCategory : cat
       )
     );
@@ -89,84 +82,64 @@ const AllCategory = () => {
   };
 
   return (
-    <>
-      <section className="mt-4">
-        <div className="container">
-          <div
-            className="row g-4"
-            style={{ width: "100%", marginLeft: "auto" }}
+    <section className="mt-4">
+      <div className="container">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="h4">Category List</h1>
+            <p>All Categories Here</p>
+          </div>
+          <Button
+            variant="primary"
+            onClick={() => setAddCategoryModalOpen(true)}
           >
-            <div className="col-xl-12">
-              <div className="card">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                      <h1 className="h4">Category List</h1>
-                      <p>All Categories Here</p>
-                    </div>
-                    <Button
-                      variant="primary"
-                      onClick={() => setAddCategoryModalOpen(true)}
-                    >
-                      Add Category
-                    </Button>
+            Add Category
+          </Button>
+        </div>
+
+        <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+          {categories.map((category) => (
+            <Col key={category._id}>
+              <Card>
+                <Card.Body>
+                  <Card.Title>{category.name}</Card.Title>
+                  <Card.Subtitle className="mb-2 text-muted">
+                    Parent: {category.parentCategory || "None"}
+                  </Card.Subtitle>
+
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <Form.Check
+                      type="switch"
+                      id={`status-switch-${category._id}`}
+                      label={category.isActive ? "Active" : "Inactive"}
+                      checked={category.isActive}
+                      onChange={() =>
+                        handleStatusChange(category._id, category.isActive)
+                      }
+                    />
                   </div>
 
-                  <div className="table-responsive">
-                    <Table bordered hover>
-                      <thead>
-                        <tr>
-                          <th>Category Name</th>
-                          <th>Parent Category</th>
-                          <th>Status</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {categories.map((category) => (
-                          <tr key={category._id}>
-                            <td>{category.name}</td>
-                            <td>{category.parentCategory}</td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={category.isActive}
-                                onChange={() =>
-                                  handleStatusChange(
-                                    category._id,
-                                    category.isActive
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <div className="d-flex gap-2">
-                                <Button
-                                  variant="warning"
-                                  size="sm"
-                                  onClick={() => handleEditClick(category)}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="danger"
-                                  size="sm"
-                                  onClick={() => handleDeleteClick(category)}
-                                >
-                                  Delete
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+                  <div className="d-flex justify-content-between">
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => handleEditClick(category)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleDeleteClick(category)}
+                    >
+                      Delete
+                    </Button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
 
         {/* Delete Modal */}
         <DeleteModal
@@ -189,8 +162,8 @@ const AllCategory = () => {
           onConfirm={handleEditConfirm}
           categoryToEdit={selectedCategory}
         />
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 
