@@ -1,5 +1,6 @@
 const express = require("express");
 const asyncHandler = require("express-async-handler");
+require("dotenv").config(); // Add this line
 const BlogPost = require("../models/blogPost");
 const multer = require("multer");
 const fs = require("fs");
