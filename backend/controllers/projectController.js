@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Project = require("../models/project");
 const admin = require("firebase-admin");
-require("dotenv").config(); // Add this line
+const dotenv = require("dotenv"); // Add this line
 const fs = require("fs");
 const path = require("path");
 const slugify = require("slugify");
