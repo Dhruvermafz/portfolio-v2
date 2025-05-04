@@ -20,6 +20,7 @@ app.use(
       "http://localhost:3001",
       "https://dhruvermafz.vercel.app",
       "http://192.168.221.143:3000",
+      "https://dhruvermafz.in",
     ],
     credentials: true,
     optionSuccessStatus: 200,
