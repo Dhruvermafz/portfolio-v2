@@ -1,0 +1,23 @@
+{
+  "data": {
+    "user": {
+      "pullRequests": {
+        "nodes": [
+          {
+            "title": "new request",
+            "url": "https://github.com/gouravgrover298/thetorncoders.github.io/pull/1",
+            "createdAt": "2022-10-01T07:18:41Z",
+            "repository": {
+              "nameWithOwner": "gouravgrover298/thetorncoders.github.io",
+              "isFork": false,
+              "isPrivate": false,
+              "owner": {
+                "login": "gouravgrover298"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
