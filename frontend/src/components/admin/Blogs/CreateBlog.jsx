@@ -2,32 +2,46 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { Form, Button, Card, Alert, Image, Spinner } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Alert,
+  Image,
+  Spinner,
+  Container,
+} from "react-bootstrap";
 import useAuth from "../../../context/auth";
 import { API_URL } from "../../../config";
 import upload from "../../../assets/img/upload.png";
 import "./CreateBlog.css";
+
 const CreateBlog = () => {
   const user = useAuth();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [blogTitle, setBlogTitle] = useState("");
   const [blogContent, setBlogContent] = useState("");
   const [markdownContent, setMarkdownContent] = useState("");
-  const [useMarkdown, setUseMarkdown] = useState(false); // Toggle for Markdown
+  const [useMarkdown, setUseMarkdown] = useState(false);
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoadingCategories(true);
         const response = await axios.get(`${API_URL}/categories`);
         setCategories(response.data);
       } catch (err) {
         setError("Failed to load categories. Please try again later.");
         console.error(err);
+      } finally {
+        setLoadingCategories(false);
       }
     };
     fetchCategories();
@@ -56,25 +70,27 @@ const CreateBlog = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setSubmitting(true);
 
     if (!user) {
       setError("Unauthorized: Please log in to create a blog.");
+      setSubmitting(false);
       return;
     }
 
     const content = useMarkdown ? markdownContent : blogContent;
-
     const trimmedTitle = blogTitle.trim();
     const trimmedContent = content.trim();
 
     if (!trimmedTitle || !trimmedContent) {
-      console.log("Title or content is empty after trimming.");
       setError("Title and content are required.");
+      setSubmitting(false);
       return;
     }
 
     if (!selectedCategories.length || !thumbnail) {
       setError("All fields are required.");
+      setSubmitting(false);
       return;
     }
 
@@ -85,18 +101,8 @@ const CreateBlog = () => {
     formData.append("thumbnail", thumbnail);
     formData.append("userId", user.userId || "");
 
-    // Debug FormData
-    formData.forEach((value, key) => {
-      console.log(`${key}:`, value);
-    });
-
     try {
       const token = localStorage.getItem("authToken");
-      axios
-        .post("http://localhost:8000/post", formData)
-        .then((response) => console.log(response))
-        .catch((error) => console.error("Error:", error.response || error));
-
       const response = await axios.post(`${API_URL}/post`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -111,8 +117,11 @@ const CreateBlog = () => {
           "An error occurred while creating the blog."
       );
       console.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
+
   const resetForm = () => {
     setBlogTitle("");
     setBlogContent("");
@@ -124,27 +133,60 @@ const CreateBlog = () => {
   };
 
   return (
-    <div className="col-lg-10">
-      <Card className="content-box-card">
-        <Card.Body>
-          <Form onSubmit={handleSubmit} className="create-blog-container">
-            <Card className="main-content">
-              <Card.Header>Create New Blog</Card.Header>
-              <Card.Body>
-                <Form.Group className="mb-3">
-                  <Form.Label>Blog Title *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Title"
-                    value={blogTitle}
-                    onChange={(e) => setBlogTitle(e.target.value)}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Blog Categories *</Form.Label>
+    <section className="create-blog-section py-5">
+      <Container>
+        <div className="json-header mb-4">
+          <h1 className="json-title">Create New Blog</h1>
+          <div className="json-actions">
+            <Button
+              variant="secondary"
+              className="me-2"
+              onClick={resetForm}
+              disabled={submitting}
+            >
+              Discard
+            </Button>
+            <Button
+              variant="primary"
+              type="submit"
+              form="blog-form"
+              disabled={submitting}
+            >
+              {submitting ? (
+                <>
+                  <Spinner animation="border" size="sm" className="me-2" />
+                  Publishing...
+                </>
+              ) : (
+                "Publish Blog"
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <Form id="blog-form" onSubmit={handleSubmit}>
+          <div className="json-object">
+            <div className="json-brace">{"{"}</div>
+            <div className="json-content">
+              {/* Title */}
+              <div className="json-field">
+                <label className="json-key">"title":</label>
+                <Form.Control
+                  type="text"
+                  value={blogTitle}
+                  onChange={(e) => setBlogTitle(e.target.value)}
+                  className="json-value"
+                  placeholder="Enter blog title"
+                  required
+                />
+              </div>
+
+              {/* Categories */}
+              <div className="json-field">
+                <label className="json-key">"categories":</label>
+                <div className="json-array">
+                  <div className="json-brace">{"["}</div>
                   <div className="categories-container">
-                    {/* Display selected categories as tags */}
                     {selectedCategories.map((category, index) => (
                       <span key={index} className="category-tag">
                         {category}
@@ -156,86 +198,75 @@ const CreateBlog = () => {
                             )
                           }
                         >
-                          &times;
+                          ×
                         </span>
                       </span>
                     ))}
-
-                    {/* Dropdown to select categories */}
                     <Form.Select
-                      onChange={(e) => {
-                        const selectedValue = e.target.value;
-                        if (
-                          selectedValue &&
-                          !selectedCategories.includes(selectedValue)
-                        ) {
-                          setSelectedCategories([
-                            ...selectedCategories,
-                            selectedValue,
-                          ]);
-                        }
-                        e.target.value = ""; // Reset dropdown
-                      }}
+                      onChange={handleCategoryChange}
+                      multiple
+                      className="json-value"
+                      disabled={loadingCategories}
                     >
-                      <option value="" disabled>
-                        Select a category
-                      </option>
-                      {categories.length > 0 ? (
+                      {loadingCategories ? (
+                        <option>Loading categories...</option>
+                      ) : categories.length > 0 ? (
                         categories.map((category) => (
                           <option key={category._id} value={category.name}>
                             {category.name}
                           </option>
                         ))
                       ) : (
-                        <option disabled>Loading categories...</option>
+                        <option disabled>No categories available</option>
                       )}
                     </Form.Select>
                   </div>
-                </Form.Group>
+                  <div className="json-brace">{"]"}</div>
+                </div>
+              </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Blog Content *</Form.Label>
+              {/* Content */}
+              <div className="json-field">
+                <label className="json-key">"content":</label>
+                <div className="content-container">
                   {useMarkdown ? (
-                    <ReactQuill theme="snow" value={markdownContent} readOnly />
+                    <Form.Control
+                      as="textarea"
+                      rows={10}
+                      value={markdownContent}
+                      onChange={(e) => setMarkdownContent(e.target.value)}
+                      className="json-value markdown-editor"
+                      placeholder="Enter Markdown content"
+                    />
                   ) : (
                     <ReactQuill
                       theme="snow"
                       value={blogContent}
                       onChange={setBlogContent}
+                      className="json-value quill-editor"
                     />
                   )}
-                </Form.Group>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className="toggle-editor-btn mt-2"
+                    onClick={() => setUseMarkdown(!useMarkdown)}
+                  >
+                    {useMarkdown ? "Switch to Rich Text" : "Switch to Markdown"}
+                  </Button>
+                </div>
+              </div>
 
-                <Button
-                  variant="primary"
-                  onClick={() => setUseMarkdown(!useMarkdown)}
-                >
-                  {useMarkdown
-                    ? "Switch to Rich Text Editor"
-                    : "Switch to Markdown"}
-                </Button>
-              </Card.Body>
-            </Card>
-
-            <Card className="thumbnail-section mt-4">
-              <Card.Header>Add Blog Thumbnail</Card.Header>
-              <Card.Body>
-                <Form.Group className="thumbnail-upload">
-                  <Form.Label className="file-container">
-                    <Form.Control
-                      type="file"
-                      onChange={handleThumbnailChange}
-                      hidden
-                    />
-                    <span className="upload-icon">
-                      <Image
-                        src={upload}
-                        alt="icon"
-                        className="upload-icon-image"
-                      />
-                      <span className="upload-text">Choose file</span>
-                    </span>
-                  </Form.Label>
+              {/* Thumbnail */}
+              <div className="json-field">
+                <label className="json-key">"thumbnail":</label>
+                <div className="thumbnail-container">
+                  <Form.Control
+                    type="file"
+                    onChange={handleThumbnailChange}
+                    className="json-value file-input"
+                    accept="image/*"
+                  />
                   {thumbnailPreview && (
                     <Image
                       src={thumbnailPreview}
@@ -244,20 +275,51 @@ const CreateBlog = () => {
                       fluid
                     />
                   )}
-                </Form.Group>
+                  {!thumbnailPreview && (
+                    <div className="upload-placeholder">
+                      <Image
+                        src={upload}
+                        alt="Upload"
+                        className="upload-icon"
+                      />
+                      <span>Choose or drag an image</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="json-brace">{"}"}</div>
+          </div>
 
-                {error && <Alert variant="danger">{error}</Alert>}
-                {success && <Alert variant="success">{success}</Alert>}
+          {error && (
+            <Alert variant="danger" className="mt-4">
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert variant="success" className="mt-4">
+              {success}
+            </Alert>
+          )}
 
-                <Button type="submit" className="mt-3">
-                  Submit
-                </Button>
-              </Card.Body>
-            </Card>
-          </Form>
-        </Card.Body>
-      </Card>
-    </div>
+          <Button
+            type="submit"
+            variant="success"
+            className="w-100 mt-4 submit-btn"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Publishing...
+              </>
+            ) : (
+              "Submit Blog"
+            )}
+          </Button>
+        </Form>
+      </Container>
+    </section>
   );
 };
 

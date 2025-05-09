@@ -9,24 +9,32 @@ import {
   Badge,
   Form,
   Pagination,
+  InputGroup,
+  Spinner,
 } from "react-bootstrap";
-import { FaUser, FaBriefcase } from "react-icons/fa";
+import { FaUser, FaBriefcase, FaSearch } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { API_URL } from "../config";
+import "./adminproject.css";
 
 const AdminProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [clientFilter, setClientFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const projectsPerPage = 6;
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(`${API_URL}/projects`);
         setProjects(response.data);
       } catch (error) {
         console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,54 +63,99 @@ const AdminProjectList = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Delete Project
+  const handleDelete = async (projectId) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await axios.delete(`${API_URL}/projects/${projectId}`);
+        setProjects(projects.filter((project) => project._id !== projectId));
+        alert("Project deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        alert("Failed to delete project");
+      }
+    }
+  };
+
   return (
-    <Container fluid className="py-4">
-      {/* Summary */}
-      <Row className="mb-4">
-        <Col md={6} lg={3}>
-          <Card className="text-white bg-primary shadow-sm">
-            <Card.Body className="d-flex justify-content-between align-items-center">
+    <Container fluid className="admin-project-list py-5">
+      {/* Header */}
+      <Row className="mb-4 align-items-center">
+        <Col>
+          <h1 className="dashboard-title">Project Dashboard</h1>
+          <p className="dashboard-subtitle">
+            Manage your projects and clients efficiently
+          </p>
+        </Col>
+        <Col xs="auto">
+          <Button
+            variant="primary"
+            as={Link}
+            to="/project-add"
+            className="add-project-btn"
+          >
+            <FaBriefcase className="me-2" /> Add New Project
+          </Button>
+        </Col>
+      </Row>
+
+      {/* Summary Cards */}
+      <Row className="mb-5">
+        <Col md={6} lg={3} className="mb-4">
+          <Card className="summary-card clients-card shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <FaUser className="summary-icon" />
               <div>
-                <Card.Title className="fs-3">{totalClients}</Card.Title>
-                <Card.Text>Clients</Card.Text>
+                <Card.Title className="summary-value">
+                  {totalClients}
+                </Card.Title>
+                <Card.Text className="summary-label">Clients</Card.Text>
               </div>
-              <FaUser size={30} />
             </Card.Body>
           </Card>
         </Col>
-        <Col md={6} lg={3}>
-          <Card className="text-white bg-success shadow-sm">
-            <Card.Body className="d-flex justify-content-between align-items-center">
+        <Col md={6} lg={3} className="mb-4">
+          <Card className="summary-card projects-card shadow-sm">
+            <Card.Body className="d-flex align-items-center">
+              <FaBriefcase className="summary-icon" />
               <div>
-                <Card.Title className="fs-3">{totalProjects}</Card.Title>
-                <Card.Text>Projects</Card.Text>
+                <Card.Title className="summary-value">
+                  {totalProjects}
+                </Card.Title>
+                <Card.Text className="summary-label">Projects</Card.Text>
               </div>
-              <FaBriefcase size={30} />
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
       {/* Filters */}
-      <Row className="mb-4">
-        <Col md={6} lg={4}>
-          <Form.Control
-            type="text"
-            placeholder="Search by project title..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
+      <Row className="mb-5">
+        <Col md={6} lg={4} className="mb-3">
+          <InputGroup>
+            <InputGroup.Text className="filter-icon">
+              <FaSearch />
+            </InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Search by project title..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="filter-input"
+            />
+          </InputGroup>
         </Col>
-        <Col md={6} lg={4}>
+        <Col md={6} lg={4} className="mb-3">
           <Form.Select
             value={clientFilter}
             onChange={(e) => {
               setClientFilter(e.target.value);
               setCurrentPage(1);
             }}
+            className="filter-select"
           >
             <option value="All">All Clients</option>
             {clients.map((client) => (
@@ -116,39 +169,62 @@ const AdminProjectList = () => {
 
       {/* Project Cards */}
       <Row>
-        {currentProjects.length === 0 ? (
+        {loading ? (
+          <Col className="text-center">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3">Loading projects...</p>
+          </Col>
+        ) : currentProjects.length === 0 ? (
           <Col>
-            <Card className="text-center shadow-sm">
-              <Card.Body>No matching projects found.</Card.Body>
+            <Card className="no-results-card shadow-sm">
+              <Card.Body className="text-center">
+                No matching projects found.
+              </Card.Body>
             </Card>
           </Col>
         ) : (
           currentProjects.map((project) => (
             <Col key={project._id} sm={12} md={6} lg={4} className="mb-4">
-              <Card className="h-100 shadow-sm">
+              <Card className="project-card shadow-sm h-100">
                 <Card.Body>
-                  <Card.Title>{project.title}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    <Badge bg="info">{project.client}</Badge>
+                  <Card.Title className="project-title">
+                    {project.title}
+                  </Card.Title>
+                  <Card.Subtitle className="mb-3">
+                    <Badge bg="info" className="client-badge">
+                      {project.client}
+                    </Badge>
                   </Card.Subtitle>
-                  <Card.Text>
+                  <Card.Text className="project-info">
                     <strong>Services:</strong> {project.services}
                   </Card.Text>
-                  <Card.Text>
+                  <Card.Text className="project-info">
                     <strong>Website:</strong>{" "}
                     <a
                       href={project.website}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="website-link"
                     >
                       Visit Site
                     </a>
                   </Card.Text>
                   <div className="d-flex justify-content-end gap-2">
-                    <Button variant="outline-primary" size="sm">
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="action-btn"
+                      as={Link}
+                      to={`/project-edit/${project._id}`}
+                    >
                       Edit
                     </Button>
-                    <Button variant="outline-danger" size="sm">
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      className="action-btn"
+                      onClick={() => handleDelete(project._id)}
+                    >
                       Delete
                     </Button>
                   </div>
@@ -161,9 +237,13 @@ const AdminProjectList = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Row className="mt-4">
+        <Row className="mt-5">
           <Col>
-            <Pagination className="justify-content-center">
+            <Pagination className="custom-pagination justify-content-center">
+              <Pagination.Prev
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+              />
               {[...Array(totalPages).keys()].map((number) => (
                 <Pagination.Item
                   key={number + 1}
@@ -173,6 +253,10 @@ const AdminProjectList = () => {
                   {number + 1}
                 </Pagination.Item>
               ))}
+              <Pagination.Next
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              />
             </Pagination>
           </Col>
         </Row>

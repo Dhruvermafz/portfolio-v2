@@ -23,6 +23,8 @@ import Resume from "../pages/Resume";
 import CategoryDetail from "../pages/CategoryDetail";
 import AdminProjectList from "../pages/AdminProjectList";
 import CreateProject from "../components/admin/Projects/CreateProject";
+import Achievement from "../components/Achievement/Achievement";
+import AchievementList from "../components/admin/Achivements/AchievementList";
 
 // Public routes
 const publicRoutes = [
@@ -51,6 +53,8 @@ const adminRoutes = [
   { path: "/admin/contact", element: <AllQueries /> },
   { path: "/projects-list", element: <AdminProjectList /> },
   { path: "/project-add", element: <CreateProject /> },
+  { path: "/project-edit/:_id", element: <CreateProject /> },
+  { path: "/admin/achievements", element: <AchievementList /> },
 ];
 
 const Router = () => {

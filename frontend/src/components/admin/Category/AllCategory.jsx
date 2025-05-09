@@ -3,8 +3,10 @@ import axios from "axios";
 import DeleteModal from "./DeleteModal";
 import AddCategoryModal from "./AddCategoryModal";
 import EditCategoryModal from "./EditCategoryModal";
-import { Button, Card, Row, Col, Form } from "react-bootstrap";
+import { Button, Card, Row, Col, Form, Badge } from "react-bootstrap";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { API_URL } from "../../../config";
+import "./category.css";
 
 const AllCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -82,63 +84,88 @@ const AllCategory = () => {
   };
 
   return (
-    <section className="mt-4">
+    <section className="category-section py-5">
       <div className="container">
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-5">
           <div>
-            <h1 className="h4">Category List</h1>
-            <p>All Categories Here</p>
+            <h1 className="category-title">Category Management</h1>
+            <p className="category-subtitle">
+              Organize and manage all categories
+            </p>
           </div>
           <Button
             variant="primary"
+            className="add-category-btn"
             onClick={() => setAddCategoryModalOpen(true)}
           >
-            Add Category
+            <FaPlus className="me-2" /> Add Category
           </Button>
         </div>
 
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
-          {categories.map((category) => (
-            <Col key={category._id}>
-              <Card>
-                <Card.Body>
-                  <Card.Title>{category.name}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    Parent: {category.parentCategory || "None"}
-                  </Card.Subtitle>
-
-                  <div className="d-flex align-items-center justify-content-between mb-3">
+          {categories.length === 0 ? (
+            <Col>
+              <Card className="no-categories-card shadow-sm">
+                <Card.Body className="text-center">
+                  <p className="mb-0">
+                    No categories found. Add a new category to get started!
+                  </p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ) : (
+            categories.map((category) => (
+              <Col key={category._id}>
+                <Card className="category-card shadow-sm h-100">
+                  <Card.Body className="d-flex flex-column">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <Card.Title className="category-name mb-0">
+                        {category.name}
+                      </Card.Title>
+                      <Badge
+                        bg={category.isActive ? "success" : "secondary"}
+                        className="status-badge"
+                      >
+                        {category.isActive ? "Active" : "Inactive"}
+                      </Badge>
+                    </div>
+                    <Card.Text className="category-parent mb-3">
+                      <strong>Parent:</strong>{" "}
+                      {category.parentCategory || "None"}
+                    </Card.Text>
                     <Form.Check
                       type="switch"
                       id={`status-switch-${category._id}`}
-                      label={category.isActive ? "Active" : "Inactive"}
+                      label="Toggle Status"
                       checked={category.isActive}
                       onChange={() =>
                         handleStatusChange(category._id, category.isActive)
                       }
+                      className="mb-4"
                     />
-                  </div>
-
-                  <div className="d-flex justify-content-between">
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      onClick={() => handleEditClick(category)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDeleteClick(category)}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+                    <div className="mt-auto d-flex justify-content-end gap-2">
+                      <Button
+                        variant="outline-warning"
+                        size="sm"
+                        className="action-btn"
+                        onClick={() => handleEditClick(category)}
+                      >
+                        <FaEdit className="me-1" /> Edit
+                      </Button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        className="action-btn"
+                        onClick={() => handleDeleteClick(category)}
+                      >
+                        <FaTrash className="me-1" /> Delete
+                      </Button>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))
+          )}
         </Row>
 
         {/* Delete Modal */}

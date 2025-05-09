@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Card,
+  InputGroup,
+  Spinner,
+  Modal,
+} from "react-bootstrap";
 import { FaReply, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { API_URL } from "../../../config";
 import PaginationComponent from "./PaginationQueries";
+import "./queries.css";
 
 const AllQueries = () => {
   const [queries, setQueries] = useState([]);
   const [filteredQueries, setFilteredQueries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const queriesPerPage = 5;
+  const [loading, setLoading] = useState(true);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState("");
+  const queriesPerPage = 10;
 
   // Fetch queries from API
   useEffect(() => {
     const fetchQueries = async () => {
       try {
-        const response = await axios.get(`${API_URL}/contact/`);
+        setLoading(true);
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get(`${API_URL}/contact/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (response.data.success && Array.isArray(response.data.data)) {
           setQueries(response.data.data);
           setFilteredQueries(response.data.data);
@@ -28,6 +46,8 @@ const AllQueries = () => {
         console.error("Error fetching queries:", error);
         setQueries([]);
         setFilteredQueries([]);
+      } finally {
+        setLoading(false);
       }
     };
     fetchQueries();
@@ -52,56 +72,86 @@ const AllQueries = () => {
     indexOfLastQuery
   );
 
-  return (
-    <section className="mt-4">
-      <div className="container">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="h4">All Contact Queries</h2>
-          <Form className="w-50">
-            <InputGroup>
-              <Form.Control
-                type="text"
-                placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <InputGroup.Text>
-                <FaSearch />
-              </InputGroup.Text>
-            </InputGroup>
-          </Form>
-        </div>
+  const handleViewMessage = (message) => {
+    setSelectedMessage(message);
+    setShowMessageModal(true);
+  };
 
-        {currentQueries.length === 0 ? (
-          <p className="text-muted">No queries found.</p>
+  return (
+    <section className="queries-section py-5">
+      <Container>
+        <Row className="mb-5 align-items-center">
+          <Col md={6}>
+            <h1 className="queries-title">Contact Queries</h1>
+            <p className="queries-subtitle">Manage all contact queries</p>
+          </Col>
+          <Col md={6} className="d-flex justify-content-end">
+            <Form className="queries-search-form">
+              <InputGroup>
+                <InputGroup.Text className="search-icon-bg">
+                  <FaSearch className="search-icon" />
+                </InputGroup.Text>
+                <Form.Control
+                  type="text"
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                  aria-label="Search queries"
+                />
+              </InputGroup>
+            </Form>
+          </Col>
+        </Row>
+
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3 text-muted">Loading queries...</p>
+          </div>
+        ) : currentQueries.length === 0 ? (
+          <Card className="no-queries-card shadow-sm">
+            <Card.Body className="text-center">
+              <p className="mb-0 text-muted">
+                {searchTerm
+                  ? "No queries match your search."
+                  : "No queries found."}
+              </p>
+            </Card.Body>
+          </Card>
         ) : (
-          <Row className="g-4">
+          <Row xs={1} sm={2} md={3} className="g-4">
             {currentQueries.map((query) => (
-              <Col md={6} lg={4} key={query._id}>
-                <Card className="h-100 shadow-sm">
-                  <Card.Body>
-                    <Card.Title>{query.name}</Card.Title>
-                    <Card.Subtitle className="mb-2 text-muted">
+              <Col key={query._id}>
+                <Card className="query-card shadow-sm h-100">
+                  <Card.Body className="d-flex flex-column">
+                    <Card.Title className="query-name">{query.name}</Card.Title>
+                    <Card.Subtitle className="mb-2 query-email">
                       {query.email}
                     </Card.Subtitle>
-                    <Card.Text>
+                    <Card.Text className="query-date">
                       <strong>Date:</strong>{" "}
                       {new Date(query.createdAt).toLocaleDateString()}
                     </Card.Text>
-                    <Button
-                      variant="info"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => alert(`Message: \n\n${query.message}`)}
-                    >
-                      View Message
-                    </Button>
-                    <a
-                      href={`mailto:${query.email}`}
-                      className="btn btn-secondary btn-sm"
-                    >
-                      <FaReply /> Reply
-                    </a>
+                    <div className="mt-auto d-flex justify-content-end gap-2">
+                      <Button
+                        variant="outline-info"
+                        size="sm"
+                        className="action-btn"
+                        onClick={() => handleViewMessage(query.message)}
+                      >
+                        View Message
+                      </Button>
+                      <Button
+                        as="a"
+                        href={`mailto:${query.email}`}
+                        variant="outline-secondary"
+                        size="sm"
+                        className="action-btn"
+                      >
+                        <FaReply className="me-1" /> Reply
+                      </Button>
+                    </div>
                   </Card.Body>
                 </Card>
               </Col>
@@ -109,15 +159,38 @@ const AllQueries = () => {
           </Row>
         )}
 
-        <div className="mt-4">
-          <PaginationComponent
-            totalQueries={filteredQueries.length}
-            queriesPerPage={queriesPerPage}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-        </div>
-      </div>
+        {filteredQueries.length > queriesPerPage && (
+          <div className="mt-5 d-flex justify-content-center">
+            <PaginationComponent
+              totalQueries={filteredQueries.length}
+              queriesPerPage={queriesPerPage}
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+            />
+          </div>
+        )}
+
+        <Modal
+          show={showMessageModal}
+          onHide={() => setShowMessageModal(false)}
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Query Message</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p className="query-message">{selectedMessage}</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowMessageModal(false)}
+            >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Container>
     </section>
   );
 };

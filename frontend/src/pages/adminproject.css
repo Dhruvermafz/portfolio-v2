@@ -1,0 +1,185 @@
+.admin-project-list {
+  background-color: #cbd5e1;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: "Inter", sans-serif;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #718096;
+}
+
+.add-project-btn {
+  background-color: #3b82f6;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-project-btn:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+}
+
+/* Summary Cards */
+.summary-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.clients-card {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+.projects-card {
+  background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+.summary-icon {
+  font-size: 2.5rem;
+  color: #ffffff;
+  opacity: 0.9;
+  margin-right: 1rem;
+}
+
+.summary-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-size: 1rem;
+  color: #e6f1ff;
+  margin-bottom: 0;
+}
+
+/* Filters */
+.filter-input,
+.filter-select {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+.filter-icon {
+  background-color: #e2e8f0;
+  border: none;
+  color: #718096;
+  border-radius: 8px 0 0 8px;
+}
+
+/* Project Cards */
+.project-card {
+  border: none;
+  border-radius: 12px;
+  background-color: #ffffff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.project-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.client-badge {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.project-info {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.website-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.website-link:hover {
+  text-decoration: underline;
+}
+
+.action-btn {
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.no-results-card {
+  border: none;
+  border-radius: 12px;
+  background-color: #ffffff;
+  text-align: center;
+  padding: 2rem;
+  font-size: 1rem;
+  color: #718096;
+}
+
+/* Pagination */
+.custom-pagination .page-item .page-link {
+  border: none;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+  color: #4b5563;
+  background-color: #ffffff;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.custom-pagination .page-item .page-link:hover {
+  background-color: #e2e8f0;
+  color: #1a202c;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+  color: #cbd5e1;
+  background-color: #f1f5f9;
+}

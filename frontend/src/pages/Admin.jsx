@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import PopularCategories from "../components/admin/Dashboard/PopularCategories";
-import ProgressCard from "../components/admin/Dashboard/ProgressCard";
-import LatestBlogs from "../components/admin/Dashboard/LatestBlogs";
+import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaBlog,
   FaTags,
   FaPhone,
   FaSignOutAlt,
-  FaRProject,
+  FaProjectDiagram,
 } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
-import { Navbar, Nav, Container } from "react-bootstrap";
+import { GiAchievement } from "react-icons/gi";
+import "./admin.css";
+
 const Admin = ({ username = "Boss" }) => {
   const navigate = useNavigate();
   const [time, setTime] = useState(new Date());
@@ -26,55 +26,78 @@ const Admin = ({ username = "Boss" }) => {
   };
 
   return (
-    <div className="admin-container">
-      {/* Include the AppBar component */}
-      <div className="main-content">
-        <section className="content-box-area mt-4 text-center">
-          <div className="container">
-            <div className="row g-4">
-              <div
-                className="card content-box-card p-4"
-                style={{ width: "100%" }}
-              >
-                <div className="card-body">
-                  {/* Main content will be added here */}
-                  <Navbar bg="dark" variant="dark" expand="lg" className="py-3">
-                    <Container>
-                      <Navbar.Brand>
-                        Welcome, {username} | {time.toLocaleTimeString()}
-                      </Navbar.Brand>
-                      <Navbar.Toggle aria-controls="main-navbar-nav" />
-                      <Navbar.Collapse id="main-navbar-nav">
-                        <Nav className="ms-auto d-flex align-items-center gap-3">
-                          <Nav.Link as={Link} to="/projects-list">
-                            <FaRProject className="me-1" /> Projects
-                          </Nav.Link>
-                          <Nav.Link as={Link} to="/admin/category">
-                            <FaTags className="me-1" /> Category
-                          </Nav.Link>
-                          <Nav.Link as={Link} to="/admin/blogs">
-                            <FaBlog className="me-1" /> Blogs
-                          </Nav.Link>
-                          <Nav.Link as={Link} to="/admin/contact">
-                            <FaPhone className="me-1" /> Contact
-                          </Nav.Link>
-                          <Nav.Link
-                            onClick={handleLogout}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <FaSignOutAlt className="me-1" /> Logout
-                          </Nav.Link>
-                        </Nav>
-                      </Navbar.Collapse>
-                    </Container>
-                  </Navbar>
+    <section className="admin-section">
+      <Container className="admin-header py-4">
+        <Card className="admin-card shadow-sm">
+          <Card.Body>
+            <Row className="align-items-center">
+              <Col md={4} className="text-center text-md-start mb-3 mb-md-0">
+                <h2 className="admin-title">
+                  Welcome, {username}
+                  <span className="time-text">
+                    {" "}
+                    | {time.toLocaleTimeString()}
+                  </span>
+                </h2>
+              </Col>
+            </Row>
+            <Row className="align-items-center">
+              <Col md={8} className="text-center text-md-start mb-3 mb-md-0">
+                <div className="admin-nav d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
+                  <Button
+                    as={Link}
+                    to="/projects-list"
+                    variant="outline-primary"
+                    className="admin-nav-btn"
+                  >
+                    <FaProjectDiagram className="me-2" /> Projects
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/admin/category"
+                    variant="outline-primary"
+                    className="admin-nav-btn"
+                  >
+                    <FaTags className="me-2" /> Category
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/admin/blogs"
+                    variant="outline-primary"
+                    className="admin-nav-btn"
+                  >
+                    <FaBlog className="me-2" /> Blogs
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/admin/contact"
+                    variant="outline-primary"
+                    className="admin-nav-btn"
+                  >
+                    <FaPhone className="me-2" /> Contact
+                  </Button>
+                  <Button
+                    as={Link}
+                    to="/admin/achievements"
+                    variant="outline-primary"
+                    className="admin-nav-btn"
+                  >
+                    <GiAchievement className="me-2" /> Achievements
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    className="admin-nav-btn logout-btn"
+                    onClick={handleLogout}
+                  >
+                    <FaSignOutAlt className="me-2" /> Logout
+                  </Button>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </Container>
+    </section>
   );
 };
 

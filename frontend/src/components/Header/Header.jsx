@@ -14,6 +14,7 @@ import {
   FaAppStoreIos,
   FaProjectDiagram,
 } from "react-icons/fa";
+import { GiAchievement } from "react-icons/gi";
 import { Link } from "react-router-dom";
 import "./header.css";
 import logo from "../../assets/img/logo/logo@transparent.png";

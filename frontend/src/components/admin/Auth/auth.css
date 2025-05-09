@@ -1,0 +1,256 @@
+.login-section {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.login-card {
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.login-image {
+  max-width: 80%;
+  height: auto;
+}
+
+.login-welcome {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.login-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.login-checkbox {
+  font-size: 0.9rem;
+}
+
+.login-checkbox input {
+  cursor: pointer;
+}
+
+.login-btn {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #007bff;
+  border-color: #007bff;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.login-alert {
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: opacity 0.3s ease;
+}
+
+.login-signup-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.login-signup-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .login-section {
+    padding: 2rem 0;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  .login-welcome {
+    font-size: 1.25rem;
+  }
+
+  .login-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .login-image {
+    max-width: 100%;
+  }
+
+  .login-input,
+  .login-btn {
+    font-size: 0.85rem;
+  }
+
+  .login-checkbox {
+    font-size: 0.85rem;
+  }
+}
+.signup-section {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.signup-card {
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.signup-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.signup-subtitle {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.signup-image {
+  max-width: 80%;
+  height: auto;
+}
+
+.signup-welcome {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.signup-input {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.signup-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.signup-checkbox {
+  font-size: 0.9rem;
+}
+
+.signup-checkbox input {
+  cursor: pointer;
+}
+
+.signup-btn {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background-color: #007bff;
+  border-color: #007bff;
+  transition: all 0.3s ease;
+}
+
+.signup-btn:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.signup-btn:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.signup-alert {
+  font-size: 0.85rem;
+  border-radius: 6px;
+  padding: 0.75rem;
+  transition: opacity 0.3s ease;
+}
+
+.signup-login-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.signup-login-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .signup-section {
+    padding: 2rem 0;
+  }
+
+  .signup-title {
+    font-size: 1.5rem;
+  }
+
+  .signup-welcome {
+    font-size: 1.25rem;
+  }
+
+  .signup-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .signup-image {
+    max-width: 100%;
+  }
+
+  .signup-input,
+  .signup-btn {
+    font-size: 0.85rem;
+  }
+
+  .signup-checkbox {
+    font-size: 0.85rem;
+  }
+}

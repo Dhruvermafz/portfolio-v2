@@ -1,112 +1,197 @@
 import React, { useState } from "react";
 import axios from "axios";
 import loti from "../../../assets/img/loti/loti-auth.svg";
-import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Container,
+  Row,
+  Col,
+  Alert,
+  Image,
+  Card,
+  Spinner,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../../../config";
+import "./auth.css";
+
 const SignUp = () => {
-  // State to hold form data
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
-  const navigate = useNavigate();
-  // State to handle errors
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Handle form submission
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    if (!formData.username.trim()) {
+      setError("Username is required.");
+      setLoading(false);
+      return;
+    }
+    if (!validateEmail(formData.email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await axios.post(`${API_URL}/user/register`, formData);
-      // Handle successful response
-      console.log("User registered successfully:", response.data);
+      setSuccess("Account created successfully! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 1500);
     } catch (err) {
-      // Handle error
       console.error("Registration failed:", err);
-      setError("Registration failed. Please try again.");
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Container className="my-4">
-      <Row className="justify-content-center">
-        <Col lg={6} className="text-center mb-4">
-          <img src={loti} alt="loti" className="img-fluid" />
-          <h3 className="mt-4">Welcome back!</h3>
-          <p className="text-muted">
-            Whether you're launching a stunning online store optimizing your our
-            object-oriented
-          </p>
-        </Col>
+    <section className="signup-section py-5">
+      <Container>
+        <Row className="justify-content-center align-items-center">
+          <Col lg={6} className="text-center mb-4 mb-lg-0">
+            <Image
+              src={loti}
+              alt="Sign Up Illustration"
+              className="signup-image"
+              fluid
+            />
+            <h3 className="signup-welcome mt-3">Join Us!</h3>
+            <p className="signup-subtitle text-muted">
+              Create an account to manage your projects, blogs, and
+              achievements.
+            </p>
+          </Col>
 
-        <Col lg={6}>
-          <div className="border p-4 rounded-3">
-            <h3>Sign Up</h3>
-            <p className="text-muted">Welcome! Create your account</p>
-            {error && <Alert variant="danger">{error}</Alert>}
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="username">
-                <Form.Label>Username</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Debra Holt"
-                  required
-                />
-              </Form.Group>
+          <Col lg={6}>
+            <Card className="signup-card shadow-sm">
+              <Card.Body className="p-4">
+                <h3 className="signup-title">Sign Up</h3>
+                <p className="signup-subtitle text-muted">
+                  Create your account to get started
+                </p>
+                {error && (
+                  <Alert variant="danger" className="signup-alert">
+                    {error}
+                  </Alert>
+                )}
+                {success && (
+                  <Alert variant="success" className="signup-alert">
+                    {success}
+                  </Alert>
+                )}
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-3" controlId="username">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={formData.username}
+                      onChange={handleChange}
+                      placeholder="Debra Holt"
+                      className="signup-input"
+                      required
+                      aria-label="Username"
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3" controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="debra.holt@example.com"
-                  required
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3" controlId="email">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="debra.holt@example.com"
+                      className="signup-input"
+                      required
+                      aria-label="Email address"
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3" controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  required
-                />
-              </Form.Group>
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Password"
+                      className="signup-input"
+                      required
+                      aria-label="Password"
+                    />
+                  </Form.Group>
 
-              <Form.Group className="mb-3" controlId="rememberMe">
-                <Form.Check type="checkbox" label="Remember Me" />
-              </Form.Group>
+                  <Form.Group className="mb-4" controlId="rememberMe">
+                    <Form.Check
+                      type="checkbox"
+                      label="Remember Me"
+                      className="signup-checkbox"
+                      aria-label="Remember me checkbox"
+                    />
+                  </Form.Group>
 
-              <Button variant="primary" type="submit" className="w-100">
-                Sign Up
-              </Button>
-            </Form>
-            <div className="mt-3">
-              Have an account?{" "}
-              <a href="/login" className="text-primary">
-                Login
-              </a>
-            </div>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    className="signup-btn w-100"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-2"
+                        />
+                        Signing Up...
+                      </>
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
+                </Form>
+                <div className="mt-3 text-center">
+                  Already have an account?{" "}
+                  <a href="/login" className="signup-login-link">
+                    Login
+                  </a>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </section>
   );
 };
 
