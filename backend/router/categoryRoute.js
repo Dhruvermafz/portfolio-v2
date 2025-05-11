@@ -5,8 +5,9 @@ const route = Router();
 
 route.get("/", categoriesController.findAll);
 route.post("/", categoriesController.create);
-route.get("/:id", categoriesController.findCategory);
-route.delete("/:id", categoriesController.delete);
+route.get("/:id", categoriesController.findCategory); // Basic category info
+route.get("/:id/items", categoriesController.findByIdWithItems); // Category with items
 route.put("/:id", categoriesController.update);
-route.get("/:id", categoriesController.findByIdWithItems);
+route.delete("/:id", categoriesController.delete);
+
 module.exports = route;

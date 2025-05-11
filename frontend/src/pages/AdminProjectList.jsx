@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import {
   Card,
   Container,
@@ -14,32 +13,20 @@ import {
 } from "react-bootstrap";
 import { FaUser, FaBriefcase, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { API_URL } from "../config";
 import "./adminproject.css";
-
+import {
+  useGetAllProjectsQuery,
+  useDeleteProjectMutation,
+} from "../api/projectApi";
 const AdminProjectList = () => {
-  const [projects, setProjects] = useState([]);
   const [search, setSearch] = useState("");
   const [clientFilter, setClientFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+
+  // Fetching projects from the Redux store using RTK Query
+  const { data: projects = [], isLoading, error } = useGetAllProjectsQuery();
+
   const projectsPerPage = 6;
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/projects`);
-        setProjects(response.data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
 
   const totalProjects = projects.length;
   const clients = [...new Set(projects.map((p) => p.client))];
@@ -63,12 +50,13 @@ const AdminProjectList = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Delete Project
+  // Delete Project with RTK Query Mutation
+  const [deleteProject] = useDeleteProjectMutation();
+
   const handleDelete = async (projectId) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        await axios.delete(`${API_URL}/projects/${projectId}`);
-        setProjects(projects.filter((project) => project._id !== projectId));
+        await deleteProject(projectId);
         alert("Project deleted successfully!");
       } catch (error) {
         console.error("Error deleting project:", error);
@@ -169,7 +157,7 @@ const AdminProjectList = () => {
 
       {/* Project Cards */}
       <Row>
-        {loading ? (
+        {isLoading ? (
           <Col className="text-center">
             <Spinner animation="border" variant="primary" />
             <p className="mt-3">Loading projects...</p>

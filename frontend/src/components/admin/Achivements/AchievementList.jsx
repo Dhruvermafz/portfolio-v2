@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -9,53 +9,45 @@ import {
   Pagination,
   Spinner,
 } from "react-bootstrap";
-import axios from "axios";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import DeleteModal from "./DeleteModal";
-import { API_URL } from "../../../config";
-import "./achievement.css";
 import AddAchievementModal from "./AddAchivementModal";
+import "./achievement.css";
+import {
+  useGetAllAchievementsQuery,
+  useCreateAchievementMutation,
+  useUpdateAchievementMutation,
+  useDeleteAchievementMutation,
+} from "../../../api/achievementsApi";
+
 const AchievementList = () => {
-  const [achievements, setAchievements] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [isAchievementModalOpen, setAchievementModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedAchievement, setSelectedAchievement] = useState(null);
   const [isEditMode, setEditMode] = useState(false);
   const achievementsPerPage = 6;
 
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get(`${API_URL}/achievements`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAchievements(response.data || []);
-      } catch (error) {
-        console.error("Error fetching achievements:", error);
-        alert("Failed to load achievements.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAchievements();
-  }, []);
+  // RTK Query hook to fetch achievements
+  const {
+    data: achievements = [],
+    isLoading,
+    isError,
+  } = useGetAllAchievementsQuery();
+
+  // RTK Query mutation hooks
+  const [createAchievement] = useCreateAchievementMutation();
+  const [updateAchievement] = useUpdateAchievementMutation();
+  const [deleteAchievement] = useDeleteAchievementMutation();
 
   const handleAddAchievement = async (newAchievement) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.post(
-        `${API_URL}/achievements`,
-        newAchievement,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setAchievements([...achievements, response.data]);
+      await createAchievement({
+        ...newAchievement,
+        headers: { Authorization: `Bearer ${token}` },
+      }).unwrap();
       setAchievementModalOpen(false);
     } catch (error) {
       console.error("Error adding achievement:", error);
@@ -72,18 +64,11 @@ const AchievementList = () => {
   const handleEditAchievement = async (updatedAchievement) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.put(
-        `${API_URL}/achievements/${selectedAchievement._id}`,
-        updatedAchievement,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setAchievements(
-        achievements.map((a) =>
-          a._id === selectedAchievement._id ? response.data : a
-        )
-      );
+      await updateAchievement({
+        id: selectedAchievement._id,
+        ...updatedAchievement,
+        headers: { Authorization: `Bearer ${token}` },
+      }).unwrap();
       setAchievementModalOpen(false);
       setEditMode(false);
       setSelectedAchievement(null);
@@ -101,12 +86,10 @@ const AchievementList = () => {
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      await axios.delete(`${API_URL}/achievements/${selectedAchievement._id}`, {
+      await deleteAchievement({
+        id: selectedAchievement._id,
         headers: { Authorization: `Bearer ${token}` },
-      });
-      setAchievements(
-        achievements.filter((a) => a._id !== selectedAchievement._id)
-      );
+      }).unwrap();
       setDeleteModalOpen(false);
       setSelectedAchievement(null);
     } catch (error) {
@@ -169,10 +152,20 @@ const AchievementList = () => {
         </Row>
 
         <Row xs={1} sm={2} md={3} className="g-4">
-          {loading ? (
+          {isLoading ? (
             <Col className="text-center py-5">
               <Spinner animation="border" variant="primary" />
               <p className="mt-3 text-muted">Loading achievements...</p>
+            </Col>
+          ) : isError ? (
+            <Col>
+              <Card className="no-achievements-card shadow-sm">
+                <Card.Body className="text-center">
+                  <p className="mb-0 text-muted">
+                    Failed to load achievements.
+                  </p>
+                </Card.Body>
+              </Card>
             </Col>
           ) : paginatedAchievements.length === 0 ? (
             <Col>

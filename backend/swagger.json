@@ -1,0 +1,131 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Portfolio API",
+    "description": "API for managing users, categories, posts, contacts, projects, and achievements",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local server"
+    },
+    {
+      "url": "https://dhruvermafz.in",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/user": {
+      "get": {
+        "summary": "Get all users",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "List of users"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user",
+        "tags": ["Users"],
+        "responses": {
+          "201": {
+            "description": "User created"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "summary": "Get all categories",
+        "tags": ["Categories"],
+        "responses": {
+          "200": {
+            "description": "List of categories"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new category",
+        "tags": ["Categories"],
+        "responses": {
+          "201": {
+            "description": "Category created"
+          }
+        }
+      }
+    },
+    "/post": {
+      "get": {
+        "summary": "Get all posts",
+        "tags": ["Posts"],
+        "responses": {
+          "200": {
+            "description": "List of posts"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new post",
+        "tags": ["Posts"],
+        "responses": {
+          "201": {
+            "description": "Post created"
+          }
+        }
+      }
+    },
+    "/contact": {
+      "post": {
+        "summary": "Submit a contact form",
+        "tags": ["Contact"],
+        "responses": {
+          "201": {
+            "description": "Contact form submitted"
+          }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "summary": "Get all projects",
+        "tags": ["Projects"],
+        "responses": {
+          "200": {
+            "description": "List of projects"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new project",
+        "tags": ["Projects"],
+        "responses": {
+          "201": {
+            "description": "Project created"
+          }
+        }
+      }
+    },
+    "/achievements": {
+      "get": {
+        "summary": "Get all achievements",
+        "tags": ["Achievements"],
+        "responses": {
+          "200": {
+            "description": "List of achievements"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new achievement",
+        "tags": ["Achievements"],
+        "responses": {
+          "201": {
+            "description": "Achievement created"
+          }
+        }
+      }
+    }
+  }
+}

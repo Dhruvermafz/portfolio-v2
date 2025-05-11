@@ -11,47 +11,20 @@ import {
   Modal,
 } from "react-bootstrap";
 import { FaReply, FaSearch } from "react-icons/fa";
-import axios from "axios";
-import { API_URL } from "../../../config";
+import { useGetAllContactsQuery } from "../../../api/contactApi";
 import PaginationComponent from "./PaginationQueries";
 import "./queries.css";
 
 const AllQueries = () => {
-  const [queries, setQueries] = useState([]);
   const [filteredQueries, setFilteredQueries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
   const queriesPerPage = 10;
 
-  // Fetch queries from API
-  useEffect(() => {
-    const fetchQueries = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("authToken");
-        const response = await axios.get(`${API_URL}/contact/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.data.success && Array.isArray(response.data.data)) {
-          setQueries(response.data.data);
-          setFilteredQueries(response.data.data);
-        } else {
-          setQueries([]);
-          setFilteredQueries([]);
-        }
-      } catch (error) {
-        console.error("Error fetching queries:", error);
-        setQueries([]);
-        setFilteredQueries([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQueries();
-  }, []);
+  // Fetch queries using RTK Query
+  const { data: queries = [], isLoading, isError } = useGetAllContactsQuery();
 
   // Handle search filter
   useEffect(() => {
@@ -104,11 +77,17 @@ const AllQueries = () => {
           </Col>
         </Row>
 
-        {loading ? (
+        {isLoading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
             <p className="mt-3 text-muted">Loading queries...</p>
           </div>
+        ) : isError ? (
+          <Card className="no-queries-card shadow-sm">
+            <Card.Body className="text-center">
+              <p className="mb-riff text-muted">Failed to load queries.</p>
+            </Card.Body>
+          </Card>
         ) : currentQueries.length === 0 ? (
           <Card className="no-queries-card shadow-sm">
             <Card.Body className="text-center">

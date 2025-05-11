@@ -1,41 +1,15 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import { useParams } from "react-router-dom";
 import ItsABlogCommetBox from "./ItsABlogCommetBox";
-import { API_URL } from "../../config";
 import "./blogdetail.css";
+import { useGetSingleBlogQuery } from "../../api/blogApi";
 const BlogDetailsPage = () => {
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
   const { id } = useParams();
+  const { data: blog, isLoading, isError } = useGetSingleBlogQuery(id);
 
-  useEffect(() => {
-    const fetchBlogDetails = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/post/${id}`);
-        const post = response.data; // Adjust based on API response
-        setBlog(post);
-      } catch (error) {
-        console.error("Error fetching blog details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (isLoading) return <p>Loading...</p>;
+  if (isError || !blog) return <p>Blog post not found.</p>;
 
-    if (id) {
-      fetchBlogDetails();
-    }
-  }, [id]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (!blog) {
-    return <p>Blog post not found.</p>;
-  }
-
-  // Destructure the blog details
   const {
     title = "Untitled",
     content = "No content available.",
@@ -44,7 +18,6 @@ const BlogDetailsPage = () => {
     userId = {},
   } = blog;
 
-  // Extract user information
   const authorName = userId.username || "Unknown Author";
 
   return (

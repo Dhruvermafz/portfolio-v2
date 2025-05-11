@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import {
@@ -11,8 +10,9 @@ import {
   Spinner,
   Container,
 } from "react-bootstrap";
+import { useGetAllCategoriesQuery } from "../../../api/categoryApi";
+import { useCreateBlogMutation } from "../../../api/blogApi";
 import useAuth from "../../../context/auth";
-import { API_URL } from "../../../config";
 import upload from "../../../assets/img/upload.png";
 import "./CreateBlog.css";
 
@@ -27,25 +27,25 @@ const CreateBlog = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Fetch categories using the API slice
+  const {
+    data: categories,
+    isLoading: loadingCategoriesData,
+    error: categoriesError,
+  } = useGetAllCategoriesQuery();
+
+  // Mutation for creating a blog
+  const [createBlog, { isLoading: creatingBlog }] = useCreateBlogMutation();
+
+  // Update the loading state based on API response
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const response = await axios.get(`${API_URL}/categories`);
-        setCategories(response.data);
-      } catch (err) {
-        setError("Failed to load categories. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-    fetchCategories();
-  }, []);
+    if (categoriesError) {
+      setError("Failed to load categories. Please try again later.");
+    }
+  }, [categoriesError]);
 
   const handleCategoryChange = (event) => {
     const options = event.target.options;
@@ -102,13 +102,7 @@ const CreateBlog = () => {
     formData.append("userId", user.userId || "");
 
     try {
-      const token = localStorage.getItem("authToken");
-      const response = await axios.post(`${API_URL}/post`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await createBlog(formData).unwrap();
       setSuccess("Blog created successfully!");
       resetForm();
     } catch (err) {
@@ -206,11 +200,11 @@ const CreateBlog = () => {
                       onChange={handleCategoryChange}
                       multiple
                       className="json-value"
-                      disabled={loadingCategories}
+                      disabled={loadingCategoriesData}
                     >
-                      {loadingCategories ? (
+                      {loadingCategoriesData ? (
                         <option>Loading categories...</option>
-                      ) : categories.length > 0 ? (
+                      ) : categories && categories.length > 0 ? (
                         categories.map((category) => (
                           <option key={category._id} value={category.name}>
                             {category.name}

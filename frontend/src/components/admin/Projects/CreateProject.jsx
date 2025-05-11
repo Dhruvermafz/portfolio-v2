@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { Container, Form, Button } from "react-bootstrap";
-import { API_URL } from "../../../config";
+import {
+  useGetProjectByIdQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+} from "../../../api/projectApi";
 import "./createproject.css";
 
 const ProjectForm = () => {
@@ -25,32 +28,33 @@ const ProjectForm = () => {
     tags: "",
   });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+  // Fetch project data if in edit mode
+  const {
+    data: project,
+    isLoading,
+    isError,
+  } = useGetProjectByIdQuery(_id, {
+    skip: !isEditMode, // Only fetch if in edit mode
+  });
 
-    // Fetch project data if in edit mode
-    if (isEditMode) {
-      const fetchProject = async () => {
-        try {
-          const response = await axios.get(`${API_URL}/projects/${_id}`);
-          const project = response.data;
-          setFormData({
-            ...project,
-            mainImage: null, // Reset file inputs
-            images: [], // Reset file inputs
-            challenges: project.challenges || [
-              { title: "", challenge: "", solution: "" },
-            ],
-            tags: project.tags ? project.tags.join(", ") : "", // Convert tags array to comma-separated string
-          });
-        } catch (err) {
-          console.error("Fetch error:", err);
-          alert("Failed to load project data");
-        }
-      };
-      fetchProject();
+  // Populate form data when project is fetched
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    if (isEditMode && project) {
+      setFormData({
+        ...project,
+        mainImage: null, // Reset file inputs
+        images: [], // Reset file inputs
+        challenges: project.challenges || [
+          { title: "", challenge: "", solution: "" },
+        ],
+        tags: project.tags ? project.tags.join(", ") : "", // Convert tags array to comma-separated string
+      });
     }
-  }, [_id, isEditMode]);
+  }, [isEditMode, project]);
+
+  const [createProject] = useCreateProjectMutation();
+  const [updateProject] = useUpdateProjectMutation();
 
   const handleChange = (e) => {
     const { name, value, dataset } = e.target;
@@ -98,7 +102,6 @@ const ProjectForm = () => {
       } else if (key === "mainImage" && formData.mainImage) {
         form.append("mainImage", formData.mainImage);
       } else if (key === "tags") {
-        // Convert comma-separated tags to array
         const tagsArray = formData.tags
           .split(",")
           .map((tag) => tag.trim())
@@ -113,16 +116,10 @@ const ProjectForm = () => {
 
     try {
       if (isEditMode) {
-        // Update project
-        await axios.put(`${API_URL}/projects/${_id}`, form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await updateProject({ id: _id, ...form }).unwrap();
         alert("Project updated successfully!");
       } else {
-        // Create project
-        await axios.post(`${API_URL}/projects/`, form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await createProject(form).unwrap();
         alert("Project added successfully!");
       }
       navigate("/projects");
@@ -131,6 +128,14 @@ const ProjectForm = () => {
       alert(`Failed to ${isEditMode ? "update" : "add"} project`);
     }
   };
+
+  if (isEditMode && isLoading) {
+    return <div>Loading project data...</div>;
+  }
+
+  if (isEditMode && isError) {
+    return <div>Failed to load project data</div>;
+  }
 
   return (
     <Container className="my-5 json-container">

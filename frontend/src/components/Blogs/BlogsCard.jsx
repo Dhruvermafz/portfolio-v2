@@ -1,40 +1,23 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import placeholder from "../../assets/img/blog/placeholder.png";
-import { API_URL, PORTFOLIO_URL } from "../../config";
-
+import { useGetAllBlogsQuery } from "../../api/blogApi";
 const BlogsCard = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError } = useGetAllBlogsQuery();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/post`);
-        setPosts(response.data.docs);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (isLoading) return <p>Loading articles...</p>;
+  if (isError || !data?.docs) return <p>Failed to load articles.</p>;
 
-    fetchPosts();
-  }, []);
+  const posts = data?.docs;
 
-  if (loading) {
-    return <p>Loading articles...</p>; // Replace with Skeleton Loader
-  }
+  const calculateReadingTime = (content) => {
+    const wordsPerMinute = 200;
+    const words = content?.split(/\s+/).length || 0;
+    return Math.ceil(words / wordsPerMinute);
+  };
 
   return (
     <>
-      {posts.map((post) => {
-        const { _id, title, content, published } = post;
-        const calculateReadingTime = (content) => {
-          const wordsPerMinute = 200;
-          const words = content?.split(/\s+/).length || 0;
-          return Math.ceil(words / wordsPerMinute);
-        };
+      {posts.map(({ _id, title, content, published }) => {
         const readingTime = calculateReadingTime(content);
         const formattedDate = new Date(published).toLocaleDateString();
 
@@ -54,17 +37,9 @@ const BlogsCard = () => {
                 <a href={`/blogs/${_id}`} className="title">
                   {title}
                 </a>
-                <ul
-                  style={{ listStyle: "none", padding: 0, margin: 0 }}
-                  className="list-unstyled"
-                >
-                  <li style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                    {readingTime} min read
-                  </li>
-
-                  <li style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                    {formattedDate}
-                  </li>
+                <ul className="list-unstyled" style={{ padding: 0, margin: 0 }}>
+                  <li>{readingTime} min read</li>
+                  <li>{formattedDate}</li>
                 </ul>
               </div>
             </div>

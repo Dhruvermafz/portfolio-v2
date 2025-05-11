@@ -13,22 +13,17 @@ const {
   authorizeAdmin,
 } = require("../middlewares/authMiddleware");
 
-const blogRouter = express.Router();
+const router = express.Router();
 
 // Apply authentication and authorization only for these routes
-blogRouter.post("/", authenticateUser, authorizeAdmin, createBlog);
-blogRouter.put("/:id", authenticateUser, authorizeAdmin, updateBlog);
-blogRouter.delete("/:id", authenticateUser, authorizeAdmin, deleteBlog);
-blogRouter.post(
-  "/markdown",
-  authenticateUser,
-  authorizeAdmin,
-  createBlogWithMD
-);
+router.post("/", authenticateUser, authorizeAdmin, createBlog);
+router.put("/:id", authenticateUser, authorizeAdmin, updateBlog);
+router.delete("/:id", authenticateUser, authorizeAdmin, deleteBlog);
+router.post("/markdown", authenticateUser, authorizeAdmin, createBlogWithMD);
 
 // Fetch routes (no authentication required)
-blogRouter.get("/:id", getSingleBlog);
-blogRouter.get("/", getAllBlogs);
-blogRouter.get("/featured", getFeaturedBlogs);
+router.get("/:id", getSingleBlog);
+router.get("/", getAllBlogs);
+router.get("/featured", getFeaturedBlogs);
 
-module.exports = blogRouter;
+module.exports = router;

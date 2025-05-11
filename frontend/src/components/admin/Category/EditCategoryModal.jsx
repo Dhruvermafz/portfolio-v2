@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import axios from "axios";
-import { API_URL } from "../../../config";
+import {
+  useUpdateCategoryMutation,
+  useGetAllCategoriesQuery,
+} from "../../../api/categoryApi";
 
 const EditCategoryModal = ({ isOpen, onClose, onConfirm, categoryToEdit }) => {
   const [name, setName] = useState("");
   const [parentCategory, setParentCategory] = useState("");
-  const [parentCategories, setParentCategories] = useState([]);
   const [status, setStatus] = useState(true);
   const [isParentCategory, setIsParentCategory] = useState(false);
+
+  const {
+    data: parentCategories = [],
+    error,
+    isLoading,
+  } = useGetAllCategoriesQuery();
+  const [updateCategory] = useUpdateCategoryMutation();
 
   useEffect(() => {
     if (categoryToEdit) {
@@ -17,17 +25,6 @@ const EditCategoryModal = ({ isOpen, onClose, onConfirm, categoryToEdit }) => {
       setStatus(categoryToEdit.isActive);
       setIsParentCategory(categoryToEdit.isParent || false);
     }
-
-    const fetchParentCategories = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/categories`);
-        setParentCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching parent categories", error);
-      }
-    };
-
-    fetchParentCategories();
   }, [categoryToEdit]);
 
   const handleSubmit = async () => {
@@ -38,16 +35,19 @@ const EditCategoryModal = ({ isOpen, onClose, onConfirm, categoryToEdit }) => {
         isActive: status,
         isParent: isParentCategory,
       };
-      const response = await axios.put(
-        `${API_URL}/categories/${categoryToEdit._id}`,
-        updatedCategory
-      );
-      onConfirm(response.data);
+      const response = await updateCategory({
+        id: categoryToEdit._id,
+        ...updatedCategory,
+      }).unwrap();
+      onConfirm(response);
       onClose();
     } catch (error) {
       console.error("Error updating category", error);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading categories</div>;
 
   return (
     <Modal show={isOpen} onHide={onClose}>

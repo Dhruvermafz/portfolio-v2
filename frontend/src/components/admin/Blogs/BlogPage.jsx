@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// src/pages/admin/BlogPage.js
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -8,50 +9,38 @@ import {
   Pagination,
   Spinner,
 } from "react-bootstrap";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import AdminBlogCard from "./AdminBlogCard";
-import { API_URL } from "../../../config";
 import "./blogs.css";
+import {
+  useGetAllBlogsQuery,
+  useDeleteBlogMutation,
+} from "../../../api/blogApi";
 
 const BlogPage = () => {
-  const [blogs, setBlogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(true);
   const blogsPerPage = 6;
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_URL}/post`);
-        setBlogs(res.data.docs || []);
-      } catch (err) {
-        console.error("Failed to fetch blogs:", err);
-        alert("Failed to load blogs. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBlogs();
-  }, []);
+  // Redux Toolkit Query
+  const { data, isLoading, isError } = useGetAllBlogsQuery();
+  const [deleteBlog] = useDeleteBlogMutation();
+
+  const blogs = data?.docs || [];
 
   const handleEdit = (post) => {
-    // Placeholder for edit modal or navigation
     console.log("Edit post:", post._id);
-    // Example: navigate(`/admin/blogs/edit/${post._id}`);
+    // Optional: navigate(`/admin/blogs/edit/${post._id}`);
   };
 
   const handleDelete = async (post) => {
     if (window.confirm("Are you sure you want to delete this blog post?")) {
       try {
-        await axios.delete(`${API_URL}/post/${post._id}`);
-        setBlogs(blogs.filter((b) => b._id !== post._id));
+        await deleteBlog(post._id).unwrap();
         alert("Blog post deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting post:", error);
+      } catch (err) {
+        console.error("Error deleting post:", err);
         alert("Failed to delete blog post.");
       }
     }
@@ -105,11 +94,13 @@ const BlogPage = () => {
         </Row>
 
         <Row>
-          {loading ? (
+          {isLoading ? (
             <Col className="text-center py-5">
               <Spinner animation="border" variant="primary" />
               <p className="mt-3 text-muted">Loading blogs...</p>
             </Col>
+          ) : isError ? (
+            <Col className="text-center text-danger">Error loading blogs</Col>
           ) : paginatedBlogs.length === 0 ? (
             <Col>
               <div className="no-blogs-card text-center py-4">

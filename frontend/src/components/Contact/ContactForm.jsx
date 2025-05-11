@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { API_URL } from "../../config";
-
+import { useCreateContactMutation } from "../../api/contactApi";
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -11,6 +9,8 @@ const ContactForm = () => {
     subject: "",
     message: "",
   });
+
+  const [sendMessage, { isLoading }] = useCreateContactMutation(); // Use the RTK Query mutation
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,8 +24,8 @@ const ContactForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${API_URL}/contact/`, formData);
-      if (response.status === 200) {
+      const response = await sendMessage(formData).unwrap(); // Send the message using RTK Query
+      if (response) {
         toast.success("Your message has been sent successfully!", {
           position: "top-right",
         });
@@ -127,8 +127,12 @@ const ContactForm = () => {
                       </div>
                     </div>
                     <div className="col-md-12">
-                      <button className="submit-btn" type="submit">
-                        Send Message
+                      <button
+                        className="submit-btn"
+                        type="submit"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Sending..." : "Send Message"}
                         <svg
                           className="icon"
                           width="20"

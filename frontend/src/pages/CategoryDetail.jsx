@@ -1,29 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { API_URL } from "../config";
-
+import { useGetCategoryByIdQuery } from "../api/categoryApi";
 const CategoryDetail = () => {
   const { id } = useParams();
-  const [category, setCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    const fetchCategoryDetails = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/categories/${id}`);
-        setCategory(response.data);
-        setItems(response.data.items || []); // Items can be blogs, projects, etc.
-      } catch (error) {
-        console.error("Error fetching category details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Use RTK Query to fetch category data by ID
+  const { data: category, isLoading, isError } = useGetCategoryByIdQuery(id);
 
-    fetchCategoryDetails();
-  }, [id]);
+  // Check if category is not found
+  if (isLoading) {
+    return (
+      <section className="content-box-area mt-4">
+        <div className="container">
+          <p>Loading category details...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="content-box-area mt-4">
+        <div className="container">
+          <p>Error fetching category details. Please try again.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="content-box-area mt-4">
@@ -32,16 +35,14 @@ const CategoryDetail = () => {
           <div className="col-xl-12">
             <div className="card content-box-card">
               <div className="card-body">
-                {loading ? (
-                  <p>Loading category details...</p>
-                ) : category ? (
+                {category ? (
                   <>
                     <h1 className="main-title">{category.name}</h1>
                     <p>{category.description}</p>
 
                     <div className="row g-4">
-                      {items.length > 0 ? (
-                        items.map((item) => (
+                      {category.items && category.items.length > 0 ? (
+                        category.items.map((item) => (
                           <div key={item.id} className="col-md-4">
                             <div className="card item-card">
                               <div className="card-body">

@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
-import loti from "../../../assets/img/loti/loti-auth.svg";
 import {
   Form,
   Button,
@@ -13,9 +11,9 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { API_URL } from "../../../config";
+import loti from "../../../assets/img/loti/loti-auth.svg";
 import "./auth.css";
-
+import { useRegisterUserMutation } from "../../../api/userApi";
 const SignUp = () => {
   const [formData, setFormData] = useState({
     username: "",
@@ -24,8 +22,10 @@ const SignUp = () => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [registerUser, { isLoading: isRegistering }] =
+    useRegisterUserMutation();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -39,37 +39,29 @@ const SignUp = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setLoading(true);
 
     if (!formData.username.trim()) {
       setError("Username is required.");
-      setLoading(false);
       return;
     }
     if (!validateEmail(formData.email)) {
       setError("Please enter a valid email address.");
-      setLoading(false);
       return;
     }
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long.");
-      setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.post(`${API_URL}/user/register`, formData);
+      await registerUser(formData).unwrap();
       setSuccess("Account created successfully! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } catch (err) {
       console.error("Registration failed:", err);
-      setError(
-        err.response?.data?.message || "Registration failed. Please try again."
-      );
-    } finally {
-      setLoading(false);
+      setError(err?.data?.message || "Registration failed. Please try again.");
     }
   };
 
@@ -161,9 +153,9 @@ const SignUp = () => {
                     variant="primary"
                     type="submit"
                     className="signup-btn w-100"
-                    disabled={loading}
+                    disabled={isRegistering}
                   >
-                    {loading ? (
+                    {isRegistering ? (
                       <>
                         <Spinner
                           as="span"
