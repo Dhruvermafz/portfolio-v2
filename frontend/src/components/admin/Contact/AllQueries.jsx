@@ -21,21 +21,23 @@ const AllQueries = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
-  const queriesPerPage = 10;
+  const queriesPerPage = 20;
 
   // Fetch queries using RTK Query
-  const { data: queries = [], isLoading, isError } = useGetAllContactsQuery();
+  const { data: queries, isLoading, isError } = useGetAllContactsQuery();
 
   // Handle search filter
   useEffect(() => {
-    const lowerSearch = searchTerm.toLowerCase();
-    const results = queries.filter(
-      (query) =>
-        query.name.toLowerCase().includes(lowerSearch) ||
-        query.email.toLowerCase().includes(lowerSearch)
-    );
-    setFilteredQueries(results);
-    setCurrentPage(1);
+    if (queries && queries.data) {
+      const lowerSearch = searchTerm.toLowerCase();
+      const results = queries.data.filter(
+        (query) =>
+          query.name.toLowerCase().includes(lowerSearch) ||
+          query.email.toLowerCase().includes(lowerSearch)
+      );
+      setFilteredQueries(results);
+      setCurrentPage(1);
+    }
   }, [searchTerm, queries]);
 
   const indexOfLastQuery = currentPage * queriesPerPage;

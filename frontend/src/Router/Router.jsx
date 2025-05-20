@@ -19,12 +19,11 @@ import PrivateRoute from "./PrivateRoute";
 import BlogDetails from "../pages/BlogDetails";
 import ComingSoon from "../pages/ComingSoon";
 import Category from "../pages/Category";
-import Resume from "../pages/Resume";
 import CategoryDetail from "../pages/CategoryDetail";
 import AdminProjectList from "../pages/AdminProjectList";
 import CreateProject from "../components/admin/Projects/CreateProject";
-import Achievement from "../components/Achievement/Achievement";
 import AchievementList from "../components/admin/Achivements/AchievementList";
+import ResumeCard from "../components/ResumeCard";
 
 // Public routes
 const publicRoutes = [
@@ -42,6 +41,7 @@ const publicRoutes = [
   { path: "/coming", element: <ComingSoon /> },
   { path: "/categories", element: <Category /> },
   { path: "/categories/:id", element: <CategoryDetail /> },
+  { path: "/resume", element: <ResumeCard /> },
 ];
 
 // Admin routes

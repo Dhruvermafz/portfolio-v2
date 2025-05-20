@@ -1,6 +1,59 @@
 {
   "projects": [
     {
+      "id": "cmtradingco",
+      "title": "CmTradingCo",
+      "client": "Chhabra Marbel Co",
+      "website": "https://cmtradingco.in",
+      "ghLink": "https://github.com/rocklimedev/dashboard-ROCKLIME",
+      "overview": "CmTradingCo is a comprehensive e-commerce and inventory management platform built for Chhabra Marbel, tailored for their smart security and access control products.",
+      "services": "React.js, Node.js, MySQL, Docker, MongoDB, Redux",
+      "mainImage": "cmtrading.png",
+      "images": ["cmtrading_2.png", "cmtrading_3.png"],
+      "challenges": [
+        {
+          "title": "Commercial Use Platform Complexity",
+          "challenge": "Building a highly scalable backend that supports dynamic product management, user segmentation, seemless quotaitons, invoices with cart management and fast search/filter capabilities across various regions and user types.",
+          "solution": "MySQL with multi-indexing was used to handle large datasets efficiently, and Dockerized microservices ensured modular scalability and deployment flexibility."
+        },
+        {
+          "title": "Real-time Synchronization of Product and Cart Data",
+          "challenge": "Keeping inventory and cart data up-to-date across multiple concurrent users, especially during peak loads and flash sales.",
+          "solution": "WebSocket APIs with Node.js enabled live updates across the app. Caching mechanisms minimized latency and offloaded pressure from the database."
+        },
+        {
+          "title": "Multi-platform Compatibility and Mobile Responsiveness",
+          "challenge": "Delivering a seamless experience across desktops, tablets, and mobile devices with consistent UX and feature parity.",
+          "solution": "Used ReactJS with responsive design patterns and TailwindCSS to ensure the interface adapted fluidly across screen sizes and devices."
+        },
+        {
+          "title": "Secure Backend Services with various roles and permissions",
+          "challenge": "Ensuring secure data flows, encrypted with data concurrecny accross various roles and permissions, segmented in the database while keeping with the global data protection standards.",
+          "solution": "Integrated secure backend counterparts with sleek logic and testing the services with various tools and methodologies."
+        },
+        {
+          "title": "Efficient Inventory Management and Order & Cart Fulfillment",
+          "challenge": "Maintaining up-to-date stock data and ensuring smooth order processing and logistics for both local and international deliveries.",
+          "solution": "Built APIs to handle inventory tracking in real-time, linked with shipping partners and internal stock management systems. Automated stock alerts helped maintain supply levels efficiently."
+        },
+        {
+          "title": "API Testing and Continuous Integration",
+          "challenge": "Testing dozens of endpoints and flows for correctness, speed, and resilience under load while avoiding manual bottlenecks.",
+          "solution": "Used Postman for API test coverage and automated testing with Jest and React Testing Library to enforce quality across backend and frontend."
+        }
+      ],
+      "results": "cmtradingco has delivered a seamless B2B and B2C experience for Chhabra Marbel Co, customers, combining a highly responsive interface with powerful backend logistics and inventory handling. The platform has scaled reliably under load and has significantly improved product visibility, customer satisfaction, and operational efficiency.",
+      "tags": [
+        "React.js",
+        "Node.js",
+        "MySQL",
+        "Docker",
+        "MongoDB",
+        "E-commerce",
+        "Redux"
+      ]
+    },
+    {
       "id": "itsablog",
       "title": "ItsABlog",
       "client": "Self",
@@ -119,7 +172,6 @@
         "Redux"
       ]
     },
-
     {
       "id": "live_auctions",
       "title": "Live Auctions",

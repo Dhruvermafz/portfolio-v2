@@ -1,36 +1,99 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import projects from "../../assets/data/projectsData";
+import { useGetAllProjectsQuery } from "../../api/projectApi";
 import HireMeSlider from "../HireMeSlider";
-import { FaLink } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa6";
+import { FaLink, FaGithub } from "react-icons/fa6";
 import Tags from "../Tags";
+import { Link } from "react-router-dom";
 const ProjectDetailsCard = () => {
-  const { id } = useParams();
+  const { id: slug } = useParams(); // URL parameter is slug (e.g., "indus_education_world")
   const navigate = useNavigate();
-  const projectIndex = projects.findIndex((proj) => proj.id === id);
-  const project = projects[projectIndex];
+
+  // Normalize slug: replace underscores with hyphens
+  const normalizedSlug = slug.replace(/_/g, "-"); // e.g., "indus_education_world" -> "indus-education-world"
+
+  // Fetch all projects
+  const {
+    data: projects = [],
+    isLoading: isProjectsLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetAllProjectsQuery();
+
+  // Find the project with the matching slug
+  const project = projects.find((proj) => proj.slug === normalizedSlug);
 
   useEffect(() => {
-    // Scroll to the top of the page when the project changes
+    // Scroll to the top of the page when the slug changes
     window.scrollTo(0, 0);
-  }, [id]);
+    // Debug: Log the slug, normalized slug, and projects
+    console.log("Fetching project with slug:", slug);
+    console.log("Normalized slug:", normalizedSlug);
+    console.log("All projects:", projects);
+    console.log(
+      "Project slugs:",
+      projects.map((p) => p.slug)
+    );
+    console.log("Selected project:", project);
+  }, [slug, normalizedSlug, projects, project]);
 
-  if (!project) {
-    return <div>Project not found</div>;
+  // Handle loading state
+  if (isProjectsLoading) {
+    return <div aria-live="polite">Loading project...</div>;
   }
+
+  // Handle error state
+  if (isError) {
+    return (
+      <div aria-live="polite">
+        Error loading project: {error?.data?.message || "Something went wrong"}
+        <button onClick={() => refetch()} className="btn btn-primary mt-2">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // Handle project not found
+  if (!project) {
+    // Suggest similar slugs
+    const similarSlugs = projects
+      .filter((p) => p.slug.includes(slug.replace(/_/g, "")))
+      .map((p) => p.slug);
+    return (
+      <div aria-live="polite">
+        Project not found for slug: {slug}
+        {similarSlugs.length > 0 && (
+          <div>
+            <p>Did you mean:</p>
+            <ul>
+              {similarSlugs.map((s) => (
+                <li key={s}>
+                  <Link to={`/project/${s}`}>{s}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Find the current project's index for navigation
+  const projectIndex = projects.findIndex((proj) => proj.slug === project.slug);
 
   const handlePrevClick = () => {
     if (projectIndex > 0) {
       const prevProject = projects[projectIndex - 1];
-      navigate(`/project/${prevProject.id}`);
+      navigate(`/project/${prevProject.slug}`);
     }
   };
 
   const handleNextClick = () => {
     if (projectIndex < projects.length - 1) {
       const nextProject = projects[projectIndex + 1];
-      navigate(`/project/${nextProject.id}`);
+      navigate(`/project/${nextProject.slug}`);
     }
   };
 
@@ -40,7 +103,18 @@ const ProjectDetailsCard = () => {
         <div className="card-body portfolio-card">
           <div className="portfolio-details-area">
             <div className="main-image">
-              <img src={project.mainImage} alt={project.title} />
+              <img
+                src={project.mainImage}
+                alt={project.title}
+                loading="lazy"
+                onError={(e) => {
+                  console.error(`Failed to load image: ${project.mainImage}`);
+                  if (!project.mainImage.includes("Signature=")) {
+                    console.warn(`Unsigned URL detected: ${project.mainImage}`);
+                  }
+                  e.target.src = "/assets/fallback-image.png";
+                }}
+              />
             </div>
             <div className="portfolio-details-text">
               <div className="short-info">
@@ -51,15 +125,13 @@ const ProjectDetailsCard = () => {
                 <div className="info-item">
                   <p className="subtitle">Services:</p>
                   <h4 className="card-title">{project.services}</h4>
-
                   <a
                     href={project.website}
                     className="website"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {" "}
-                    Live Link <FaLink> {project.website}</FaLink>
+                    Live Link <FaLink /> {project.website}
                     <svg
                       className="arrow-up"
                       width="14"
@@ -72,12 +144,12 @@ const ProjectDetailsCard = () => {
                         d="M9.91634 4.5835L4.08301 10.4168"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                      ></path>
+                      />
                       <path
                         d="M4.66699 4.5835H9.91699V9.8335"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                      ></path>
+                      />
                     </svg>
                   </a>
                   <a
@@ -86,8 +158,7 @@ const ProjectDetailsCard = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {" "}
-                    Source Code <FaGithub> {project.ghLink}</FaGithub>
+                    Source Code <FaGithub /> {project.ghLink}
                     <svg
                       className="arrow-up"
                       width="14"
@@ -100,12 +171,12 @@ const ProjectDetailsCard = () => {
                         d="M9.91634 4.5835L4.08301 10.4168"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                      ></path>
+                      />
                       <path
                         d="M4.66699 4.5835H9.91699V9.8335"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                      ></path>
+                      />
                     </svg>
                   </a>
                 </div>
@@ -124,6 +195,14 @@ const ProjectDetailsCard = () => {
                         src={image}
                         alt={`project-details-${index + 2}`}
                         className="img-fluid w-100"
+                        loading="lazy"
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${image}`);
+                          if (!image.includes("Signature=")) {
+                            console.warn(`Unsigned URL detected: ${image}`);
+                          }
+                          e.target.src = "/assets/fallback-image.png";
+                        }}
                       />
                     </div>
                   </div>
@@ -147,21 +226,22 @@ const ProjectDetailsCard = () => {
               ))}
               <h3 className="more-info-title">Results/Conclusion:</h3>
               <p>{project.results}</p>
-
               <Tags tags={project.tags} />
             </div>
             <div className="prev-and-next-btn">
               <button
                 className="btn btn-prev"
                 onClick={handlePrevClick}
-                disabled={projectIndex === 0}
+                disabled={projectIndex === 0 || projectIndex === -1}
               >
                 Previous
               </button>
               <button
                 className="btn btn-next"
                 onClick={handleNextClick}
-                disabled={projectIndex === projects.length - 1}
+                disabled={
+                  projectIndex === projects.length - 1 || projectIndex === -1
+                }
               >
                 Next
               </button>

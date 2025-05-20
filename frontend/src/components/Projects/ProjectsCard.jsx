@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import projects from "../../assets/data/projectsData";
 import Pagination from "../Pagination";
 import HireMeSlider from "../HireMeSlider";
-
+import { useGetAllProjectsQuery } from "../../api/projectApi";
 const ProjectsCard = () => {
   const projectsPerPage = 6; // Number of projects per page
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Fetch projects using RTK Query
+  const {
+    data: projects = [],
+    isLoading,
+    isError,
+    error,
+  } = useGetAllProjectsQuery();
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -18,6 +25,19 @@ const ProjectsCard = () => {
     startIndex,
     startIndex + projectsPerPage
   );
+
+  // Handle loading and error states
+  if (isLoading) {
+    return <div>Loading projects...</div>;
+  }
+
+  if (isError) {
+    return (
+      <div>
+        Error fetching projects: {error?.message || "Something went wrong"}
+      </div>
+    );
+  }
 
   return (
     <div className="col-xl-8">
@@ -36,72 +56,76 @@ const ProjectsCard = () => {
           </div>
           <div className="portfolio-area">
             <div className="row g-4 parent-container">
-              {currentProjects.map((project) => (
-                <div className="col-lg-6" key={project.id}>
-                  <div className="portfolio-item">
-                    <div className="image">
-                      <img
-                        src={project.mainImage}
-                        alt={`project-${project.id}`}
-                        className="img-fluid w-100"
-                      />
-                      <a
-                        href={project.mainImage}
-                        className="gallery-popup full-image-preview parent-container"
-                      >
-                        <svg
-                          className="icon"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="1.5"
-                        >
-                          <path d="M10 4.167v11.666M4.167 10h11.666"></path>
-                        </svg>
-                      </a>
-                    </div>
-                    <div className="text">
-                      <div className="info">
-                        <Link to={`/project/${project.id}`} className="title">
-                          {project.title}
-                        </Link>
-                        <p className="subtitle">{project.services}</p>
-                      </div>
-                      <div className="visite-btn">
+              {currentProjects.length > 0 ? (
+                currentProjects.map((project) => (
+                  <div className="col-lg-6" key={project.id}>
+                    <div className="portfolio-item">
+                      <div className="image">
+                        <img
+                          src={project.mainImage}
+                          alt={`project-${project.id}`}
+                          className="img-fluid w-100"
+                        />
                         <a
-                          href={project.website}
-                          target="_blank"
-                          rel="noreferrer"
+                          href={project.mainImage}
+                          className="gallery-popup full-image-preview parent-container"
                         >
-                          Visit Site
                           <svg
-                            className="arrow-up"
-                            width="14"
-                            height="15"
-                            viewBox="0 0 14 15"
-                            fill="none"
+                            className="icon"
                             xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
                           >
-                            <path
-                              d="M9.91634 4.5835L4.08301 10.4168"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            ></path>
-                            <path
-                              d="M4.66699 4.5835H9.91699V9.8335"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            ></path>
+                            <path d="M10 4.167v11.666M4.167 10h11.666"></path>
                           </svg>
                         </a>
                       </div>
+                      <div className="text">
+                        <div className="info">
+                          <Link to={`/project/${project.id}`} className="title">
+                            {project.title}
+                          </Link>
+                          <p className="subtitle">{project.services}</p>
+                        </div>
+                        <div className="visite-btn">
+                          <a
+                            href={project.website}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Visit Site
+                            <svg
+                              className="arrow-up"
+                              width="14"
+                              height="15"
+                              viewBox="0 0 14 15"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9.91634 4.5835L4.08301 10.4168"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              ></path>
+                              <path
+                                d="M4.66699 4.5835H9.91699V9.8335"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              ></path>
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div>No projects available</div>
+              )}
             </div>
             <Pagination
               totalPages={Math.ceil(projects.length / projectsPerPage)}
