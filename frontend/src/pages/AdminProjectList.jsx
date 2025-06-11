@@ -26,7 +26,7 @@ const AdminProjectList = () => {
   // Fetching projects from the Redux store using RTK Query
   const { data: projects = [], isLoading, error } = useGetAllProjectsQuery();
 
-  const projectsPerPage = 6;
+  const projectsPerPage = 10;
 
   const totalProjects = projects.length;
   const clients = [...new Set(projects.map((p) => p.client))];

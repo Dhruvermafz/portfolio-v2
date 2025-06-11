@@ -24,6 +24,7 @@ import AdminProjectList from "../pages/AdminProjectList";
 import CreateProject from "../components/admin/Projects/CreateProject";
 import AchievementList from "../components/admin/Achivements/AchievementList";
 import ResumeCard from "../components/ResumeCard";
+import TodoList from "../components/admin/ToDo/TodoList";
 
 // Public routes
 const publicRoutes = [
@@ -55,6 +56,7 @@ const adminRoutes = [
   { path: "/project-add", element: <CreateProject /> },
   { path: "/project-edit/:_id", element: <CreateProject /> },
   { path: "/admin/achievements", element: <AchievementList /> },
+  { path: "/todo-list", element: <TodoList /> },
 ];
 
 const Router = () => {

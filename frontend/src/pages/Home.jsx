@@ -3,8 +3,7 @@ import ProfileCard from "../components/Cards/ProfileCard";
 import WorkExperience from "../components/Cards/WorkExperience";
 import TechnologiesIWorked from "../components/TechStack/TechnologiesIWorked";
 import Projects from "../components/Cards/Projects";
-import Academia from "../components/Cards/Academia";
-import ExperienceTimeline from "../components/Experience/ExperienceTimeline";
+
 const Home = () => {
   return (
     <section className="home-area">
@@ -13,7 +12,6 @@ const Home = () => {
           <ProfileCard />
           <WorkExperience />
           <Projects />
-
           <TechnologiesIWorked />
         </div>
       </div>
