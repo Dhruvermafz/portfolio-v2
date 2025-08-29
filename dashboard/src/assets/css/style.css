@@ -24366,19 +24366,8 @@ footer {
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
-  background-image: -webkit-gradient(
-      linear,
-      left top,
-      left bottom,
-      from(rgba(158, 107, 248, 0.5)),
-      to(rgba(119, 101, 250, 0.5))
-    ),
-    url(../assets/images/landing/title.html);
-  background-image: linear-gradient(
-      rgba(158, 107, 248, 0.5),
-      rgba(119, 101, 250, 0.5)
-    ),
-    url(../assets/images/landing/title.html);
+
+
   background-position: left;
   line-height: 1;
   font-size: calc(25px + (57 - 25) * ((100vw - 300px) / (1920 - 300)));
@@ -24756,7 +24745,7 @@ footer {
   margin-left: 0;
 }
 .email_bg {
-  background-image: url(../assets/images/landing/email-bg.html) !important;
+
 }
 .app_bg {
   background-color: #f7f7fe;
@@ -24777,7 +24766,7 @@ footer {
   -webkit-text-fill-color: #fff !important;
 }
 .layout {
-  background-image: url(../assets/images/landing/email-bg.html);
+
 }
 .layout {
   margin-bottom: -30px;
