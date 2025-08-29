@@ -3,17 +3,52 @@ import { Link } from "react-router-dom";
 import Pagination from "../Pagination";
 import HireMeSlider from "../HireMeSlider";
 import { useGetAllProjectsQuery } from "../../api/projectApi";
+
+// A simple CSS-based loader component
+const Loader = () => (
+  <div className="loader-container">
+    <div className="spinner"></div>
+    <style jsx>{`
+      .loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    `}</style>
+  </div>
+);
+
 const ProjectsCard = () => {
   const projectsPerPage = 6; // Number of projects per page
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch projects using RTK Query
+  // Fetch projects using RTK Query with pollingInterval to avoid excessive refetching
   const {
     data: projects = [],
     isLoading,
     isError,
     error,
-  } = useGetAllProjectsQuery();
+  } = useGetAllProjectsQuery(undefined, {
+    pollingInterval: 0, // Disable polling to reduce server load
+    refetchOnMountOrArgChange: true, // Refetch only when component mounts or args change
+  });
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -28,12 +63,12 @@ const ProjectsCard = () => {
 
   // Handle loading and error states
   if (isLoading) {
-    return <div>Loading projects...</div>;
+    return <Loader />;
   }
 
   if (isError) {
     return (
-      <div>
+      <div className="error-message">
         Error fetching projects: {error?.message || "Something went wrong"}
       </div>
     );
@@ -65,6 +100,7 @@ const ProjectsCard = () => {
                           src={project.mainImage}
                           alt={`project-${project.id}`}
                           className="img-fluid w-100"
+                          loading="lazy" // Enable lazy loading for images
                         />
                         <a
                           href={project.mainImage}

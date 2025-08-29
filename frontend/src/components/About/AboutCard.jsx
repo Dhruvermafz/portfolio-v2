@@ -27,7 +27,6 @@ const AboutCard = () => {
     const clientList = projects.map((project) => project.client);
     // Remove duplicates by converting the array into a Set
     const uniqueClients = new Set(clientList);
-    console.log(clientList);
     // Return the number of unique clients
     return uniqueClients.size;
   };

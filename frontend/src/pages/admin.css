@@ -1,5 +1,4 @@
 .admin-section {
-  background-color: #f4f7fa;
   min-height: 100vh;
 }
 
@@ -8,7 +7,7 @@
 }
 
 .admin-header {
-  background: #ffffff;
+  background: #f8fafc;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;

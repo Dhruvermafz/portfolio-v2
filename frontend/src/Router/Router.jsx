@@ -50,6 +50,7 @@ const adminRoutes = [
   { path: "/admin", element: <Admin /> },
   { path: "/admin/blogs", element: <BlogPage /> },
   { path: "/admin/blogs/create", element: <CreateBlog /> },
+  { path: "/admin/blogs/:_id/edit", element: <CreateBlog /> },
   { path: "/admin/category", element: <AllCategory /> },
   { path: "/admin/contact", element: <AllQueries /> },
   { path: "/projects-list", element: <AdminProjectList /> },
@@ -68,12 +69,15 @@ const Router = () => {
       ))}
 
       {/* Admin routes inside PrivateRoute */}
-      {adminRoutes.map((route) => (
+      {/* {adminRoutes.map((route) => (
         <Route
           key={route.path}
           path={route.path}
           element={<PrivateRoute>{route.element}</PrivateRoute>}
         />
+      ))} */}
+      {adminRoutes.map((route) => (
+        <Route key={route.path} path={route.path} element={route.element} />
       ))}
     </Routes>
   );

@@ -36,7 +36,7 @@ export const workExperiences = [
     date: "Jul 2024 - Feb 2025",
     icon: pickyvibe,
     company: "PickyVibe LLP",
-    position: "Full Stack Developer Intern",
+    position: "Full Stack Developer",
     description:
       "Developed and maintained advanced infrastructure tools for Travel Agency using React.js, Node.js, ensuring industry-standard compliance. Skilled in system development, AWS, GraphQL, and problem-solving.",
   },
