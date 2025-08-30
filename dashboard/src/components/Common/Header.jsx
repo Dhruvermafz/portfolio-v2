@@ -14,7 +14,7 @@ import { BiMenu } from "react-icons/bi";
 import { FaCircle } from "react-icons/fa";
 import logo_light from "../../assets/images/logo/logo-white.png";
 import logo from "../../assets/images/logo/1.png";
-
+import Avatar from "react-avatar";
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -124,9 +124,12 @@ const Header = () => {
             {/* Profile Dropdown */}
             <li className="profile-nav onhover-dropdown pe-0 me-0">
               <div className="media profile-media">
-                <Image
+                <Avatar
+                  name={user?.name || "Guest"} // Fallback to "Guest" if no user
+                  src={user?.avatar} // Use user avatar if available
+                  size="40"
+                  round={true}
                   className="user-profile rounded-circle"
-                  src={user?.avatar || "assets/images/users/4.jpg"}
                   alt={user?.name || "User"}
                 />
                 <div className="user-name-hide media-body">
@@ -145,10 +148,10 @@ const Header = () => {
               </div>
               <ul className="profile-dropdown onhover-show-div">
                 <li>
-                  <Link to="/all-users">
+                  <a href="https://dhruvermafz.in" target="_blank">
                     <i data-feather="users"></i>
-                    <span>Users</span>
-                  </Link>
+                    <span>Portfolio</span>
+                  </a>
                 </li>
                 <li>
                   <Link to="/order-list">

@@ -111,10 +111,9 @@ const Categories = () => {
                   >
                     <thead>
                       <tr>
-                        <th>Product Name</th>
+                        <th>Category Name</th>
                         <th>Date</th>
-                        <th>Product Image</th>
-                        <th>Icon</th>
+
                         <th>Slug</th>
                         <th>Option</th>
                       </tr>
@@ -132,32 +131,7 @@ const Categories = () => {
                           <tr key={category._id}>
                             <td>{category.name}</td>
                             <td>{category.createdAt || "N/A"}</td>
-                            <td>
-                              <div className="table-image">
-                                <Image
-                                  src={
-                                    category.image ||
-                                    "assets/images/product/placeholder.png"
-                                  }
-                                  className="img-fluid"
-                                  alt={category.name}
-                                  style={{ maxWidth: "50px" }}
-                                />
-                              </div>
-                            </td>
-                            <td>
-                              <div className="category-icon">
-                                <Image
-                                  src={
-                                    category.icon ||
-                                    "https://themes.pixelstrap.com/fastkart/assets/svg/1/vegetable.svg"
-                                  }
-                                  className="img-fluid"
-                                  alt={category.name}
-                                  style={{ maxWidth: "30px" }}
-                                />
-                              </div>
-                            </td>
+
                             <td>
                               {category.slug || category.name.toLowerCase()}
                             </td>

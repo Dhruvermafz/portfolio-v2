@@ -88,7 +88,6 @@ const MediaWrapper = () => {
                     </label>
                   </div>
                 </div>
-                <div></div>
               </div>
             </div>
           </div>

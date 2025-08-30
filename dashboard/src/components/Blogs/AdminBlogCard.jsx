@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Dropdown, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaBookOpen } from "react-icons/fa";
-import placeholder from "../../assets/img/blog/placeholder.png";
+import placeholder from "../../assets/images/product/1.png";
 import { PORTFOLIO_URL } from "../../config";
 import "./blogs.css";
 
