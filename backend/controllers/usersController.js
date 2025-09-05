@@ -171,8 +171,54 @@ const updateUser = async (req, res) => {
     res.status(500).json({ message: "Failed to update user" });
   }
 };
+// Add a new user directly (e.g., via admin portal)
+const addUser = async (req, res) => {
+  const { username, email, password, photo, role } = req.body;
 
+  try {
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser)
+      return res.status(400).json({ message: "Email already exists" });
+
+    // Check if username already exists
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername)
+      return res.status(400).json({ message: "Username already exists" });
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      photo,
+      role: role || "user", // Default to 'user' role if not provided
+    });
+    await newUser.save();
+
+    // Respond with the created user details
+    res.status(201).json({
+      message: "User added successfully",
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+        createdAt: newUser.createdAt,
+        updatedAt: newUser.updatedAt,
+        photo: newUser.photo,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to add user" });
+  }
+};
 module.exports = {
+  addUser,
   registerUser,
   loginUser,
   getUserById,

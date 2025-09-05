@@ -94,15 +94,6 @@ const Queries = () => {
                     >
                       <thead>
                         <tr>
-                          <th>
-                            <span className="form-check user-checkbox m-0 p-0">
-                              <input
-                                className="checkbox_animated checkall"
-                                type="checkbox"
-                                value=""
-                              />
-                            </span>
-                          </th>
                           <th>Name</th>
                           <th>Email</th>
                           <th>Subject</th>
@@ -134,15 +125,6 @@ const Queries = () => {
                           !isError &&
                           currentQueries.map((query) => (
                             <tr key={query._id}>
-                              <td>
-                                <span className="form-check user-checkbox m-0 p-0">
-                                  <input
-                                    className="checkbox_animated check-it"
-                                    type="checkbox"
-                                    value=""
-                                  />
-                                </span>
-                              </td>
                               <td>{query.name}</td>
                               <td>{query.email}</td>
                               <td>{query.subject || "No Subject"}</td>

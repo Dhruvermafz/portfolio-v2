@@ -1,28 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-  BiClipboard,
-  BiTrophy,
-  BiAward,
-  BiCalendarCheck,
-  BiBuilding,
-} from "react-icons/bi";
+
 import {
   RiHeartFill,
   RiDatabase2Line,
   RiShoppingBag3Line,
   RiChat3Line,
   RiUserAddLine,
-  RiShieldLine,
-  RiCheckLine,
-  RiExchangeDollarLine,
-  RiBankCardLine,
-  RiBarChartGroupedLine,
 } from "react-icons/ri";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { Dropdown, DropdownButton } from "react-bootstrap";
-import { Bar, Pie } from "react-chartjs-2";
+
+import { Dropdown } from "react-bootstrap";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,7 +22,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import PageTitle from "../components/Common/PageTitle";
+
 import {
   useGetAllAchievementsQuery,
   useGetAchievementByIdQuery,
@@ -82,16 +71,6 @@ const Dashboard = () => {
   // State for new task input
   const [newTask, setNewTask] = useState("");
 
-  // Placeholder for contentClick
-  const contentClick = () => {
-    console.log("Content clicked");
-  };
-
-  // Placeholder for starting tour
-  const startTour = () => {
-    console.log("Starting tour");
-  };
-
   // Update progress bar dynamically
   useEffect(() => {
     const progressBar = document.querySelector(".progress-bar");
@@ -114,41 +93,6 @@ const Dashboard = () => {
         console.error("Failed to add task:", error);
       }
     }
-  };
-
-  // Chart data for Revenue Report (Bar Chart)
-  const revenueChartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Revenue",
-        data: [12000, 19000, 3000, 5000, 2000, 3000],
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-      },
-    ],
-  };
-
-  // Chart data for Earning (Bar Chart)
-  const earningChartData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [
-      {
-        label: "Earnings",
-        data: [400, 300, 500, 200, 600, 700, 100],
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-    ],
-  };
-
-  // Chart data for Visitors (Pie Chart)
-  const visitorsChartData = {
-    labels: ["New Visitors", "Returning Visitors"],
-    datasets: [
-      {
-        data: [65, 35],
-        backgroundColor: ["#36A2EB", "#FF6384"],
-      },
-    ],
   };
 
   // Handle loading state
@@ -258,7 +202,7 @@ const Dashboard = () => {
         </div>
 
         {/* Category Slider */}
-        <div className="col-12">
+        <div className="col-xl-6">
           <div className="card o-hidden card-hover">
             <div className="card-header border-0 pb-1">
               <div className="card-header-title p-0">
@@ -301,114 +245,67 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Revenue Report */}
+        {/* To Do List */}
         <div className="col-xl-6">
           <div className="card o-hidden card-hover">
-            <div className="card-header border-0 pb-1">
+            <div className="card-header border-0">
               <div className="card-header-title">
-                <h4>Revenue Report</h4>
+                <h4>To Do List</h4>
               </div>
             </div>
-            <div className="card-body p-0">
-              <div id="report-chart">
-                <Bar data={revenueChartData} options={{ responsive: true }} />
-              </div>
+            <div className="card-body pt-0">
+              <ul className="to-do-list">
+                {todos?.slice(0, 4).map((todo, index) => (
+                  <li className="to-do-item" key={todo._id}>
+                    <div className="form-check user-checkbox">
+                      <input
+                        className="checkbox_animated check-it"
+                        type="checkbox"
+                        checked={todo.completed}
+                        id={`flexCheckDefault${index}`}
+                        readOnly // Prevent direct interaction; add mutation for toggling if needed
+                      />
+                    </div>
+                    <div className="to-do-list-name">
+                      <strong>{todo.content}</strong>
+                      <p>
+                        {todo.createdAt
+                          ? new Date(todo.createdAt).toLocaleDateString()
+                          : "8 Hours"}
+                      </p>
+                    </div>
+                  </li>
+                )) || (
+                  <li className="to-do-item">
+                    <p>No tasks available</p>
+                  </li>
+                )}
+                <li className="to-do-item">
+                  <form className="row g-2" onSubmit={handleAddTask}>
+                    <div className="col-8">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="content"
+                        placeholder="Enter Task Name"
+                        value={newTask}
+                        onChange={(e) => setNewTask(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-4">
+                      <button
+                        type="submit"
+                        className="btn btn-primary w-100 h-100"
+                      >
+                        Add task
+                      </button>
+                    </div>
+                  </form>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-
-        {/* Top Projects */}
-        <div className="col-xl-6 col-md-12">
-          <div className="card o-hidden card-card-header--2 px-0 pt-0">
-            <div className="card-header-title">
-              <h4>Top Projects</h4>
-            </div>
-            <div className="best-selling-box d-sm-flex d-none">
-              <span>Sort By:</span>
-              <Dropdown>
-                <Dropdown.Toggle variant="light" id="dropdownMenuButton1">
-                  Today
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                  <Dropdown.Item href="#">Today</Dropdown.Item>
-                  <Dropdown.Item href="#">This Week</Dropdown.Item>
-                  <Dropdown.Item href="#">This Month</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </div>
-          </div>
-          <div className="card-body p-0">
-            <div>
-              <div className="table-responsive">
-                <table className="best-selling-table w-image table border-0">
-                  <tbody>
-                    {projects?.slice(0, 3).map((project, index) => (
-                      <tr key={project._id}>
-                        <td>
-                          <div className="best-product-box">
-                            <div className="product-image">
-                              <img
-                                src={
-                                  project.mainImage ||
-                                  "assets/images/project/default.png"
-                                }
-                                className="img-fluid"
-                                alt={project.title}
-                              />
-                            </div>
-                            <div className="product-name">
-                              <h5>{project.title || "Untitled Project"}</h5>
-                              <h6>{project.client || "Unknown Client"}</h6>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="product-detail-box">
-                            <h6>Services</h6>
-                            <h5>{project.services || "N/A"}</h5>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="product-detail-box">
-                            <h6>Website</h6>
-                            <h5>
-                              <a
-                                href={project.website}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {project.website ? "Visit" : "N/A"}
-                              </a>
-                            </h5>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="product-detail-box">
-                            <h6>GitHub</h6>
-                            <h5>
-                              <a
-                                href={project.ghLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {project.ghLink ? "View" : "N/A"}
-                              </a>
-                            </h5>
-                          </div>
-                        </td>
-                      </tr>
-                    )) || (
-                      <tr>
-                        <td colSpan="4">No projects available</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Recent Queries */}
         <div className="col-xl-6">
           <div className="card o-hidden card-hover">
@@ -481,166 +378,96 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Earning */}
-        <div className="col-xl-6">
+        {/* Top Projects */}
+        <div className="col-xl-6 col-md-12">
           <div className="card o-hidden card-hover">
-            <div className="card-header border-0 mb-0">
+            <div className="card-header card-header-top card-header--2 px-0 pt-0">
               <div className="card-header-title">
-                <h4>Earning</h4>
+                <h4>Top Projects</h4>
+              </div>
+              <div className="best-selling-box d-sm-flex d-none">
+                <span>Sort By:</span>
+                <Dropdown>
+                  <Dropdown.Toggle variant="light" id="dropdownMenuButton1">
+                    Today
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item href="#">Today</Dropdown.Item>
+                    <Dropdown.Item href="#">This Week</Dropdown.Item>
+                    <Dropdown.Item href="#">This Month</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             </div>
             <div className="card-body p-0">
-              <div id="bar-chart-earning">
-                <Bar data={earningChartData} options={{ responsive: true }} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Transactions */}
-        <div className="col-xxl-4 col-md-6">
-          <div className="card o-hidden card-hover">
-            <div className="card-header border-0">
-              <div className="card-header-title">
-                <h4>Transactions</h4>
-              </div>
-            </div>
-            <div className="card-body pt-0">
               <div>
                 <div className="table-responsive">
-                  <table className="user-table transactions-table table border-0">
+                  <table className="best-selling-table w-image table border-0">
                     <tbody>
-                      {userData?.transactions
-                        ?.slice(0, 5)
-                        .map((transaction, index) => (
-                          <tr key={index} className={`td-color-${index % 5}`}>
-                            <td>
-                              <div className="transactions-icon">
-                                {transaction.type === "Wallets" && (
-                                  <RiShieldLine />
-                                )}
-                                {transaction.type === "Bank Transfer" && (
-                                  <RiCheckLine />
-                                )}
-                                {transaction.type === "Paypal" && (
-                                  <RiExchangeDollarLine />
-                                )}
-                                {transaction.type === "Mastercard" && (
-                                  <RiBankCardLine />
-                                )}
-                                {transaction.type === "Transfer" && (
-                                  <RiBarChartGroupedLine />
-                                )}
+                      {projects?.slice(0, 3).map((project, index) => (
+                        <tr key={project._id}>
+                          <td>
+                            <div className="best-product-box">
+                              <div className="product-image">
+                                <img
+                                  src={
+                                    project.mainImage ||
+                                    "assets/images/project/default.png"
+                                  }
+                                  className="img-fluid"
+                                  alt={project.title}
+                                />
                               </div>
-                              <div className="transactions-name">
-                                <h6>{transaction.type}</h6>
-                                <p>{transaction.description}</p>
+                              <div className="product-name">
+                                <h5>{project.title || "Untitled Project"}</h5>
+                                <h6>{project.client || "Unknown Client"}</h6>
                               </div>
-                            </td>
-                            <td
-                              className={
-                                transaction.amount < 0 ? "lost" : "success"
-                              }
-                            >
-                              {transaction.amount}
-                            </td>
-                          </tr>
-                        )) || (
+                            </div>
+                          </td>
+                          <td>
+                            <div className="product-detail-box">
+                              <h6>Services</h6>
+                              <h5>{project.services || "N/A"}</h5>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="product-detail-box">
+                              <h6>Website</h6>
+                              <h5>
+                                <a
+                                  href={project.website}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {project.website ? "Visit" : "N/A"}
+                                </a>
+                              </h5>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="product-detail-box">
+                              <h6>GitHub</h6>
+                              <h5>
+                                <a
+                                  href={project.ghLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {project.ghLink ? "View" : "N/A"}
+                                </a>
+                              </h5>
+                            </div>
+                          </td>
+                        </tr>
+                      )) || (
                         <tr>
-                          <td colSpan="2">No transactions available</td>
+                          <td colSpan="4">No projects available</td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Visitors */}
-        <div className="col-xxl-4 col-md-6">
-          <div className="h-100">
-            <div className="card o-hidden card-hover">
-              <div className="card-header border-0">
-                <div className="d-flex align-items-center justify-content-between">
-                  <div className="card-header-title">
-                    <h4>Visitors</h4>
-                  </div>
-                </div>
-              </div>
-              <div className="card-body pt-0">
-                <div className="pie-chart">
-                  <div id="pie-chart-visitors">
-                    <Pie
-                      data={visitorsChartData}
-                      options={{ responsive: true }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* To Do List */}
-        <div className="col-xxl-4 col-md-6">
-          <div className="card o-hidden card-hover">
-            <div className="card-header border-0">
-              <div className="card-header-title">
-                <h4>To Do List</h4>
-              </div>
-            </div>
-            <div className="card-body pt-0">
-              <ul className="to-do-list">
-                {todos?.slice(0, 4).map((todo, index) => (
-                  <li className="to-do-item" key={todo._id}>
-                    <div className="form-check user-checkbox">
-                      <input
-                        className="checkbox_animated check-it"
-                        type="checkbox"
-                        checked={todo.completed}
-                        id={`flexCheckDefault${index}`}
-                        readOnly // Prevent direct interaction; add mutation for toggling if needed
-                      />
-                    </div>
-                    <div className="to-do-list-name">
-                      <strong>{todo.content}</strong>
-                      <p>
-                        {todo.createdAt
-                          ? new Date(todo.createdAt).toLocaleDateString()
-                          : "8 Hours"}
-                      </p>
-                    </div>
-                  </li>
-                )) || (
-                  <li className="to-do-item">
-                    <p>No tasks available</p>
-                  </li>
-                )}
-                <li className="to-do-item">
-                  <form className="row g-2" onSubmit={handleAddTask}>
-                    <div className="col-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="content"
-                        placeholder="Enter Task Name"
-                        value={newTask}
-                        onChange={(e) => setNewTask(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <button
-                        type="submit"
-                        className="btn btn-primary w-100 h-100"
-                      >
-                        Add task
-                      </button>
-                    </div>
-                  </form>
-                </li>
-              </ul>
             </div>
           </div>
         </div>

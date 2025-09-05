@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Image } from "react-bootstrap";
 import { FaAngleLeft } from "react-icons/fa";
 import { RiAppsLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import masterRoutes from "../../Router/routes";
-import logo_white from "../../assets/images/logo/full-white.png";
-import logo_icon_white from "../../assets/images/logo/logo.png";
-import logo_icon_dark from "../../assets/images/logo/logo-white.png";
+import logo_white from "../../assets/images/logo/logo@transparent.png";
+import logo_icon_white from "../../assets/images/logo/logo@transparent.png";
+import logo_icon_dark from "../../assets/images/logo/logo@transparent.png";
 import "./sidebar.css";
+
 const Sidebar = () => {
+  // State to track the currently open submenu
+  const [openSubmenu, setOpenSubmenu] = useState(null);
+
+  // Toggle sidebar (optional, add your logic here)
   const initSidebar = () => {
     console.log("Sidebar toggle clicked");
     // Add sidebar toggle logic here (e.g., toggle sidebar visibility)
+  };
+
+  // Handle submenu toggle
+  const handleSubmenuToggle = (index) => {
+    setOpenSubmenu(openSubmenu === index ? null : index);
   };
 
   return (
@@ -19,31 +28,27 @@ const Sidebar = () => {
       <div id="sidebarEffect"></div>
 
       {/* Logo Section */}
-      <div class="logo-wrapper logo-wrapper-center">
+      <div className="logo-wrapper logo-wrapper-center">
         <a href="index.html" data-bs-original-title="" title="">
-          <img
-            class="img-fluid for-white"
-            src="assets/images/logo/full-white.png"
-            alt="logo"
-          />
+          <img className="img-fluid for-white" src={logo_white} alt="logo" />
         </a>
-        <div class="back-btn">
-          <i class="fa fa-angle-left"></i>
+        <div className="back-btn">
+          <FaAngleLeft />
         </div>
-        <div class="toggle-sidebar">
-          <i class="ri-apps-line status_toggle middle sidebar-toggle"></i>
+        <div className="toggle-sidebar" onClick={initSidebar}>
+          <RiAppsLine className="status_toggle middle sidebar-toggle" />
         </div>
       </div>
-      <div class="logo-icon-wrapper">
+      <div className="logo-icon-wrapper">
         <a href="index.html">
           <img
-            class="img-fluid main-logo main-white"
-            src="assets/images/logo/logo.png"
+            className="img-fluid main-logo main-white"
+            src={logo_icon_white}
             alt="logo"
           />
           <img
-            class="img-fluid main-logo main-dark"
-            src="assets/images/logo/logo-white.png"
+            className="img-fluid main-logo main-dark"
+            src={logo_icon_dark}
             alt="logo"
           />
         </a>
@@ -64,11 +69,11 @@ const Sidebar = () => {
                   {route.submenu.length > 0 ? (
                     // Dropdown for routes with submenus
                     <a
-                      className="linear-icon-link sidebar-link sidebar-title"
+                      className={`linear-icon-link sidebar-link sidebar-title ${
+                        openSubmenu === index ? "active" : ""
+                      }`}
                       href="#"
-                      data-bs-toggle="collapse"
-                      data-bs-target={`#submenu-${index}`}
-                      aria-expanded="false"
+                      onClick={() => handleSubmenuToggle(index)}
                       role="button"
                     >
                       {route.icon}
@@ -86,14 +91,18 @@ const Sidebar = () => {
                   )}
                   {route.submenu.length > 0 && (
                     <ul
-                      className="sidebar-submenu collapse"
+                      className={`sidebar-submenu ${
+                        openSubmenu === index ? "show" : ""
+                      }`}
                       id={`submenu-${index}`}
                     >
-                      {route.submenu.map((subRoute, subIndex) => (
-                        <li key={subIndex}>
-                          <Link to={subRoute.path}>{subRoute.name}</Link>
-                        </li>
-                      ))}
+                      {route.submenu
+                        .filter((subRoute) => subRoute.isSidebarActive) // Filter submenu items
+                        .map((subRoute, subIndex) => (
+                          <li key={subIndex}>
+                            <Link to={subRoute.path}>{subRoute.name}</Link>
+                          </li>
+                        ))}
                     </ul>
                   )}
                 </li>

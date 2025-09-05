@@ -106,7 +106,7 @@ const Achievements = () => {
       <div className="container-fluid">
         <div className="row">
           <div className="col-sm-12">
-            <div className="card card-table">
+            <div className="card">
               <div className="card-body">
                 <div className="title-header option-title">
                   <h5>Achievement List</h5>
@@ -141,104 +141,56 @@ const Achievements = () => {
                     </ul>
                   </div>
                 </div>
-                <div>
-                  <div className="table-responsive">
-                    <table
-                      className="table all-package coupon-list-table table-hover theme-table"
-                      id="table_id"
-                    >
-                      <thead>
-                        <tr>
-                          <th>
-                            <span className="form-check user-checkbox m-0 p-0">
-                              <input
-                                className="checkbox_animated checkall"
-                                type="checkbox"
-                                value=""
-                              />
-                            </span>
-                          </th>
-                          <th>Title</th>
-
-                          <th>Option</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {isLoading && (
-                          <tr>
-                            <td colSpan="7">Loading achievements...</td>
-                          </tr>
-                        )}
-                        {isError && (
-                          <tr>
-                            <td colSpan="7" className="text-danger">
-                              Error loading achievements
-                            </td>
-                          </tr>
-                        )}
-                        {!isLoading &&
-                          !isError &&
-                          paginatedAchievements.length === 0 && (
-                            <tr>
-                              <td colSpan="7">No achievements found.</td>
-                            </tr>
-                          )}
-                        {!isLoading &&
-                          !isError &&
-                          paginatedAchievements.map((achievement) => (
-                            <tr key={achievement._id}>
-                              <td>
-                                <span className="form-check user-checkbox m-0 p-0">
-                                  <input
-                                    className="checkbox_animated check-it"
-                                    type="checkbox"
-                                    value=""
-                                  />
-                                </span>
-                              </td>
-                              <td>
-                                <div className="row gx-3 align-items-center">
-                                  <div className="col">
-                                    <p className="mb-0">{achievement.title}</p>
-                                    <p className="text-secondary small">
-                                      {achievement.description ||
-                                        "No description"}
-                                      {""}
-                                      {achievement.details}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-
-                              <td>
-                                <ul>
-                                  <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      onClick={() =>
-                                        handleEditClick(achievement)
-                                      }
-                                    >
-                                      <i className="ri-pencil-line"></i>
-                                    </a>
-                                  </li>
-                                  <li>
-                                    <a
-                                      href="javascript:void(0)"
-                                      onClick={() =>
-                                        handleDeleteClick(achievement)
-                                      }
-                                    >
-                                      <i className="ri-delete-bin-line"></i>
-                                    </a>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
+                <div className="row">
+                  {isLoading && (
+                    <div className="col-12 text-center">
+                      <p>Loading achievements...</p>
+                    </div>
+                  )}
+                  {isError && (
+                    <div className="col-12 text-center">
+                      <p className="text-danger">Error loading achievements</p>
+                    </div>
+                  )}
+                  {!isLoading &&
+                    !isError &&
+                    paginatedAchievements.length === 0 && (
+                      <div className="col-12 text-center">
+                        <p>No achievements found.</p>
+                      </div>
+                    )}
+                  {!isLoading &&
+                    !isError &&
+                    paginatedAchievements.map((achievement) => (
+                      <div
+                        className="col-md-4 col-sm-6 mb-4"
+                        key={achievement._id}
+                      >
+                        <div className="card h-100 shadow-sm">
+                          <div className="card-body">
+                            <h5 className="card-title">{achievement.title}</h5>
+                            <p className="card-text text-secondary">
+                              {achievement.description || "No description"}{" "}
+                              {achievement.details}
+                            </p>
+                          </div>
+                          <div className="card-footer bg-transparent d-flex justify-content-end">
+                            <button
+                              className="btn btn-outline-primary btn-sm me-2"
+                              onClick={() => handleEditClick(achievement)}
+                            >
+                              <i className="ri-pencil-line"></i> Edit
+                            </button>
+                            <button
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => handleDeleteClick(achievement)}
+                            >
+                              <i className="ri-delete-bin-line"></i> Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                 </div>
                 {totalPages > 1 && (
                   <div className="card-footer">

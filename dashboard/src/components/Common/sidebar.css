@@ -61,7 +61,7 @@
 }
 
 .back-btn:hover {
-  color: #3498db;
+  color: #0e1018;
 }
 
 /* Toggle Sidebar Button */
@@ -75,7 +75,7 @@
 }
 
 .toggle-sidebar:hover {
-  color: #3498db;
+  color: #0e1018;
 }
 
 /* Sidebar Menu */
@@ -106,7 +106,7 @@
 
 .left-arrow:hover,
 .right-arrow:hover {
-  color: #3498db;
+  color: #0e1018;
 }
 
 /* Sidebar Links */
@@ -144,12 +144,17 @@
 }
 
 /* Submenu */
+/* Sidebar Submenu */
 .sidebar-submenu {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: none; /* Hidden by default */
+  transition: max-height 0.3s ease; /* Optional: keep for smooth transitions if max-height is used */
+}
 
-  transition: max-height 0.3s ease;
+.sidebar-submenu.show {
+  display: block; /* Show when 'show' class is applied */
 }
 
 .sidebar-submenu li {
@@ -164,7 +169,13 @@
 }
 
 .sidebar-submenu li a:hover {
-  color: #3498db;
+  color: #0e1018;
+}
+
+/* Active Menu Item (Optional Styling) */
+.sidebar-link.active {
+  background-color: rgba(52, 152, 219, 0.1); /* Example: subtle background for active menu */
+  color: #0e1018; /* Highlight active menu */
 }
 
 /* Collapsed Sidebar */

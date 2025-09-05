@@ -1,12 +1,11 @@
 import React from "react";
-import { Card, Dropdown, Badge } from "react-bootstrap";
+import { Card, Badge, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaBookOpen } from "react-icons/fa";
 import placeholder from "../../assets/images/product/1.png";
 import { PORTFOLIO_URL } from "../../config";
-import "./blogs.css";
 
-const AdminBlogCard = ({ post, onEdit, onDelete }) => {
+const AdminBlogCard = ({ post, onDelete }) => {
   if (!post) return null;
 
   const { _id, title, content, published } = post;
@@ -23,7 +22,7 @@ const AdminBlogCard = ({ post, onEdit, onDelete }) => {
 
   const readingTime = calculateReadingTime(content);
   const formattedDate = new Date(published).toLocaleDateString();
-  const isPublished = !!published; // Assuming published is a timestamp or null
+  const isPublished = !!published;
 
   return (
     <div className="col-xl-4 col-lg-6 col-md-6 mb-4">
@@ -34,6 +33,7 @@ const AdminBlogCard = ({ post, onEdit, onDelete }) => {
             src={post.image || placeholder}
             alt={title}
             className="blog-card-img"
+            style={{ height: "200px", objectFit: "cover" }}
           />
           <Badge
             bg={isPublished ? "success" : "warning"}
@@ -55,40 +55,30 @@ const AdminBlogCard = ({ post, onEdit, onDelete }) => {
             {readingTime} min read • {formattedDate}
           </Card.Text>
           <Card.Text className="blog-excerpt">{getExcerpt(content)}</Card.Text>
-          <div className="mt-auto d-flex justify-content-end">
-            <Dropdown>
-              <Dropdown.Toggle
-                variant="light"
-                size="sm"
-                className="action-toggle"
-              >
-                <i className="bi bi-three-dots-vertical" />
-              </Dropdown.Toggle>
-              <Dropdown.Menu className="action-menu">
-                <Dropdown.Item
-                  as={Link}
-                  to={`/admin/blogs/${_id}/edit`}
-                  className="action-item"
-                  onClick={() => onEdit?.(post)}
-                >
-                  <FaEdit className="me-2" /> Edit
-                </Dropdown.Item>
-                <Dropdown.Item
-                  as="button"
-                  className="action-item text-danger"
-                  onClick={() => onDelete?.(post)}
-                >
-                  <FaTrash className="me-2" /> Delete
-                </Dropdown.Item>
-                <Dropdown.Item
-                  as={Link}
-                  to={`${PORTFOLIO_URL}blogs/${_id}`}
-                  className="action-item"
-                >
-                  <FaBookOpen className="me-2" /> Read
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+          <div className="mt-auto d-flex justify-content-end gap-2">
+            <Button
+              variant="outline-primary"
+              size="sm"
+              as={Link}
+              to={`/blogs/${_id}/edit`}
+            >
+              <FaEdit className="me-1" /> Edit
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={() => onDelete?.(post)}
+            >
+              <FaTrash className="me-1" /> Delete
+            </Button>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              as={Link}
+              to={`${PORTFOLIO_URL}blogs/${_id}`}
+            >
+              <FaBookOpen className="me-1" /> Read
+            </Button>
           </div>
         </Card.Body>
       </Card>

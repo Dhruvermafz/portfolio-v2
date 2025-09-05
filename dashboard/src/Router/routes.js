@@ -23,7 +23,11 @@ import Achievements from "../pages/Achievements";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import MediaWrapper from "../components/Media/MediaWrapper";
-
+import { elements } from "chart.js";
+import Error404 from "../pages/Error404";
+import AllUsers from "../pages/AllUsers";
+import AddNewUser from "../pages/AddNewUser";
+import Profile from "../pages/Profile";
 const masterRoutes = [
   {
     path: "/",
@@ -56,14 +60,14 @@ const masterRoutes = [
       {
         path: "/users/list",
         name: "All Users",
-
+        element: <AllUsers />,
         isSidebarActive: true,
       },
       {
-        path: "/users/add-new-user", // Fixed typo
+        path: "/users/add", // Fixed typo
         name: "Add New User",
-
-        isSidebarActive: true,
+        element: <AddNewUser />,
+        isSidebarActive: false,
       },
     ],
   },
@@ -171,6 +175,20 @@ const masterRoutes = [
         path: "/signup",
         element: <Signup />,
         name: "Signup",
+        isSidebarActive: false,
+        icon: <RiLoginBoxFill />,
+      },
+      {
+        path: "/*",
+        element: <Error404 />,
+        name: "Error",
+        isSidebarActive: false,
+        icon: <RiLoginBoxFill />,
+      },
+      {
+        path: "/u/:id",
+        element: <Profile />,
+        name: "Profile",
         isSidebarActive: false,
         icon: <RiLoginBoxFill />,
       },

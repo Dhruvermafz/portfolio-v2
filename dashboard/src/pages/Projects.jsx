@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import PageTitle from "../components/Common/PageTitle";
 import {
   useGetAllProjectsQuery,
   useDeleteProjectMutation,
@@ -46,14 +45,16 @@ const Projects = () => {
         alert("Project deleted successfully!");
       } catch (error) {
         console.error("Error deleting project:", error);
-        alert("Failed to delete project");
+        alert(
+          `Failed to delete project: ${error?.data?.message || "Unknown error"}`
+        );
       }
     }
   };
 
   // Handle Edit
   const handleEdit = (projectId) => {
-    window.location.href = `/projects/edit/${projectId}`;
+    window.location.href = `/projects/${projectId}/edit`;
   };
 
   // Handle Move (Placeholder)
@@ -61,7 +62,7 @@ const Projects = () => {
     alert(`Move functionality for project ${projectId} not implemented yet.`);
   };
 
-  // Handle View (Placeholder for viewing project details)
+  // Handle View
   const handleView = (projectId) => {
     window.location.href = `/projects/${projectId}`;
   };
@@ -82,25 +83,6 @@ const Projects = () => {
                 <div className="col">
                   <p className="small text-secondary mb-1">Projects</p>
                   <h5>{totalProjects}</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-12 col-md-12 col-lg-6 col-xl-3">
-          <div className="card adminuiux-card shadow-sm mb-3 mb-lg-4">
-            <div className="card-body">
-              <div className="row gx-3 align-items-center">
-                <div className="col-auto">
-                  <div className="avatar avatar-50 rounded bg-theme-1 theme-green">
-                    <i className="bi bi-clock h5"></i>
-                  </div>
-                </div>
-                <div className="col">
-                  <p className="small text-secondary mb-1">Total Efforts</p>
-                  <h5>
-                    {projects.reduce((sum, p) => sum + (p.effort || 0), 0)} hrs
-                  </h5>
                 </div>
               </div>
             </div>
@@ -194,36 +176,35 @@ const Projects = () => {
                       <tr>
                         <th>Project Image</th>
                         <th>Project Title</th>
-                        <th>Date</th>
                         <th>Client</th>
-                        <th>Status</th>
-                        <th>Effort</th>
+                        <th>Links</th>
                         <th>Option</th>
                       </tr>
                     </thead>
                     <tbody>
                       {isLoading && (
                         <tr>
-                          <td colSpan="7">Loading projects...</td>
+                          <td colSpan="5">Loading projects...</td>
                         </tr>
                       )}
                       {error && (
                         <tr>
-                          <td colSpan="7" className="text-danger">
-                            Error loading projects: {error.message}
+                          <td colSpan="5" className="text-danger">
+                            Error loading projects:{" "}
+                            {error?.data?.message || "Unknown error"}
                           </td>
                         </tr>
                       )}
                       {!isLoading && !error && currentProjects.length === 0 && (
                         <tr>
-                          <td colSpan="7">No projects found.</td>
+                          <td colSpan="5">No projects found.</td>
                         </tr>
                       )}
                       {!isLoading &&
                         !error &&
                         currentProjects.map((project) => (
                           <tr
-                            key={project.id}
+                            key={project._id}
                             data-bs-toggle="offcanvas"
                             data-bs-target="#project-details"
                           >
@@ -232,7 +213,7 @@ const Projects = () => {
                                 <span className="order-image">
                                   <img
                                     src={
-                                      project.image ||
+                                      project.mainImage ||
                                       "assets/img/modern-ai-image/pet-1.jpg"
                                     }
                                     className="img-fluid"
@@ -243,12 +224,6 @@ const Projects = () => {
                             </td>
                             <td>
                               <p className="mb-0">{project.title}</p>
-                              <p className="text-secondary small mb-1">
-                                {project.description || "No description"}
-                              </p>
-                            </td>
-                            <td>
-                              {new Date(project.createdAt).toLocaleDateString()}
                             </td>
                             <td>{project.client || "N/A"}</td>
                             <td
@@ -260,17 +235,25 @@ const Projects = () => {
                                   : "order-cancle"
                               }
                             >
-                              <span>{project.status || "Unknown"}</span>
+                              <span>
+                                <a href={project.ghLink} target="_blank">
+                                  GH LINK
+                                </a>
+                              </span>
+                              <span>
+                                <a href={project.website} target="_blank">
+                                  LIVE LINK
+                                </a>
+                              </span>
                             </td>
-                            <td>{project.effort || 0} hrs</td>
                             <td>
                               <ul>
                                 <li>
                                   <a
-                                    href={`/projects/${project.id}`}
+                                    href={`/projects/${project._id}`}
                                     onClick={(e) => {
                                       e.preventDefault();
-                                      handleView(project.id);
+                                      handleView(project._id);
                                     }}
                                   >
                                     <i className="ri-eye-line"></i>
@@ -279,7 +262,7 @@ const Projects = () => {
                                 <li>
                                   <a
                                     href="javascript:void(0)"
-                                    onClick={() => handleEdit(project.id)}
+                                    onClick={() => handleEdit(project._id)}
                                   >
                                     <i className="ri-pencil-line"></i>
                                   </a>
@@ -287,9 +270,7 @@ const Projects = () => {
                                 <li>
                                   <a
                                     href="javascript:void(0)"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#exampleModalToggle"
-                                    onClick={() => handleDelete(project.id)}
+                                    onClick={() => handleDelete(project._id)}
                                   >
                                     <i className="ri-delete-bin-line"></i>
                                   </a>
@@ -298,7 +279,7 @@ const Projects = () => {
                                   <a
                                     className="btn btn-sm btn-solid text-white"
                                     href="javascript:void(0)"
-                                    onClick={() => handleMove(project.id)}
+                                    onClick={() => handleMove(project._id)}
                                   >
                                     Move
                                   </a>

@@ -1,6 +1,6 @@
-// src/services/authApi.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../config";
+
 export const userApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
@@ -52,6 +52,19 @@ export const userApi = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: "Users", id }],
     }),
+    addUser: builder.mutation({
+      query: (userData) => ({
+        url: "/add",
+        method: "POST",
+        body: userData,
+        // Override prepareHeaders to ensure no Authorization header is sent
+        prepareHeaders: (headers) => {
+          headers.set("Content-Type", "application/json");
+          return headers;
+        },
+      }),
+      invalidatesTags: ["Users"], // Invalidate Users cache to refresh user list
+    }),
   }),
 });
 
@@ -62,4 +75,5 @@ export const {
   useGetUsersQuery,
   useDeleteUserMutation,
   useUpdateUserMutation,
+  useAddUserMutation, // Export the new hook
 } = userApi;
