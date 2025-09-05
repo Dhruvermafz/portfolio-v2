@@ -28,6 +28,7 @@ app.use(
       "https://dhruvermafz.vercel.app",
       "http://192.168.221.143:3000",
       "https://dhruvermafz.in",
+      "https://dashbaord.dhruvermafz.in",
     ],
     credentials: true,
     optionSuccessStatus: 200,
