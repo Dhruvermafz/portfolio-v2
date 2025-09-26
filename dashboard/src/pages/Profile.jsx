@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setCredentials } from "../api/slices/authSlice"; // Adjust path as needed
 import { useGetUserByIdQuery, useUpdateUserMutation } from "../api/userApi";
-import { Form, Button, Alert } from "react-bootstrap";
-import Avatar from "react-avatar";
-import { RiArrowDownSLine } from "react-icons/ri";
+import { Form, Input, Button, Alert, Upload, Avatar } from "antd";
+import { UploadOutlined, DownOutlined } from "@ant-design/icons";
+import { useAuth } from "../context/auth";
 import "./profile.css"; // Import custom CSS
 
 const Profile = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { user, token, logout, isLoggedIn } = useAuth(); // Use AuthContext
+  const [form] = Form.useForm();
 
   // Fetch authenticated user data
-  const token = localStorage.getItem("authToken");
   const {
-    data: user,
+    data: userData,
     isLoading,
     isError,
     error,
   } = useGetUserByIdQuery("me", {
-    skip: !token,
+    skip: !token || !isLoggedIn,
   });
 
   // State for form fields
@@ -40,16 +38,22 @@ const Profile = () => {
 
   // Populate form with user data when fetched
   useEffect(() => {
-    if (user) {
+    if (userData) {
       setFormData({
-        username: user.username || "",
-        email: user.email || "",
+        username: userData.username || "",
+        email: userData.email || "",
         password: "",
         confirmPassword: "",
-        photo: user.photo || "",
+        photo: userData.photo || "",
+      });
+      form.setFieldsValue({
+        username: userData.username || "",
+        email: userData.email || "",
+        password: "",
+        confirmPassword: "",
       });
     }
-  }, [user]);
+  }, [userData, form]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -58,8 +62,7 @@ const Profile = () => {
   };
 
   // Handle file input change
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = ({ file }) => {
     setPhotoFile(file);
     // Optionally preview the image
     if (file) {
@@ -72,17 +75,18 @@ const Profile = () => {
   };
 
   // Handle profile update submission
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-
-    // Validate passwords
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      setUpdateError("Passwords do not match!");
-      setUpdateSuccess(null);
-      return;
-    }
-
+  const handleUpdate = async () => {
     try {
+      // Validate form
+      await form.validateFields();
+
+      // Validate passwords
+      if (formData.password && formData.password !== formData.confirmPassword) {
+        setUpdateError("Passwords do not match!");
+        setUpdateSuccess(null);
+        return;
+      }
+
       // Prepare form data for submission
       const updateData = {
         username: formData.username,
@@ -93,7 +97,7 @@ const Profile = () => {
         updateData.password = formData.password;
       }
 
-      // If a file is selected, upload it (assuming backend supports file uploads)
+      // If a file is selected, upload it
       if (photoFile) {
         const formDataToSend = new FormData();
         formDataToSend.append("username", updateData.username);
@@ -118,8 +122,7 @@ const Profile = () => {
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    dispatch(setCredentials({ user: null, token: null }));
+    logout(); // Use AuthContext logout
     navigate("/login");
   };
 
@@ -134,126 +137,132 @@ const Profile = () => {
                 <div className="card-body">
                   <div className="title-header option-title">
                     <h5>Profile Setting</h5>
-                    <Button variant="danger" onClick={handleLogout}>
+                    <Button danger onClick={handleLogout}>
                       Logout
                     </Button>
                   </div>
 
                   {isLoading && <p>Loading...</p>}
                   {isError && (
-                    <Alert variant="danger">
-                      {error?.data?.message || "Failed to load profile."}
-                    </Alert>
+                    <Alert
+                      message={
+                        error?.data?.message || "Failed to load profile."
+                      }
+                      type="error"
+                      showIcon
+                    />
                   )}
                   {updateSuccess && (
-                    <Alert variant="success">{updateSuccess}</Alert>
+                    <Alert message={updateSuccess} type="success" showIcon />
                   )}
-                  {updateError && <Alert variant="danger">{updateError}</Alert>}
+                  {updateError && (
+                    <Alert message={updateError} type="error" showIcon />
+                  )}
 
-                  <form
+                  <Form
+                    form={form}
+                    layout="horizontal"
+                    onFinish={handleUpdate}
                     className="theme-form theme-form-2 mega-form"
-                    onSubmit={handleUpdate}
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
                   >
                     <div className="row">
-                      <div className="mb-4 row align-items-center">
-                        <label className="form-label-title col-sm-2 mb-0">
-                          Username
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            className="form-control"
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                            placeholder="Enter Your Username"
-                            required
-                          />
-                        </div>
-                      </div>
+                      <Form.Item
+                        label="Username"
+                        name="username"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter your username",
+                          },
+                        ]}
+                      >
+                        <Input
+                          name="username"
+                          value={formData.username}
+                          onChange={handleInputChange}
+                          placeholder="Enter Your Username"
+                        />
+                      </Form.Item>
 
-                      <div className="mb-4 row align-items-center">
-                        <label className="form-label-title col-sm-2 mb-0">
-                          Email Address
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            className="form-control"
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="Enter Your Email Address"
-                            required
-                          />
-                        </div>
-                      </div>
+                      <Form.Item
+                        label="Email Address"
+                        name="email"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please enter your email",
+                          },
+                          {
+                            type: "email",
+                            message: "Please enter a valid email",
+                          },
+                        ]}
+                      >
+                        <Input
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Enter Your Email Address"
+                        />
+                      </Form.Item>
 
-                      <div className="mb-4 row align-items-center">
-                        <label className="form-label-title col-sm-2 mb-0">
-                          Photo
-                        </label>
-                        <div className="col-sm-10">
-                          <div className="d-flex align-items-center">
-                            {formData.photo && (
-                              <Avatar
-                                src={formData.photo}
-                                size="50"
-                                round={true}
-                                className="me-3"
-                              />
-                            )}
-                            <input
-                              className="form-control form-choose"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleFileChange}
+                      <Form.Item label="Photo" name="photo">
+                        <div className="d-flex align-items-center">
+                          {formData.photo && (
+                            <Avatar
+                              src={formData.photo}
+                              size={50}
+                              round={true}
+                              style={{ marginRight: 16 }}
                             />
-                          </div>
+                          )}
+                          <Upload
+                            accept="image/*"
+                            beforeUpload={() => false} // Prevent auto-upload
+                            onChange={handleFileChange}
+                            showUploadList={false}
+                          >
+                            <Button icon={<UploadOutlined />}>
+                              Choose Image
+                            </Button>
+                          </Upload>
                         </div>
-                      </div>
+                      </Form.Item>
 
-                      <div className="mb-4 row align-items-center">
-                        <label className="form-label-title col-sm-2 mb-0">
-                          Password
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            className="form-control"
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            placeholder="Enter New Password (optional)"
-                          />
-                        </div>
-                      </div>
+                      <Form.Item label="Password" name="password">
+                        <Input.Password
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          placeholder="Enter New Password (optional)"
+                        />
+                      </Form.Item>
 
-                      <div className="mb-4 row align-items-center">
-                        <label className="form-label-title col-sm-2 mb-0">
-                          Confirm Password
-                        </label>
-                        <div className="col-sm-10">
-                          <input
-                            className="form-control"
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            placeholder="Confirm New Password"
-                          />
-                        </div>
-                      </div>
+                      <Form.Item
+                        label="Confirm Password"
+                        name="confirmPassword"
+                      >
+                        <Input.Password
+                          name="confirmPassword"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          placeholder="Confirm New Password"
+                        />
+                      </Form.Item>
 
-                      <div className="row">
-                        <div className="col-sm-10 offset-sm-2">
-                          <Button type="submit" disabled={isUpdating}>
-                            {isUpdating ? "Updating..." : "Update Profile"}
-                          </Button>
-                        </div>
-                      </div>
+                      <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          loading={isUpdating}
+                        >
+                          {isUpdating ? "Updating..." : "Update Profile"}
+                        </Button>
+                      </Form.Item>
                     </div>
-                  </form>
+                  </Form>
                 </div>
               </div>
               {/* Details End */}
@@ -267,7 +276,7 @@ const Profile = () => {
 
                   <div className="save-details-box">
                     <div className="row g-4">
-                      {/* Mocked address data (since backend doesn't support addresses) */}
+                      {/* Mocked address data */}
                       <div className="col-xl-4 col-md-6">
                         <div className="save-details">
                           <div className="save-name">
@@ -291,11 +300,10 @@ const Profile = () => {
                             >
                               Edit
                             </Link>
-                            <button className="btn btn-sm">Remove</button>
+                            <Button size="small">Remove</Button>
                           </div>
                         </div>
                       </div>
-                      {/* Add more address cards as needed */}
                     </div>
                   </div>
                 </div>

@@ -3,7 +3,17 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_URL } from "../config";
 export const achievementApi = createApi({
   reducerPath: "achievementApi",
-  baseQuery: fetchBaseQuery({ baseUrl: `${API_URL}/achievements` }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: `${API_URL}/achievements`,
+    prepareHeaders: (headers, { getState }) => {
+      const token = localStorage.getItem("authToken");
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   tagTypes: ["Achievements"],
   endpoints: (builder) => ({
     getAllAchievements: builder.query({

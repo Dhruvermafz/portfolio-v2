@@ -6,7 +6,7 @@ const swaggerUi = require("swagger-ui-express"); // Import swagger-ui-express
 const swaggerDocument = require("./swagger.json"); // Import swagger spec
 const path = require("path"); // For serving static files
 const todoRoutes = require("./router/todoRoutes");
-// Import routes
+const bookRoutes = require("./router/book");
 const usersRoute = require("./router/usersRoute");
 const categoryRoute = require("./router/categoryRoute");
 const postsRoute = require("./router/postsRoute");
@@ -49,6 +49,7 @@ app.use("/contact", contactRoute);
 app.use("/projects", projectRoute);
 app.use("/achievements", achivementRoute);
 app.use("/api/todos", todoRoutes);
+app.use("/api/books", bookRoutes);
 // Define a simple route
 app.get("/", (_request, response) => {
   response.sendFile(path.join(__dirname, "public_html", "index.html"));

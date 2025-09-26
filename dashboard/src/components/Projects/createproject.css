@@ -1,116 +1,230 @@
 .json-container {
-  max-width: 800px;
-  margin: auto;
-  font-family: "Courier New", Courier, monospace;
-  background-color: #1e1e1e;
-  color: #d4d4d4;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  max-width: 900px;
+  margin: 40px auto;
+  font-family: "JetBrains Mono", "Fira Mono", "Courier New", Courier, monospace;
+  background: linear-gradient(135deg, #21222c 75%, #23272e 100%);
+  color: #e4e4e4;
+  padding: 32px 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px 0 rgba(30, 30, 40, 0.28), 0 1.5px 10px 0 #1e1e1e;
+  border: 1.5px solid #292942;
+  transition: box-shadow 0.2s;
 }
 
+.json-container:hover {
+  box-shadow: 0 8px 48px 3px rgba(86, 156, 214, 0.12), 0 1px 10px 0 #1e1e1e;
+}
+
+/* Header */
 .json-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 26px;
+  gap: 16px;
 }
 
-.json-header h3 {
-  color: #569cd6;
+.json-header h3, .json-header .ant-typography {
+  color: #7db2ff;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
 }
 
+/* Main JSON */
 .json-object {
   position: relative;
-  padding: 20px;
+  padding: 24px;
+  background: #23243a;
+  border-radius: 12px;
+  border: 1.5px solid #292942;
 }
 
 .json-brace {
   color: #ffd700;
   font-size: 1.5em;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 12px 0 6px 0;
+  display: inline-block;
+  font-family: inherit;
 }
 
 .json-content {
-  margin-left: 20px;
+  margin-left: 24px;
+  margin-top: 4px;
 }
 
+/* Field styling */
 .json-field {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  gap: 12px;
 }
 
 .json-key {
-  color: #9cdcfe;
-  width: 150px;
-  font-weight: bold;
-  padding-right: 10px;
+  color: #82aaff;
+  width: 140px;
+  font-weight: 600;
+  padding-right: 12px;
   text-align: right;
   flex-shrink: 0;
+  letter-spacing: 0.5px;
+  font-size: 1em;
 }
 
-.json-value {
+.json-value,
+.json-value .ant-input,
+.json-value .ant-input-number,
+.json-value .ant-select-selector,
+.json-value .ant-input-affix-wrapper {
   flex-grow: 1;
-  background-color: #252526;
-  color: #d4d4d4;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
-  padding: 8px;
-  font-family: "Courier New", Courier, monospace;
+  background: #23243a !important;
+  color: #e4e4e4 !important;
+  border: 1.5px solid #313153 !important;
+  border-radius: 5px !important;
+  padding: 9px 13px !important;
+  font-family: "JetBrains Mono", "Fira Mono", "Courier New", monospace !important;
+  font-size: 1em !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.json-value:focus {
+.json-value:focus,
+.json-value .ant-input:focus,
+.json-value .ant-input-affix-wrapper:focus,
+.json-value .ant-input-affix-wrapper-focused {
   outline: none;
-  border-color: #569cd6;
-  box-shadow: 0 0 5px rgba(86, 156, 214, 0.5);
+  border-color: #7db2ff !important;
+  box-shadow: 0 0 0 2px rgba(86, 156, 214, 0.15);
 }
 
+/* Array, Nested, Add Button */
 .json-array {
-  margin-left: 20px;
-  width: calc(100% - 20px);
+  margin-left: 24px;
+  width: calc(100% - 24px);
 }
 
 .json-nested {
-  margin: 10px 0;
-  padding-left: 20px;
-  border-left: 2px solid #3c3c3c;
+  margin: 12px 0;
+  padding-left: 18px;
+  border-left: 2px solid #313153;
+  background: #23243a;
+  border-radius: 7px;
 }
 
-.json-add-button {
-  margin: 10px 0;
-  background-color: #2d2d2d;
-  border-color: #3c3c3c;
-  color: #4ec9b0;
+.json-add-button,
+.ant-btn-dashed {
+  margin: 14px 0 0 0;
+  background: #23243a !important;
+  border: 1.5px dashed #4ec9b0 !important;
+  color: #4ec9b0 !important;
+  border-radius: 5px;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  font-weight: 500;
 }
 
-.json-add-button:hover {
-  background-color: #3c3c3c;
-  border-color: #4ec9b0;
+.json-add-button:hover,
+.ant-btn-dashed:hover {
+  background: #25314f !important;
+  border-color: #7db2ff !important;
+  color: #aaf2e7 !important;
 }
 
+/* Button Colors */
+.ant-btn-primary,
 .btn-success {
-  background-color: #4ec9b0;
-  border-color: #4ec9b0;
+  background: linear-gradient(90deg,#4ec9b0 60%,#7db2ff 100%) !important;
+  border: none !important;
+  color: #131d2c !important;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(86,156,214,0.12);
+  transition: background 0.2s, color 0.2s;
 }
 
+.ant-btn-primary:hover,
 .btn-success:hover {
-  background-color: #3da998;
-  border-color: #3da998;
+  background: linear-gradient(90deg,#3da998 60%,#569cd6 100%) !important;
+  color: #fff !important;
 }
 
+.ant-btn-default,
 .btn-secondary {
-  background-color: #3c3c3c;
-  border-color: #3c3c3c;
+  background: #23243a !important;
+  border-color: #313153 !important;
+  color: #e4e4e4 !important;
 }
 
+.ant-btn-default:hover,
+.btn-secondary:hover {
+  background: #292942 !important;
+  color: #7db2ff !important;
+}
+
+.ant-btn-dashed,
 .btn-outline-primary {
-  color: #569cd6;
-  border-color: #569cd6;
+  background: #23243a !important;
+  border-color: #7db2ff !important;
+  color: #7db2ff !important;
 }
 
+.ant-btn-dashed:hover,
 .btn-outline-primary:hover {
-  background-color: #569cd6;
-  color: #1e1e1e;
+  background: #7db2ff !important;
+  color: #23243a !important;
+}
+
+/* Upload Button */
+.ant-upload,
+.ant-upload-list {
+  background: transparent !important;
+}
+
+.ant-upload-list-item {
+  background: #181921 !important;
+  border-radius: 7px !important;
+}
+
+.ant-upload-list-item-info {
+  color: #7db2ff !important;
+}
+
+/* Misc */
+input[type="file"] {
+  color: #7db2ff;
+}
+
+/* Focus effect for JSON braces */
+.json-brace:focus {
+  outline: none;
+  background: #23243a;
+  border-radius: 5px;
+  box-shadow: 0 0 8px #ffd70044;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .json-container {
+    padding: 13px 5px;
+  }
+  .json-header,
+  .json-object {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 10px 5px !important;
+  }
+  .json-key {
+    min-width: 90px;
+    font-size: 0.95em;
+    padding-right: 7px;
+  }
+  .json-content,
+  .json-array {
+    margin-left: 6px;
+    width: 98vw;
+  }
+  .json-field {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
 }

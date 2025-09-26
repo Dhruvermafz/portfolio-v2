@@ -1,26 +1,32 @@
+import React from "react";
+import { Layout, Typography } from "antd";
+
+const { Footer: AntFooter } = Layout;
+const { Text } = Typography;
+
 const Footer = () => {
-  // Get current year dynamically
   const currentYear = new Date().getFullYear();
 
   return (
-    <div class="container-fluid">
-      <footer class="footer">
-        <div class="row">
-          <div class="col-md-12 footer-copyright text-center">
-            <p class="mb-0">
-              Copyright &copy;{currentYear}, Creatively designed by
-              <a
-                href="https://dhruvermafz.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Dhruv Verma
-              </a>
-            </p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <AntFooter
+      style={{
+        textAlign: "center",
+        background: "transparent",
+        padding: "18px 0",
+      }}
+    >
+      <Text type="secondary">
+        Copyright &copy;{currentYear}, Creatively designed by{" "}
+        <a
+          href="https://dhruvermafz.in/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#16b3ac" }}
+        >
+          Dhruv Verma
+        </a>
+      </Text>
+    </AntFooter>
   );
 };
 

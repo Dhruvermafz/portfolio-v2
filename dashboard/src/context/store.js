@@ -8,9 +8,11 @@ import { projectApi } from "../api/projectApi";
 import { achievementApi } from "../api/achievementsApi";
 import { todoApi } from "../api/todoApi";
 import authReducer from "../api/slices/authSlice";
+import { bookApi } from "../api/bookApi";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    [bookApi.reducerPath]: bookApi.reducer,
     [achievementApi.reducerPath]: achievementApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
@@ -21,6 +23,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
+      bookApi.middleware,
       achievementApi.middleware,
       userApi.middleware,
       contactApi.middleware,

@@ -12,6 +12,7 @@ import projects from "../../assets/data/projectsData"; // Importing the projects
 import Achievement from "../Achievement/Achievement";
 import ExperienceTimeline from "../Experience/ExperienceTimeline";
 import "./about.css";
+import ContributionCalendar from "../ContributionCalendar";
 const AboutCard = () => {
   // Calculate total experience
   const totalExperience = getTotalExperience();

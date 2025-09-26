@@ -1,96 +1,84 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-
 import {
-  RiHeartFill,
-  RiDatabase2Line,
-  RiShoppingBag3Line,
-  RiChat3Line,
-  RiUserAddLine,
-} from "react-icons/ri";
-
-import { Dropdown } from "react-bootstrap";
-
+  Row,
+  Col,
+  Card,
+  Table,
+  Form,
+  Input,
+  Button,
+  Select,
+  Image,
+  Checkbox,
+  Carousel,
+  Tag,
+  Spin,
+  message,
+} from "antd";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-import {
-  useGetAllAchievementsQuery,
-  useGetAchievementByIdQuery,
-} from "../api/achievementsApi";
-import { useGetTodosQuery, useAddTodoMutation } from "../api/todoApi";
-import { useGetUserByIdQuery } from "../api/userApi";
+  HeartFilled,
+  DatabaseOutlined,
+  ShoppingOutlined,
+  MessageOutlined,
+  UserAddOutlined,
+  CodeOutlined,
+} from "@ant-design/icons";
 import { useGetAllCategoriesQuery } from "../api/categoryApi";
 import { useGetAllProjectsQuery } from "../api/projectApi";
+import { useGetTodosQuery, useAddTodoMutation } from "../api/todoApi";
+import { useGetUserByIdQuery } from "../api/userApi";
 import { useGetAllContactsQuery } from "../api/contactApi";
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { useGetAllBlogsQuery } from "../api/blogApi";
+
+const { Option } = Select;
 
 const Dashboard = () => {
-  // Fetch authenticated user data
+  const [form] = Form.useForm();
   const token = localStorage.getItem("authToken");
-  const { user } = useSelector((state) => state.auth);
+  // Use the hook directly for the current user ("me")
   const { data: userData, isLoading: userLoading } = useGetUserByIdQuery("me", {
     skip: !token,
   });
-  const { data: categories, isLoading: categoriesLoading } =
+
+  const { data: categories = [], isLoading: categoriesLoading } =
     useGetAllCategoriesQuery();
-  const { data: projects, isLoading: projectsLoading } =
+  const { data: projects = [], isLoading: projectsLoading } =
     useGetAllProjectsQuery();
-  const { data: todos, isLoading: todosLoading } = useGetTodosQuery();
-  const { data: queries, isLoading: queriesLoading } = useGetAllContactsQuery(); // Fetch queries
+  const { data: todos = [], isLoading: todosLoading } = useGetTodosQuery();
+  const { data: queries = { data: [] }, isLoading: queriesLoading } =
+    useGetAllContactsQuery();
+  const { data: blogs = [], isLoading: blogsLoading } = useGetAllBlogsQuery();
   const [addTodo] = useAddTodoMutation();
 
   const categoryImageMap = {
-    technology: "assets/svg/technology.svg",
-    Programming: "assets/svg/programming.svg",
-    "MERN Stack": "assets/svg/mern.svg",
-    MySQL: "assets/svg/mysql.svg",
-    "Web Development": "assets/svg/webdev.svg",
-    "React.Js": "assets/svg/react.svg",
-    database: "assets/svg/database.svg",
+    technology: <CodeOutlined />,
+    Programming: <CodeOutlined />,
+    "MERN Stack": <CodeOutlined />,
+    MySQL: <CodeOutlined />,
+    "Web Development": <CodeOutlined />,
+    "React.Js": <CodeOutlined />,
+    database: <CodeOutlined />,
   };
 
   // State for new task input
   const [newTask, setNewTask] = useState("");
 
-  // Update progress bar dynamically
-  useEffect(() => {
-    const progressBar = document.querySelector(".progress-bar");
-    if (progressBar && userData) {
-      const profileCompletion = userData.profileCompletion || 25;
-      progressBar.style.width = `${profileCompletion}%`;
-      progressBar.setAttribute("aria-valuenow", profileCompletion);
-    }
-  }, [userData]);
-
   // Handle task submission
-  const handleAddTask = async (e) => {
-    e.preventDefault();
-    if (newTask.trim()) {
+  const handleAddTask = async (values) => {
+    if (values.content?.trim()) {
       try {
-        // Send `content` instead of `title` to match backend schema
-        await addTodo({ content: newTask, order: todos?.length || 0 }).unwrap();
+        await addTodo({
+          content: values.content,
+          order: todos?.length || 0,
+        }).unwrap();
         setNewTask("");
+        form.resetFields();
+        message.success("Task added successfully!");
       } catch (error) {
         console.error("Failed to add task:", error);
+        message.error("Failed to add task.");
       }
     }
   };
@@ -101,377 +89,351 @@ const Dashboard = () => {
     todosLoading ||
     categoriesLoading ||
     projectsLoading ||
-    queriesLoading
+    queriesLoading ||
+    blogsLoading
   ) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <Spin size="large" />
+        <p style={{ marginTop: 8 }}>Loading...</p>
+      </div>
+    );
   }
 
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        {/* Total Revenue */}
-        <div className="col-sm-6 col-xxl-3 col-lg-6">
-          <div className="main-tiles border-5 border-0 card-hover card o-hidden">
-            <div className="custome-1-bg b-r-4 card-body">
-              <div className="media align-items-center static-top-widget">
-                <div className="media-body p-0">
-                  <span className="m-0">Total Revenue</span>
-                  <h4 className="mb-0 counter">
-                    ${userData?.revenue || 6659}
-                    <span className="badge badge-light-primary grow">
-                      <RiHeartFill /> 8.5%
-                    </span>
-                  </h4>
-                </div>
-                <div className="align-self-center text-center">
-                  <RiDatabase2Line />
-                </div>
-              </div>
-            </div>
+  // Table columns for Recent Queries
+  const queryColumns = [
+    {
+      title: "Name",
+      key: "name",
+      render: (_, query) => (
+        <div>
+          <h5 style={{ margin: 0 }}>{query.name}</h5>
+          <h6 style={{ color: "#595959" }}>{query.email}</h6>
+        </div>
+      ),
+    },
+    {
+      title: "Subject",
+      dataIndex: "subject",
+      key: "subject",
+    },
+    {
+      title: "Message",
+      dataIndex: "message",
+      key: "message",
+    },
+    {
+      title: "Date",
+      key: "createdAt",
+      render: (_, query) =>
+        new Date(query.createdAt || query._id).toLocaleDateString(),
+    },
+  ];
+
+  // Table columns for Top Projects
+  const projectColumns = [
+    {
+      title: "Project",
+      key: "project",
+      render: (_, project) => (
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Image
+            src={project.mainImage || "assets/images/project/default.png"}
+            alt={project.title}
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+            preview={false}
+          />
+          <div>
+            <h5 style={{ margin: 0 }}>{project.title || "Untitled Project"}</h5>
+            <h6 style={{ color: "#595959" }}>
+              {project.client || "Unknown Client"}
+            </h6>
           </div>
         </div>
+      ),
+    },
+    {
+      title: "Services",
+      dataIndex: "services",
+      key: "services",
+      render: (services) => services || "N/A",
+    },
+    {
+      title: "Website",
+      key: "website",
+      render: (_, project) => (
+        <a href={project.website} target="_blank" rel="noopener noreferrer">
+          {project.website ? "Visit" : "N/A"}
+        </a>
+      ),
+    },
+    {
+      title: "GitHub",
+      key: "ghLink",
+      render: (_, project) => (
+        <a href={project.ghLink} target="_blank" rel="noopener noreferrer">
+          {project.ghLink ? "View" : "N/A"}
+        </a>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <Row gutter={[16, 16]}>
+        {/* Total Revenue */}
+        <Col xs={24} sm={12} lg={6}>
+          <Card hoverable>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <DatabaseOutlined style={{ fontSize: 24, color: "#1890ff" }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
+                  Total Revenue
+                </p>
+                <h4 style={{ margin: 0 }}>
+                  ${userData?.revenue || 6659}
+                  <Tag color="blue" style={{ marginLeft: 8 }}>
+                    <HeartFilled /> 8.5%
+                  </Tag>
+                </h4>
+              </div>
+            </div>
+          </Card>
+        </Col>
 
         {/* Total Orders */}
-        <div className="col-sm-6 col-xxl-3 col-lg-6">
-          <div className="main-tiles border-5 card-hover border-0 card o-hidden">
-            <div className="custome-2-bg b-r-4 card-body">
-              <div className="media static-top-widget">
-                <div className="media-body">
-                  {" "}
-                  <span className="m-0">Total Orders</span>
-                  <h4 className="mb-0 counter">
-                    {userData?.orders || 9856}
-                    <span className="badge badge-light-danger grow">
-                      <RiHeartFill /> 8.5%
-                    </span>
-                  </h4>
-                </div>
-                <div className="align-self-center text-center">
-                  <RiShoppingBag3Line />
-                </div>
+        <Col xs={24} sm={12} lg={6}>
+          <Card hoverable>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <ShoppingOutlined style={{ fontSize: 24, color: "#ff4d4f" }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
+                  Total Orders
+                </p>
+                <h4 style={{ margin: 0 }}>
+                  {userData?.orders || 9856}
+                  <Tag color="red" style={{ marginLeft: 8 }}>
+                    <HeartFilled /> 8.5%
+                  </Tag>
+                </h4>
               </div>
             </div>
-          </div>
-        </div>
+          </Card>
+        </Col>
 
         {/* Total Projects */}
-        <div className="col-sm-6 col-xxl-3 col-lg-6">
-          <div className="main-tiles border-5 card-hover border-0 card o-hidden">
-            <div className="custome-3-bg b-r-4 card-body">
-              <div className="media static-top-widget">
-                <div className="media-body p-0">
-                  <span className="m-0">Total Projects</span>
-                  <h4 className="mb-0 counter">
-                    {projects?.length || 0}
-                    <Link
-                      to="/projects/add"
-                      className="badge badge-light-secondary grow"
+        <Col xs={24} sm={12} lg={6}>
+          <Card hoverable>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <MessageOutlined style={{ fontSize: 24, color: "#fa8c16" }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
+                  Total Projects
+                </p>
+                <h4 style={{ margin: 0 }}>
+                  {projects?.length || 0}
+                  <Link to="/projects/add">
+                    <Tag
+                      color="default"
+                      style={{ marginLeft: 8, cursor: "pointer" }}
                     >
                       ADD NEW
-                    </Link>
-                  </h4>
-                </div>
-                <div className="align-self-center text-center">
-                  <RiChat3Line />
-                </div>
+                    </Tag>
+                  </Link>
+                </h4>
               </div>
             </div>
-          </div>
-        </div>
+          </Card>
+        </Col>
 
-        {/* Total Customers */}
-        <div className="col-sm-6 col-xxl-3 col-lg-6">
-          <div className="main-tiles border-5 card-hover border-0 card o-hidden">
-            <div className="custome-4-bg b-r-4 card-body">
-              <div className="media static-top-widget">
-                <div className="media-body p-0">
-                  <span className="m-0">Total Customers</span>
-                  <h4 className="mb-0 counter">
-                    {userData?.customers || "4.6k"}
-                    <span className="badge badge-light-success grow">
-                      <RiHeartFill /> 8.5%
-                    </span>
-                  </h4>
-                </div>
-                <div className="align-self-center text-center">
-                  <RiUserAddLine />
-                </div>
+        {/* Total Blogs */}
+        <Col xs={24} sm={12} lg={6}>
+          <Card hoverable>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <UserAddOutlined style={{ fontSize: 24, color: "#52c41a" }} />
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
+                  Total Blogs
+                </p>
+                <h4 style={{ margin: 0 }}>
+                  {blogs?.length || 0}
+                  <Link to="/blogs/create">
+                    <Tag
+                      color="default"
+                      style={{ marginLeft: 8, cursor: "pointer" }}
+                    >
+                      ADD NEW
+                    </Tag>
+                  </Link>
+                </h4>
               </div>
             </div>
-          </div>
-        </div>
+          </Card>
+        </Col>
 
         {/* Category Slider */}
-        <div className="col-xl-6">
-          <div className="card o-hidden card-hover">
-            <div className="card-header border-0 pb-1">
-              <div className="card-header-title p-0">
-                <h4>Category</h4>
-              </div>
-            </div>
-            <div className="card-body p-0">
-              <div className="category-slider no-arrow">
-                {categories?.map((category) => (
+        <Col xs={24} xl={12}>
+          <Card title="Category">
+            {categories.length > 0 ? (
+              <Carousel dots autoplay>
+                {categories.map((category) => (
                   <div key={category._id}>
-                    <div className="dashboard-category">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 16,
+                        padding: 16,
+                      }}
+                    >
                       <Link
                         to={`/category/${category.name
                           .toLowerCase()
                           .replace(/ & /g, "-")}`}
-                        className="category-image"
+                        style={{ fontSize: 24, color: "#1890ff" }}
                       >
-                        <img
-                          src={
-                            categoryImageMap[category.name] ||
-                            "assets/svg/default.svg"
-                          }
-                          className="img-fluid"
-                          alt={category.name}
-                        />
+                        {categoryImageMap[category.name] || <CodeOutlined />}
                       </Link>
                       <Link
                         to={`/category/${category.name
                           .toLowerCase()
                           .replace(/ & /g, "-")}`}
-                        className="category-name"
+                        style={{ fontSize: 16, fontWeight: "bold" }}
                       >
-                        <h6>{category.name}</h6>
+                        {category.name}
                       </Link>
                     </div>
                   </div>
-                )) || <div>No categories available</div>}
+                ))}
+              </Carousel>
+            ) : (
+              <div style={{ padding: 16, textAlign: "center" }}>
+                No categories available
               </div>
-            </div>
-          </div>
-        </div>
+            )}
+          </Card>
+        </Col>
 
         {/* To Do List */}
-        <div className="col-xl-6">
-          <div className="card o-hidden card-hover">
-            <div className="card-header border-0">
-              <div className="card-header-title">
-                <h4>To Do List</h4>
-              </div>
-            </div>
-            <div className="card-body pt-0">
-              <ul className="to-do-list">
+        <Col xs={24} xl={12}>
+          <Card title="To Do List">
+            <div style={{ padding: "0 16px" }}>
+              <ul style={{ listStyle: "none", padding: 0 }}>
                 {todos?.slice(0, 4).map((todo, index) => (
-                  <li className="to-do-item" key={todo._id}>
-                    <div className="form-check user-checkbox">
-                      <input
-                        className="checkbox_animated check-it"
-                        type="checkbox"
-                        checked={todo.completed}
-                        id={`flexCheckDefault${index}`}
-                        readOnly // Prevent direct interaction; add mutation for toggling if needed
-                      />
-                    </div>
-                    <div className="to-do-list-name">
-                      <strong>{todo.content}</strong>
-                      <p>
-                        {todo.createdAt
-                          ? new Date(todo.createdAt).toLocaleDateString()
-                          : "8 Hours"}
-                      </p>
-                    </div>
+                  <li
+                    key={todo._id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "8px 0",
+                    }}
+                  >
+                    <Checkbox checked={todo.completed} disabled>
+                      {todo.content}
+                    </Checkbox>
+                    <p style={{ margin: 0, color: "#595959", fontSize: 12 }}>
+                      {todo.createdAt
+                        ? new Date(todo.createdAt).toLocaleDateString()
+                        : "8 Hours"}
+                    </p>
                   </li>
-                )) || (
-                  <li className="to-do-item">
-                    <p>No tasks available</p>
+                ))}
+                {todos.length === 0 && (
+                  <li style={{ padding: "8px 0" }}>
+                    <p style={{ margin: 0, color: "#595959" }}>
+                      No tasks available
+                    </p>
                   </li>
                 )}
-                <li className="to-do-item">
-                  <form className="row g-2" onSubmit={handleAddTask}>
-                    <div className="col-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="content"
+                <li style={{ padding: "8px 0" }}>
+                  <Form
+                    form={form}
+                    onFinish={handleAddTask}
+                    layout="inline"
+                    initialValues={{ content: "" }}
+                  >
+                    <Form.Item
+                      name="content"
+                      style={{ flex: 1 }}
+                      rules={[
+                        { required: true, message: "Task cannot be empty" },
+                      ]}
+                    >
+                      <Input
                         placeholder="Enter Task Name"
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
+                        onPressEnter={form.submit}
                       />
-                    </div>
-                    <div className="col-4">
-                      <button
-                        type="submit"
-                        className="btn btn-primary w-100 h-100"
-                      >
-                        Add task
-                      </button>
-                    </div>
-                  </form>
+                    </Form.Item>
+                    <Form.Item>
+                      <Button type="primary" htmlType="submit" block>
+                        Add Task
+                      </Button>
+                    </Form.Item>
+                  </Form>
                 </li>
               </ul>
             </div>
-          </div>
-        </div>
+          </Card>
+        </Col>
+
         {/* Recent Queries */}
-        <div className="col-xl-6">
-          <div className="card o-hidden card-hover">
-            <div className="card-header card-header-top card-header--2 px-0 pt-0">
-              <div className="card-header-title">
-                <h4>Recent Queries</h4>
-              </div>
-              <div className="best-selling-box d-sm-flex d-none">
+        <Col xs={24} xl={12}>
+          <Card
+            title="Recent Queries"
+            extra={
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span>Sort By:</span>
-                <Dropdown>
-                  <Dropdown.Toggle variant="light" id="dropdownMenuButton2">
-                    Today
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item href="#">Today</Dropdown.Item>
-                    <Dropdown.Item href="#">This Week</Dropdown.Item>
-                    <Dropdown.Item href="#">This Month</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
+                <Select defaultValue="Today" style={{ width: 120 }}>
+                  <Option value="Today">Today</Option>
+                  <Option value="This Week">This Week</Option>
+                  <Option value="This Month">This Month</Option>
+                </Select>
               </div>
-            </div>
-            <div className="card-body p-0">
-              <div>
-                <div className="table-responsive">
-                  <table className="best-selling-table table border-0">
-                    <tbody>
-                      {queries?.data?.slice(0, 4).map((query, index) => (
-                        <tr key={query._id}>
-                          <td>
-                            <div className="best-product-box">
-                              <div className="product-name">
-                                <h5>{query.name}</h5>
-                                <h6>{query.email}</h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>Subject</h6>
-                              <h5>{query.subject}</h5>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>Message</h6>
-                              <h5>{query.message}</h5>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>Date</h6>
-                              <h5>
-                                {new Date(
-                                  query.createdAt || query._id
-                                ).toLocaleDateString()}
-                              </h5>
-                            </div>
-                          </td>
-                        </tr>
-                      )) || (
-                        <tr>
-                          <td colSpan="4">No queries available</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+            }
+          >
+            <Table
+              columns={queryColumns}
+              dataSource={queries.data?.slice(0, 4)}
+              rowKey="_id"
+              pagination={false}
+              locale={{ emptyText: "No queries available" }}
+            />
+          </Card>
+        </Col>
 
         {/* Top Projects */}
-        <div className="col-xl-6 col-md-12">
-          <div className="card o-hidden card-hover">
-            <div className="card-header card-header-top card-header--2 px-0 pt-0">
-              <div className="card-header-title">
-                <h4>Top Projects</h4>
-              </div>
-              <div className="best-selling-box d-sm-flex d-none">
+        <Col xs={24} xl={12}>
+          <Card
+            title="Top Projects"
+            extra={
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span>Sort By:</span>
-                <Dropdown>
-                  <Dropdown.Toggle variant="light" id="dropdownMenuButton1">
-                    Today
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu>
-                    <Dropdown.Item href="#">Today</Dropdown.Item>
-                    <Dropdown.Item href="#">This Week</Dropdown.Item>
-                    <Dropdown.Item href="#">This Month</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
+                <Select defaultValue="Today" style={{ width: 120 }}>
+                  <Option value="Today">Today</Option>
+                  <Option value="This Week">This Week</Option>
+                  <Option value="This Month">This Month</Option>
+                </Select>
               </div>
-            </div>
-            <div className="card-body p-0">
-              <div>
-                <div className="table-responsive">
-                  <table className="best-selling-table w-image table border-0">
-                    <tbody>
-                      {projects?.slice(0, 3).map((project, index) => (
-                        <tr key={project._id}>
-                          <td>
-                            <div className="best-product-box">
-                              <div className="product-image">
-                                <img
-                                  src={
-                                    project.mainImage ||
-                                    "assets/images/project/default.png"
-                                  }
-                                  className="img-fluid"
-                                  alt={project.title}
-                                />
-                              </div>
-                              <div className="product-name">
-                                <h5>{project.title || "Untitled Project"}</h5>
-                                <h6>{project.client || "Unknown Client"}</h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>Services</h6>
-                              <h5>{project.services || "N/A"}</h5>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>Website</h6>
-                              <h5>
-                                <a
-                                  href={project.website}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {project.website ? "Visit" : "N/A"}
-                                </a>
-                              </h5>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="product-detail-box">
-                              <h6>GitHub</h6>
-                              <h5>
-                                <a
-                                  href={project.ghLink}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {project.ghLink ? "View" : "N/A"}
-                                </a>
-                              </h5>
-                            </div>
-                          </td>
-                        </tr>
-                      )) || (
-                        <tr>
-                          <td colSpan="4">No projects available</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            }
+          >
+            <Table
+              columns={projectColumns}
+              dataSource={projects?.slice(0, 3)}
+              rowKey="_id"
+              pagination={false}
+              locale={{ emptyText: "No projects available" }}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

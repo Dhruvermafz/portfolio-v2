@@ -1,97 +1,166 @@
-import React from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
-import FeatherIcon from "feather-icons-react"; // Assuming you're using feather-icons-react for icons
-import { useGetUsersQuery } from "../api/userApi";
-const AllUsers = () => {
-  // Fetch users using the useGetUsersQuery hook
-  const { data: users, isLoading, error } = useGetUsersQuery();
-  console.log(users);
-  return (
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-sm-12">
-          <div className="card card-table">
-            <div className="card-body">
-              <div className="title-header option-title">
-                <h5>All Users</h5>
-                <form className="d-inline-flex">
-                  <Link
-                    to="/users/add" // Updated to navigate to /users/add
-                    className="align-items-center btn btn-theme d-flex"
-                  >
-                    <FeatherIcon icon="plus" size="16" /> Add New
-                  </Link>
-                </form>
-              </div>
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Row, Col, Card, Table, Button, Image, Modal, Alert, Spin } from "antd";
+import {
+  PlusOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { useGetUsersQuery, useDeleteUserMutation } from "../api/userApi";
 
-              <div className="table-responsive table-product">
-                <table className="table all-package theme-table" id="table_id">
-                  <thead>
-                    <tr>
-                      <th>User</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Role</th> {/* Adjusted to match backend fields */}
-                      <th>Option</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan="5">Loading...</td>
-                      </tr>
-                    ) : error ? (
-                      <tr>
-                        <td colSpan="5">
-                          Error: {error.data?.message || "Failed to load users"}
-                        </td>
-                      </tr>
-                    ) : users && users.length > 0 ? (
-                      users.map((user) => (
-                        <tr key={user.id}>
-                          <td>
-                            <div className="table-image">
-                              <img
-                                src={
-                                  user.photo ||
-                                  "assets/images/users/default.jpg"
-                                } // Fallback image
-                                className="img-fluid"
-                                alt={user.username}
-                              />
-                            </div>
-                          </td>
-                          <td>
-                            <div className="user-name">
-                              <span>{user.username}</span>
-                            </div>
-                          </td>
-                          <td>{user.email}</td>
-                          <td>{user.role}</td>
-                          <td>
-                            <ul>
-                              <li>
-                                <Link to={`/users/${user.id}`}>
-                                  <FeatherIcon icon="eye" size="16" />
-                                </Link>
-                              </li>
-                              AREAS
-                            </ul>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="5">No users found</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+// DeleteModal Component (added for delete functionality)
+const DeleteModal = ({ isOpen, onClose, onConfirm, itemName }) => {
+  return (
+    <Modal
+      open={isOpen}
+      title="Confirm Delete"
+      onCancel={onClose}
+      footer={[
+        <Button key="cancel" onClick={onClose}>
+          Cancel
+        </Button>,
+        <Button key="confirm" type="primary" danger onClick={onConfirm}>
+          Delete
+        </Button>,
+      ]}
+      centered
+    >
+      <p>Are you sure you want to delete the user "{itemName}"?</p>
+    </Modal>
+  );
+};
+
+const AllUsers = () => {
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Fetch users using the useGetUsersQuery hook
+  const { data: users = [], isLoading, error } = useGetUsersQuery();
+
+  // Mutation hook for deleting users
+  const [deleteUser] = useDeleteUserMutation();
+
+  // Handle delete action
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteUser(selectedUser.id).unwrap();
+      setDeleteModalOpen(false);
+      setSelectedUser(null);
+      Modal.success({ content: "User deleted successfully!" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      Modal.error({ content: "Failed to delete user." });
+    }
+  };
+
+  // Table columns
+  const columns = [
+    {
+      title: "User",
+      key: "photo",
+      render: (_, user) => (
+        <Image
+          src={user.photo || "assets/images/users/default.jpg"}
+          alt={user.username}
+          style={{ maxWidth: 50, borderRadius: "50%" }}
+          preview={false}
+        />
+      ),
+    },
+    {
+      title: "Name",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Role",
+      dataIndex: "role",
+      key: "role",
+    },
+    {
+      title: "Option",
+      key: "option",
+      render: (_, user) => (
+        <div style={{ display: "flex", gap: 8 }}>
+          <Link to={`/users/${user.id}`}>
+            <Button type="link" icon={<EyeOutlined />} />
+          </Link>
+          <Link to={`/users/edit/${user.id}`}>
+            <Button type="link" icon={<EditOutlined />} />
+          </Link>
+          <Button
+            type="link"
+            icon={<DeleteOutlined />}
+            danger
+            onClick={() => handleDeleteClick(user)}
+          />
         </div>
-      </div>
+      ),
+    },
+  ];
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card
+            title="All Users"
+            extra={
+              <Link to="/users/add">
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Add New
+                </Button>
+              </Link>
+            }
+          >
+            {isLoading ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                <Spin size="large" />
+                <p style={{ marginTop: 8 }}>Loading...</p>
+              </div>
+            ) : error ? (
+              <Alert
+                message="Error"
+                description={error.data?.message || "Failed to load users"}
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+            ) : users.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "20px" }}>
+                No users found
+              </div>
+            ) : (
+              <Table
+                columns={columns}
+                dataSource={users}
+                rowKey="id"
+                pagination={false}
+                locale={{ emptyText: "No users found" }}
+              />
+            )}
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        itemName={selectedUser?.username || "user"}
+      />
     </div>
   );
 };

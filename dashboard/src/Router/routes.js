@@ -11,7 +11,8 @@ import {
   RiTodoLine,
   RiLoginBoxFill,
 } from "react-icons/ri";
-import CreateBlog from "../components/Blogs/CreateBlog";
+import { GiBookshelf } from "react-icons/gi";
+import CreateBlog from "../pages/CreateBlog";
 import CreateProject from "../components/Projects/CreateProject";
 import TodoList from "../components/ToDo/TodoList";
 import Dashboard from "../pages/Dashboard";
@@ -28,6 +29,8 @@ import Error404 from "../pages/Error404";
 import AllUsers from "../pages/AllUsers";
 import AddNewUser from "../pages/AddNewUser";
 import Profile from "../pages/Profile";
+import Books from "../pages/Books";
+import BookForm from "../components/Books/BookForm";
 const masterRoutes = [
   {
     path: "/",
@@ -103,6 +106,36 @@ const masterRoutes = [
         element: <CreateBlog />,
         name: "Edit Blog",
         isSidebarActive: false,
+      },
+    ],
+  },
+  {
+    path: "#",
+    name: "Bookshelf",
+    icon: <GiBookshelf />,
+    isSidebarActive: true,
+
+    submenu: [
+      {
+        path: "/boookshelf",
+        name: "Bookshelf",
+        icon: <GiBookshelf />,
+        isSidebarActive: true,
+        element: <Books />,
+      },
+      {
+        path: "/book/add",
+        name: "Add Book",
+        icon: <GiBookshelf />,
+        isSidebarActive: true,
+        element: <BookForm />,
+      },
+      {
+        path: "/book/:id/edit",
+        name: "Edit Book",
+        icon: <GiBookshelf />,
+        isSidebarActive: false,
+        element: <BookForm />,
       },
     ],
   },

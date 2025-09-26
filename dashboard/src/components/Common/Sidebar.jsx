@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaAngleLeft } from "react-icons/fa";
-import { RiAppsLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
+import { Link, useLocation } from "react-router-dom";
+import { Image, Button, Drawer } from "antd";
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+} from "@ant-design/icons";
 import masterRoutes from "../../Router/routes";
 import logo_white from "../../assets/images/logo/logo@transparent.png";
 import logo_icon_white from "../../assets/images/logo/logo@transparent.png";
@@ -9,111 +14,159 @@ import logo_icon_dark from "../../assets/images/logo/logo@transparent.png";
 import "./sidebar.css";
 
 const Sidebar = () => {
-  // State to track the currently open submenu
+  const [collapsed, setCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
-  // Toggle sidebar (optional, add your logic here)
-  const initSidebar = () => {
-    console.log("Sidebar toggle clicked");
-    // Add sidebar toggle logic here (e.g., toggle sidebar visibility)
+  const isMobile = window.innerWidth <= 768;
+
+  const toggleCollapse = () => {
+    setCollapsed(!collapsed);
   };
 
-  // Handle submenu toggle
   const handleSubmenuToggle = (index) => {
     setOpenSubmenu(openSubmenu === index ? null : index);
   };
 
-  return (
-    <div className="sidebar-wrapper">
-      <div id="sidebarEffect"></div>
+  // Responsive drawer for mobile
+  const handleDrawer = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
-      {/* Logo Section */}
-      <div className="logo-wrapper logo-wrapper-center">
-        <a href="index.html" data-bs-original-title="" title="">
-          <img className="img-fluid for-white" src={logo_white} alt="logo" />
-        </a>
-        <div className="back-btn">
-          <FaAngleLeft />
-        </div>
-        <div className="toggle-sidebar" onClick={initSidebar}>
-          <RiAppsLine className="status_toggle middle sidebar-toggle" />
-        </div>
-      </div>
-      <div className="logo-icon-wrapper">
-        <a href="index.html">
-          <img
-            className="img-fluid main-logo main-white"
-            src={logo_icon_white}
-            alt="logo"
-          />
-          <img
-            className="img-fluid main-logo main-dark"
-            src={logo_icon_dark}
-            alt="logo"
-          />
-        </a>
-      </div>
+  // Active path highlight
+  const isActive = (path) => location.pathname === path;
 
-      {/* Sidebar Menu */}
-      <nav className="sidebar-main">
-        <div className="left-arrow" id="left-arrow">
-          <RiArrowLeftLine />
-        </div>
-        <div id="sidebar-menu">
-          <ul className="sidebar-links" id="simple-bar">
-            <li className="back-btn"></li>
-            {masterRoutes
-              .filter((route) => route.isSidebarActive)
-              .map((route, index) => (
-                <li className="sidebar-list" key={index}>
-                  {route.submenu.length > 0 ? (
-                    // Dropdown for routes with submenus
+  const sidebarContent = (
+    <div className={`sidebar-inner ${collapsed ? "collapsed" : ""}`}>
+      <div className="logo-section">
+        <Link to="/">
+          <Image
+            className="logo-img"
+            src={collapsed ? logo_icon_white : logo_white}
+            alt="logo"
+            preview={false}
+          />
+        </Link>
+        <Button
+          type="text"
+          className="collapse-btn"
+          onClick={toggleCollapse}
+          icon={
+            collapsed ? (
+              <MenuUnfoldOutlined style={{ fontSize: 22 }} />
+            ) : (
+              <MenuFoldOutlined style={{ fontSize: 22 }} />
+            )
+          }
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        />
+      </div>
+      <nav className="sidebar-nav">
+        <ul className="sidebar-links">
+          {masterRoutes
+            .filter((route) => route.isSidebarActive)
+            .map((route, index) => (
+              <li
+                className={`sidebar-list ${
+                  isActive(route.path) ? "active" : ""
+                }`}
+                key={index}
+              >
+                {route.submenu.length > 0 ? (
+                  <>
                     <a
-                      className={`linear-icon-link sidebar-link sidebar-title ${
-                        openSubmenu === index ? "active" : ""
+                      className={`sidebar-link sidebar-title ${
+                        openSubmenu === index ? "submenu-open" : ""
                       }`}
                       href="#"
-                      onClick={() => handleSubmenuToggle(index)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleSubmenuToggle(index);
+                      }}
                       role="button"
+                      tabIndex={0}
                     >
-                      {route.icon}
-                      <span>{route.name}</span>
+                      <span className="icon">{route.icon}</span>
+                      {!collapsed && <span>{route.name}</span>}
+                      <span className="submenu-arrow">
+                        {openSubmenu === index ? (
+                          <ArrowLeftOutlined />
+                        ) : (
+                          <ArrowRightOutlined />
+                        )}
+                      </span>
                     </a>
-                  ) : (
-                    // Single link for routes without submenus
-                    <Link
-                      className="sidebar-link sidebar-title link-nav"
-                      to={route.path}
-                    >
-                      {route.icon}
-                      <span>{route.name}</span>
-                    </Link>
-                  )}
-                  {route.submenu.length > 0 && (
                     <ul
                       className={`sidebar-submenu ${
                         openSubmenu === index ? "show" : ""
                       }`}
-                      id={`submenu-${index}`}
                     >
                       {route.submenu
-                        .filter((subRoute) => subRoute.isSidebarActive) // Filter submenu items
+                        .filter((subRoute) => subRoute.isSidebarActive)
                         .map((subRoute, subIndex) => (
                           <li key={subIndex}>
-                            <Link to={subRoute.path}>{subRoute.name}</Link>
+                            <Link
+                              to={subRoute.path}
+                              className={
+                                isActive(subRoute.path) ? "active" : ""
+                              }
+                            >
+                              {subRoute.name}
+                            </Link>
                           </li>
                         ))}
                     </ul>
-                  )}
-                </li>
-              ))}
-          </ul>
-        </div>
-        <div className="right-arrow" id="right-arrow">
-          <RiArrowRightLine />
-        </div>
+                  </>
+                ) : (
+                  <Link
+                    className={`sidebar-link sidebar-title link-nav ${
+                      isActive(route.path) ? "active" : ""
+                    }`}
+                    to={route.path}
+                  >
+                    <span className="icon">{route.icon}</span>
+                    {!collapsed && <span>{route.name}</span>}
+                  </Link>
+                )}
+              </li>
+            ))}
+        </ul>
       </nav>
     </div>
+  );
+
+  return (
+    <>
+      {/* Responsive overlay for mobile */}
+      {isMobile ? (
+        <>
+          <Button
+            type="primary"
+            className="mobile-sidebar-trigger"
+            onClick={handleDrawer}
+            icon={<MenuUnfoldOutlined />}
+          />
+          <Drawer
+            placement="left"
+            closable={false}
+            onClose={handleDrawer}
+            open={mobileOpen}
+            bodyStyle={{ padding: 0, background: "#141b2d" }}
+            width={220}
+          >
+            {sidebarContent}
+          </Drawer>
+        </>
+      ) : (
+        <aside
+          className={`sidebar-wrapper${collapsed ? " collapsed" : ""}`}
+          aria-label="Sidebar Navigation"
+        >
+          {sidebarContent}
+        </aside>
+      )}
+    </>
   );
 };
 

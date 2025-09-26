@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Row,
@@ -10,7 +10,7 @@ import {
   Button,
   Pagination,
   Spin,
-  Image,
+  Modal,
   message,
 } from "antd";
 import {
@@ -18,159 +18,142 @@ import {
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  FolderOpenOutlined,
-  TeamOutlined,
-  CheckSquareOutlined,
+  BookOutlined,
   GlobalOutlined,
+  CheckSquareOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import {
-  useGetAllProjectsQuery,
-  useDeleteProjectMutation,
-} from "../api/projectApi";
+import { useGetBooksQuery, useDeleteBookMutation } from "../api/bookApi";
+
+// DeleteModal Component
 import DeleteModal from "../components/Common/DeleteModal";
 
-const Projects = () => {
+const Books = () => {
   const [search, setSearch] = useState("");
-  const [clientFilter, setClientFilter] = useState("All");
+  const [languageFilter, setLanguageFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const booksPerPage = 10;
 
   const navigate = useNavigate();
 
-  // Fetching projects using RTK Query
-  const { data: projects = [], isLoading, error } = useGetAllProjectsQuery();
-  const [deleteProject] = useDeleteProjectMutation();
-
-  const projectsPerPage = 10;
-  const totalProjects = projects.length;
-  const clients = [...new Set(projects.map((p) => p.client).filter(Boolean))];
-
-  // Filter and Search
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch = project.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesClient =
-      clientFilter === "All" || project.client === clientFilter;
-    return matchesSearch && matchesClient;
+  // Fetch books using RTK Query with pagination
+  const {
+    data = {
+      books: [],
+      pagination: { page: 1, totalPages: 1, limit: booksPerPage, total: 0 },
+    },
+    isLoading,
+    error,
+  } = useGetBooksQuery({
+    title: search,
+    language: languageFilter === "All" ? "" : languageFilter,
+    page: currentPage,
+    limit: booksPerPage,
   });
+  const [deleteBook] = useDeleteBookMutation();
 
-  // Pagination Logic
-  const indexOfLast = currentPage * projectsPerPage;
-  const indexOfFirst = indexOfLast - projectsPerPage;
-  const currentProjects = filteredProjects.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+  // Get data from pagination
+  const totalBooks = data?.pagination?.total || 0;
+  const totalPages = data?.pagination?.totalPages || 1;
+  const currentBooks = data.books || [];
+
+  // Get all languages from current page
+  const languages = [
+    ...new Set((data.books || []).map((b) => b.language).filter(Boolean)),
+  ];
 
   // Table columns
   const columns = [
     {
-      title: "Project Image",
-      key: "mainImage",
-      render: (_, project) => (
-        <Image
-          src={project.mainImage || "assets/img/modern-ai-image/pet-1.jpg"}
-          alt={project.title}
-          style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 4 }}
-          preview={false}
-        />
-      ),
-    },
-    {
-      title: "Project Title",
-      dataIndex: "title",
+      title: "Title",
       key: "title",
-    },
-    {
-      title: "Client",
-      dataIndex: "client",
-      key: "client",
-      render: (client) => client || "N/A",
-    },
-    {
-      title: "Links",
-      key: "links",
-      render: (_, project) => (
-        <div
-          style={{
-            color:
-              project.status === "Completed"
-                ? "#52c41a"
-                : project.status === "In Progress"
-                ? "#faad14"
-                : "#ff4d4f",
-          }}
-        >
-          <a href={project.ghLink} target="_blank" rel="noopener noreferrer">
-            GH LINK
-          </a>
-          <br />
-          <a href={project.website} target="_blank" rel="noopener noreferrer">
-            LIVE LINK
-          </a>
+      render: (_, book) => (
+        <div>
+          <p style={{ margin: 0 }}>{book.title}</p>
+          {book.subtitle && <small>{book.subtitle}</small>}
         </div>
       ),
     },
     {
-      title: "Option",
-      key: "option",
-      render: (_, project) => (
+      title: "Authors",
+      dataIndex: "authors",
+      key: "authors",
+      render: (authors) => authors?.join(", ") || "N/A",
+    },
+    {
+      title: "Language",
+      dataIndex: "language",
+      key: "language",
+      render: (language) => language || "N/A",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <span
+          style={{
+            color:
+              status === "completed"
+                ? "#52c41a"
+                : status === "not_started"
+                ? "#ff4d4f"
+                : "#faad14",
+          }}
+        >
+          {status}
+        </span>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, book) => (
         <div style={{ display: "flex", gap: 8 }}>
           <Button
             type="link"
             icon={<EyeOutlined />}
-            onClick={() => navigate(`/projects/${project._id}`)}
+            onClick={() => navigate(`/book/${book._id}`)}
           />
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/projects/${project._id}/edit`)}
+            onClick={() => navigate(`/book/${book._id}/edit`)}
           />
           <Button
             type="link"
             icon={<DeleteOutlined />}
             danger
             onClick={() => {
-              setSelectedProject(project);
+              setSelectedBook(book);
               setDeleteModalOpen(true);
             }}
           />
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => handleMove(project._id)}
-          >
-            Move
-          </Button>
         </div>
       ),
     },
   ];
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Handle Delete
+  // Handle delete
   const handleDeleteConfirm = async () => {
     try {
-      await deleteProject(selectedProject._id).unwrap();
+      await deleteBook(selectedBook._id).unwrap();
       setDeleteModalOpen(false);
-      setSelectedProject(null);
-      message.success("Project deleted successfully!");
+      setSelectedBook(null);
+      message.success("Book deleted successfully!");
     } catch (error) {
-      console.error("Error deleting project:", error);
       message.error(
-        `Failed to delete project: ${error?.data?.message || "Unknown error"}`
+        `Failed to delete book: ${error?.data?.message || "Unknown error"}`
       );
     }
   };
 
-  // Handle Move (Placeholder)
-  const handleMove = (projectId) => {
-    message.info(
-      `Move functionality for project ${projectId} not implemented yet.`
-    );
-  };
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, languageFilter]);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -190,15 +173,13 @@ const Projects = () => {
                   justifyContent: "center",
                 }}
               >
-                <FolderOpenOutlined
-                  style={{ fontSize: 24, color: "#1890ff" }}
-                />
+                <BookOutlined style={{ fontSize: 24, color: "#1890ff" }} />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Projects
+                  Books
                 </p>
-                <h5 style={{ margin: 0 }}>{totalProjects}</h5>
+                <h5 style={{ margin: 0 }}>{totalBooks}</h5>
               </div>
             </div>
           </Card>
@@ -217,13 +198,13 @@ const Projects = () => {
                   justifyContent: "center",
                 }}
               >
-                <TeamOutlined style={{ fontSize: 24, color: "#722ed1" }} />
+                <GlobalOutlined style={{ fontSize: 24, color: "#722ed1" }} />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Clients
+                  Languages
                 </p>
-                <h5 style={{ margin: 0 }}>{clients.length}</h5>
+                <h5 style={{ margin: 0 }}>{languages.length}</h5>
               </div>
             </div>
           </Card>
@@ -248,10 +229,16 @@ const Projects = () => {
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Tasks in Progress
+                  Books in Progress
                 </p>
                 <h5 style={{ margin: 0 }}>
-                  {projects.filter((p) => p.status === "In Progress").length}
+                  {
+                    currentBooks.filter((b) =>
+                      ["not_even_half", "mid_half", "more_than_half"].includes(
+                        b.status
+                      )
+                    ).length
+                  }
                 </h5>
               </div>
             </div>
@@ -262,11 +249,11 @@ const Projects = () => {
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card
-            title="Project List"
+            title="Book List"
             extra={
-              <Link to="/projects/add">
+              <Link to="/book/add">
                 <Button type="primary" icon={<PlusOutlined />}>
-                  Add New Project
+                  Add New Book
                 </Button>
               </Link>
             }
@@ -275,21 +262,21 @@ const Projects = () => {
               <Col xs={24} sm={12} md={8}>
                 <Input
                   prefix={<SearchOutlined />}
-                  placeholder="Search projects..."
+                  placeholder="Search books..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </Col>
               <Col xs={24} sm={12} md={4}>
                 <Select
-                  value={clientFilter}
-                  onChange={(value) => setClientFilter(value)}
+                  value={languageFilter}
+                  onChange={(value) => setLanguageFilter(value)}
                   style={{ width: "100%" }}
                 >
-                  <Select.Option value="All">All Clients</Select.Option>
-                  {clients.map((client) => (
-                    <Select.Option key={client} value={client}>
-                      {client}
+                  <Select.Option value="All">All Languages</Select.Option>
+                  {languages.map((language) => (
+                    <Select.Option key={language} value={language}>
+                      {language}
                     </Select.Option>
                   ))}
                 </Select>
@@ -299,35 +286,34 @@ const Projects = () => {
             {isLoading ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
                 <Spin size="large" />
-                <p style={{ marginTop: 8 }}>Loading projects...</p>
+                <p style={{ marginTop: 8 }}>Loading books...</p>
               </div>
             ) : error ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
                 <p style={{ color: "#ff4d4f" }}>
-                  Error loading projects:{" "}
-                  {error?.data?.message || "Unknown error"}
+                  Error loading books: {error?.data?.message || "Unknown error"}
                 </p>
               </div>
-            ) : currentProjects.length === 0 ? (
+            ) : currentBooks.length === 0 ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
-                No projects found.
+                No books found.
               </div>
             ) : (
               <Table
                 columns={columns}
-                dataSource={currentProjects}
+                dataSource={currentBooks}
                 rowKey="_id"
                 pagination={false}
-                locale={{ emptyText: "No projects found" }}
+                locale={{ emptyText: "No books found" }}
               />
             )}
 
             {totalPages > 1 && (
               <Pagination
                 current={currentPage}
-                total={filteredProjects.length}
-                pageSize={projectsPerPage}
-                onChange={(page) => paginate(page)}
+                total={totalBooks}
+                pageSize={booksPerPage}
+                onChange={(page) => setCurrentPage(page)}
                 style={{ marginTop: 16, textAlign: "center" }}
                 showSizeChanger={false}
               />
@@ -341,10 +327,10 @@ const Projects = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        itemName={selectedProject?.title || "project"}
+        itemName={selectedBook?.title || "book"}
       />
     </div>
   );
 };
 
-export default Projects;
+export default Books;

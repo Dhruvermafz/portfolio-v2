@@ -1,13 +1,31 @@
 import React, { useState } from "react";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import {
+  Card,
+  Row,
+  Col,
+  Input,
+  Button,
+  Pagination,
+  Spin,
+  Alert,
+  Modal,
+  Form,
+} from "antd";
+import {
+  PlusOutlined,
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import AddAchievementModal from "../components/Achivements/AddAchivementModal";
 import {
   useGetAllAchievementsQuery,
   useCreateAchievementMutation,
   useUpdateAchievementMutation,
   useDeleteAchievementMutation,
 } from "../api/achievementsApi";
-import DeleteModal from "../components/Achivements/DeleteModal";
-import AddAchievementModal from "../components/Achivements/AddAchivementModal";
+import "../components/Achivements/achievement.css"; // Create or update this CSS to match AntD styling
+import DeleteModal from "../components/Common/DeleteModal";
 
 const Achievements = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,9 +55,10 @@ const Achievements = () => {
         headers: { Authorization: `Bearer ${token}` },
       }).unwrap();
       setAchievementModalOpen(false);
+      Modal.success({ content: "Achievement added successfully!" });
     } catch (error) {
       console.error("Error adding achievement:", error);
-      alert("Failed to add achievement.");
+      Modal.error({ content: "Failed to add achievement." });
     }
   };
 
@@ -60,9 +79,10 @@ const Achievements = () => {
       setAchievementModalOpen(false);
       setEditMode(false);
       setSelectedAchievement(null);
+      Modal.success({ content: "Achievement updated successfully!" });
     } catch (error) {
       console.error("Error updating achievement:", error);
-      alert("Failed to update achievement.");
+      Modal.error({ content: "Failed to update achievement." });
     }
   };
 
@@ -80,9 +100,10 @@ const Achievements = () => {
       }).unwrap();
       setDeleteModalOpen(false);
       setSelectedAchievement(null);
+      Modal.success({ content: "Achievement deleted successfully!" });
     } catch (error) {
       console.error("Error deleting achievement:", error);
-      alert("Failed to delete achievement.");
+      Modal.error({ content: "Failed to delete achievement." });
     }
   };
 
@@ -99,151 +120,101 @@ const Achievements = () => {
     currentPage * achievementsPerPage
   );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   return (
-    <>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-12">
-            <div className="card">
-              <div className="card-body">
-                <div className="title-header option-title">
-                  <h5>Achievement List</h5>
-                  <div className="right-options">
-                    <ul>
-                      <li>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <FaSearch />
-                          </span>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Search achievements..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                          />
-                        </div>
-                      </li>
-                      <li>
-                        <button
-                          className="btn btn-solid"
-                          onClick={() => {
-                            setEditMode(false);
-                            setSelectedAchievement(null);
-                            setAchievementModalOpen(true);
-                          }}
-                        >
-                          <FaPlus /> Add Achievement
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="row">
-                  {isLoading && (
-                    <div className="col-12 text-center">
-                      <p>Loading achievements...</p>
-                    </div>
-                  )}
-                  {isError && (
-                    <div className="col-12 text-center">
-                      <p className="text-danger">Error loading achievements</p>
-                    </div>
-                  )}
-                  {!isLoading &&
-                    !isError &&
-                    paginatedAchievements.length === 0 && (
-                      <div className="col-12 text-center">
-                        <p>No achievements found.</p>
-                      </div>
-                    )}
-                  {!isLoading &&
-                    !isError &&
-                    paginatedAchievements.map((achievement) => (
-                      <div
-                        className="col-md-4 col-sm-6 mb-4"
-                        key={achievement._id}
-                      >
-                        <div className="card h-100 shadow-sm">
-                          <div className="card-body">
-                            <h5 className="card-title">{achievement.title}</h5>
-                            <p className="card-text text-secondary">
-                              {achievement.description || "No description"}{" "}
-                              {achievement.details}
-                            </p>
-                          </div>
-                          <div className="card-footer bg-transparent d-flex justify-content-end">
-                            <button
-                              className="btn btn-outline-primary btn-sm me-2"
-                              onClick={() => handleEditClick(achievement)}
-                            >
-                              <i className="ri-pencil-line"></i> Edit
-                            </button>
-                            <button
-                              className="btn btn-outline-danger btn-sm"
-                              onClick={() => handleDeleteClick(achievement)}
-                            >
-                              <i className="ri-delete-bin-line"></i> Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-                {totalPages > 1 && (
-                  <div className="card-footer">
-                    <nav aria-label="Page navigation">
-                      <ul className="pagination justify-content-center">
-                        <li
-                          className={`page-item ${
-                            currentPage === 1 ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() => paginate(currentPage - 1)}
-                          >
-                            Previous
-                          </button>
-                        </li>
-                        {Array.from({ length: totalPages }, (_, i) => (
-                          <li
-                            key={i}
-                            className={`page-item ${
-                              currentPage === i + 1 ? "active" : ""
-                            }`}
-                          >
-                            <button
-                              className="page-link"
-                              onClick={() => paginate(i + 1)}
-                            >
-                              {i + 1}
-                            </button>
-                          </li>
-                        ))}
-                        <li
-                          className={`page-item ${
-                            currentPage === totalPages ? "disabled" : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() => paginate(currentPage + 1)}
-                          >
-                            Next
-                          </button>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
-                )}
-              </div>
+    <div style={{ padding: "20px" }}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card
+            title="Achievement List"
+            extra={
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setEditMode(false);
+                  setSelectedAchievement(null);
+                  setAchievementModalOpen(true);
+                }}
+              >
+                Add Achievement
+              </Button>
+            }
+          >
+            <div style={{ marginBottom: 16 }}>
+              <Input
+                prefix={<SearchOutlined />}
+                placeholder="Search achievements..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: 300 }}
+              />
             </div>
-          </div>
-        </div>
-      </div>
+            <Row gutter={[16, 16]}>
+              {isLoading ? (
+                <Col span={24} style={{ textAlign: "center", padding: "20px" }}>
+                  <Spin size="large" />
+                  <p style={{ marginTop: 8 }}>Loading achievements...</p>
+                </Col>
+              ) : isError ? (
+                <Col span={24}>
+                  <Alert
+                    message="Error"
+                    description="Error loading achievements"
+                    type="error"
+                    showIcon
+                  />
+                </Col>
+              ) : paginatedAchievements.length === 0 ? (
+                <Col span={24} style={{ textAlign: "center", padding: "20px" }}>
+                  <p>No achievements found.</p>
+                </Col>
+              ) : (
+                paginatedAchievements.map((achievement) => (
+                  <Col xs={24} sm={12} md={8} key={achievement._id}>
+                    <Card
+                      hoverable
+                      title={achievement.title}
+                      extra={
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <Button
+                            type="default"
+                            size="small"
+                            onClick={() => handleEditClick(achievement)}
+                          >
+                            <EditOutlined /> Edit
+                          </Button>
+                          <Button
+                            danger
+                            size="small"
+                            onClick={() => handleDeleteClick(achievement)}
+                          >
+                            <DeleteOutlined /> Delete
+                          </Button>
+                        </div>
+                      }
+                    >
+                      <p style={{ color: "#595959" }}>
+                        {achievement.description || "No description"}{" "}
+                        {achievement.details}
+                      </p>
+                    </Card>
+                  </Col>
+                ))
+              )}
+            </Row>
+            {totalPages > 1 && (
+              <Pagination
+                current={currentPage}
+                total={filteredAchievements.length}
+                pageSize={achievementsPerPage}
+                onChange={(page) => setCurrentPage(page)}
+                style={{ marginTop: 16, textAlign: "center" }}
+                showSizeChanger={false}
+              />
+            )}
+          </Card>
+        </Col>
+      </Row>
 
       {/* Modals */}
       <AddAchievementModal
@@ -262,7 +233,7 @@ const Achievements = () => {
         onConfirm={handleDeleteConfirm}
         itemName={selectedAchievement?.title || "achievement"}
       />
-    </>
+    </div>
   );
 };
 

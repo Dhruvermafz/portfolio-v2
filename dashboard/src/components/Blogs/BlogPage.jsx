@@ -1,19 +1,22 @@
-// src/pages/admin/BlogPage.js
 import React, { useState } from "react";
 import {
-  Container,
+  Layout,
   Row,
   Col,
   Form,
+  Input,
   Button,
   Pagination,
-  Spinner,
-} from "react-bootstrap";
+  Spin,
+  Modal,
+} from "antd";
 import { Link } from "react-router-dom";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import AdminBlogCard from "./AdminBlogCard";
-import "./blogs.css";
+import "./blogs.css"; // Update this CSS to match AntD styling
 import { useGetAllBlogsQuery, useDeleteBlogMutation } from "../../api/blogApi";
+
+const { Content } = Layout;
 
 const BlogPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,15 +35,27 @@ const BlogPage = () => {
   };
 
   const handleDelete = async (post) => {
-    if (window.confirm("Are you sure you want to delete this blog post?")) {
-      try {
-        await deleteBlog(post._id).unwrap();
-        alert("Blog post deleted successfully!");
-      } catch (err) {
-        console.error("Error deleting post:", err);
-        alert("Failed to delete blog post.");
-      }
-    }
+    Modal.confirm({
+      title: "Confirm Delete",
+      content: "Are you sure you want to delete this blog post?",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteBlog(post._id).unwrap();
+          Modal.success({
+            content: "Blog post deleted successfully!",
+          });
+        } catch (err) {
+          console.error("Error deleting post:", err);
+          Modal.error({
+            title: "Error",
+            content: "Failed to delete blog post.",
+          });
+        }
+      },
+    });
   };
 
   const filteredBlogs = blogs.filter((blog) =>
@@ -54,96 +69,101 @@ const BlogPage = () => {
   );
 
   return (
-    <section className="blog-page py-5">
-      <Container>
-        <Row className="mb-5 align-items-center">
-          <Col md={6}>
-            <h1 className="blog-page-title">Blog Management</h1>
-            <p className="blog-page-subtitle">
-              Create, edit, and manage your blog posts
-            </p>
-          </Col>
-          <Col
-            md={6}
-            className="d-flex justify-content-end align-items-center gap-3"
-          >
-            <Form className="blog-search-form">
-              <Form.Group className="position-relative">
-                <FaSearch className="search-icon" />
-                <Form.Control
-                  type="text"
-                  placeholder="Search blogs by title..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  className="blog-search-input"
+    <section className="blog-page" style={{ padding: "40px 0" }}>
+      <Layout>
+        <Content style={{ padding: "0 50px" }}>
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 40 }}>
+            <Col xs={24} md={12}>
+              <h1 className="blog-page-title">Blog Management</h1>
+              <p className="blog-page-subtitle">
+                Create, edit, and manage your blog posts
+              </p>
+            </Col>
+            <Col
+              xs={24}
+              md={12}
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                gap: 16,
+              }}
+            >
+              <Form layout="inline" className="blog-search-form">
+                <Form.Item>
+                  <Input
+                    prefix={<SearchOutlined />}
+                    placeholder="Search blogs by title..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="blog-search-input"
+                    allowClear
+                    style={{ width: 300 }}
+                  />
+                </Form.Item>
+              </Form>
+              <Link to="/admin/blogs/create">
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  className="add-blog-btn"
+                >
+                  Add Blog
+                </Button>
+              </Link>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
+            {isLoading ? (
+              <Col span={24} style={{ textAlign: "center", padding: "40px 0" }}>
+                <Spin size="large" />
+                <p style={{ marginTop: 16, color: "#999" }}>Loading blogs...</p>
+              </Col>
+            ) : isError ? (
+              <Col span={24} style={{ textAlign: "center", color: "#ff4d4f" }}>
+                Error loading blogs
+              </Col>
+            ) : paginatedBlogs.length === 0 ? (
+              <Col span={24}>
+                <div
+                  className="no-blogs-card"
+                  style={{ textAlign: "center", padding: "24px" }}
+                >
+                  <p style={{ margin: 0, color: "#999" }}>
+                    {searchQuery
+                      ? "No blogs match your search."
+                      : "No blogs found. Create a new blog to get started!"}
+                  </p>
+                </div>
+              </Col>
+            ) : (
+              paginatedBlogs.map((blog) => (
+                <AdminBlogCard
+                  key={blog._id}
+                  post={blog}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
                 />
-              </Form.Group>
-            </Form>
-            <Link to="/admin/blogs/create">
-              <Button variant="success" className="add-blog-btn">
-                <FaPlus className="me-2" /> Add Blog
-              </Button>
-            </Link>
-          </Col>
-        </Row>
+              ))
+            )}
+          </Row>
 
-        <Row>
-          {isLoading ? (
-            <Col className="text-center py-5">
-              <Spinner animation="border" variant="primary" />
-              <p className="mt-3 text-muted">Loading blogs...</p>
-            </Col>
-          ) : isError ? (
-            <Col className="text-center text-danger">Error loading blogs</Col>
-          ) : paginatedBlogs.length === 0 ? (
-            <Col>
-              <div className="no-blogs-card text-center py-4">
-                <p className="mb-0 text-muted">
-                  {searchQuery
-                    ? "No blogs match your search."
-                    : "No blogs found. Create a new blog to get started!"}
-                </p>
-              </div>
-            </Col>
-          ) : (
-            paginatedBlogs.map((blog) => (
-              <AdminBlogCard
-                key={blog._id}
-                post={blog}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))
+          {totalPages > 1 && (
+            <Pagination
+              current={currentPage}
+              total={filteredBlogs.length}
+              pageSize={blogsPerPage}
+              onChange={(page) => setCurrentPage(page)}
+              style={{ textAlign: "center", marginTop: 40 }}
+              showSizeChanger={false}
+            />
           )}
-        </Row>
-
-        {totalPages > 1 && (
-          <Pagination className="custom-pagination justify-content-center mt-5">
-            <Pagination.Prev
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            />
-            {[...Array(totalPages).keys()].map((page) => (
-              <Pagination.Item
-                key={page + 1}
-                active={page + 1 === currentPage}
-                onClick={() => setCurrentPage(page + 1)}
-              >
-                {page + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            />
-          </Pagination>
-        )}
-      </Container>
+        </Content>
+      </Layout>
     </section>
   );
 };

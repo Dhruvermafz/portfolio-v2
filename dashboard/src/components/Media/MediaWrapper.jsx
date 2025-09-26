@@ -1,98 +1,202 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  Card,
+  Row,
+  Col,
+  Typography,
+  Checkbox,
+  Dropdown,
+  Button,
+  Image,
+  Space,
+  message,
+} from "antd";
+import {
+  DownloadOutlined,
+  DeleteOutlined,
+  MoreOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+
+const { Title } = Typography;
+
+// Dummy media data for demonstration
+const mediaList = [
+  {
+    id: 1,
+    src: "assets/images/product/1.png",
+    alt: "media1",
+  },
+  // Add more media items as needed
+];
 
 const MediaWrapper = () => {
-  return (
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="card">
-            <div class="card-body">
-              <div class="title-header option-title justify-content-start">
-                <h5>Media Library</h5>
-                <div class="selected-options">
-                  <ul>
-                    <li>selected(0)</li>
-                    <li>
-                      <a href="#">
-                        <i class="ri-download-2-line"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="ri-delete-bin-line"></i>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="right-options ms-auto">
-                  <ul>
-                    <li>
-                      <a
-                        class="btn btn-solid"
-                        href="javascript:void(0)"
-                        data-bs-toggle="modal"
-                        data-bs-target="#mediaModel"
-                      >
-                        Add Media
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="row row-cols-xl-6 row-cols-md-5 row-cols-sm-3 row-cols-2 g-sm-3 g-2 media-library-sec ratio_square">
-                <div>
-                  <div class="library-box">
-                    <input type="checkbox" id="myCheckbox1" />
-                    <label for="myCheckbox1">
-                      <div>
-                        <img
-                          src="assets/images/product/1.png"
-                          class="img-fluid bg-img bg_size_content"
-                          alt=""
-                        />
-                      </div>
-                      <div class="dropdown">
-                        <a
-                          class=""
-                          href="#"
-                          role="button"
-                          id="dropdownMenuLink"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i class="ri-more-fill"></i>
-                        </a>
+  const [selected, setSelected] = useState([]);
 
-                        <ul
-                          class="dropdown-menu dropdown-menu-end"
-                          aria-labelledby="dropdownMenuLink"
-                        >
-                          <li>
-                            <a
-                              class="dropdown-item d-flex align-items-center"
-                              href="#"
-                            >
-                              <i class="ri-download-2-line me-2"></i>Download
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              class="dropdown-item d-flex align-items-center"
-                              href="#"
-                            >
-                              <i class="ri-delete-bin-line me-2"></i>Delete
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </label>
-                  </div>
+  const handleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
+  };
+
+  const handleDownload = (id) => {
+    message.info(`Download media with id: ${id}`);
+    // Implement actual download logic here
+  };
+
+  const handleDelete = (id) => {
+    message.warning(`Delete media with id: ${id}`);
+    // Implement actual delete logic here
+  };
+
+  const handleBulkDownload = () => {
+    message.info(`Download ${selected.length} selected media`);
+    // Implement bulk download
+  };
+
+  const handleBulkDelete = () => {
+    message.warning(`Delete ${selected.length} selected media`);
+    // Implement bulk delete
+  };
+
+  const mediaMenu = (id) => (
+    <Dropdown.Menu>
+      <Dropdown.Item
+        key="download"
+        icon={<DownloadOutlined />}
+        onClick={() => handleDownload(id)}
+      >
+        Download
+      </Dropdown.Item>
+      <Dropdown.Item
+        key="delete"
+        icon={<DeleteOutlined />}
+        onClick={() => handleDelete(id)}
+      >
+        Delete
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  );
+
+  return (
+    <div>
+      <Card>
+        <Row
+          align="middle"
+          justify="space-between"
+          style={{ marginBottom: 16 }}
+        >
+          <Col>
+            <Space align="center">
+              <Title level={5} style={{ margin: 0 }}>
+                Media Library
+              </Title>
+              <Button
+                icon={<DownloadOutlined />}
+                disabled={selected.length === 0}
+                onClick={handleBulkDownload}
+                style={{ marginLeft: 16 }}
+              >
+                Download
+              </Button>
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                disabled={selected.length === 0}
+                onClick={handleBulkDelete}
+              >
+                Delete
+              </Button>
+              <span style={{ marginLeft: 16, color: "#888" }}>
+                selected({selected.length})
+              </span>
+            </Space>
+          </Col>
+          <Col>
+            <Button type="primary" icon={<PlusOutlined />}>
+              Add Media
+            </Button>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]} style={{ minHeight: "180px" }} justify="start">
+          {mediaList.map((media) => (
+            <Col
+              key={media.id}
+              xs={12}
+              sm={8}
+              md={6}
+              lg={4}
+              xl={4}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Card
+                hoverable
+                bordered
+                style={{ width: "100%", padding: 8, borderRadius: 12 }}
+                bodyStyle={{ padding: 8 }}
+              >
+                <Checkbox
+                  checked={selected.includes(media.id)}
+                  onChange={() => handleSelect(media.id)}
+                  style={{ position: "absolute", zIndex: 1 }}
+                />
+                <div style={{ textAlign: "center", position: "relative" }}>
+                  <Image
+                    src={media.src}
+                    alt={media.alt}
+                    width={90}
+                    height={90}
+                    style={{
+                      objectFit: "cover",
+                      borderRadius: 8,
+                      marginBottom: 6,
+                      background: "#f6f6f6",
+                    }}
+                    preview={false}
+                  />
+                  <Dropdown
+                    menu={{
+                      items: [
+                        {
+                          key: "download",
+                          icon: <DownloadOutlined />,
+                          label: "Download",
+                          onClick: () => handleDownload(media.id),
+                        },
+                        {
+                          key: "delete",
+                          icon: <DeleteOutlined />,
+                          label: "Delete",
+                          onClick: () => handleDelete(media.id),
+                        },
+                      ],
+                    }}
+                    trigger={["click"]}
+                    placement="bottomRight"
+                  >
+                    <Button
+                      shape="circle"
+                      icon={<MoreOutlined />}
+                      size="small"
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        background: "#fff",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                      }}
+                    />
+                  </Dropdown>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Card>
     </div>
   );
 };

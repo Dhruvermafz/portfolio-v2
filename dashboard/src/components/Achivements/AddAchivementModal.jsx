@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Alert } from "react-bootstrap";
-import "./achievement.css";
+import { Modal, Form, Input, Button, Alert } from "antd";
+import "./achievement.css"; // Update this CSS to match AntD styling
 
 const AddAchievementModal = ({
   isOpen,
@@ -8,111 +8,120 @@ const AddAchievementModal = ({
   onConfirm,
   achievementToEdit,
   isEditMode,
+  isLoading,
 }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [details, setDetails] = useState("");
+  const [form] = Form.useForm();
   const [error, setError] = useState("");
 
   // Pre-populate form fields when editing
   useEffect(() => {
     if (isEditMode && achievementToEdit) {
-      setTitle(achievementToEdit.title || "");
-      setDescription(achievementToEdit.description || "");
-      setDetails(achievementToEdit.details || "");
+      form.setFieldsValue({
+        title: achievementToEdit.title || "",
+        description: achievementToEdit.description || "",
+        details: achievementToEdit.details || "",
+      });
     } else {
-      setTitle("");
-      setDescription("");
-      setDetails("");
+      form.resetFields();
     }
-  }, [isEditMode, achievementToEdit]);
+  }, [isEditMode, achievementToEdit, form]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (values) => {
     setError("");
-
-    if (!title.trim() || !description.trim() || !details.trim()) {
-      setError("All fields are required.");
-      return;
-    }
-
-    onConfirm({ title, description, details });
-    setTitle("");
-    setDescription("");
-    setDetails("");
+    onConfirm(values);
+    form.resetFields();
     onClose();
   };
 
   return (
-    <Modal show={isOpen} onHide={onClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>
-          {isEditMode ? "Edit Achievement" : "Add New Achievement"}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form
-          onSubmit={handleSubmit}
-          id="achievement-modal-form"
-          className="json-modal-form"
-        >
-          <div className="json-object">
-            <div className="json-brace">{"{"}</div>
-            <div className="json-content">
-              <div className="json-field">
-                <label className="json-key">"title":</label>
-                <Form.Control
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+    <Modal
+      open={isOpen}
+      title={isEditMode ? "Edit Achievement" : "Add New Achievement"}
+      onCancel={onClose}
+      footer={null}
+      centered
+    >
+      <Form
+        form={form}
+        onFinish={handleSubmit}
+        layout="vertical"
+        id="achievement-modal-form"
+        className="json-modal-form"
+      >
+        <div className="json-object">
+          <div className="json-brace">{"{"}</div>
+          <div className="json-content">
+            <div className="json-field">
+              <label className="json-key">"title":</label>
+              <Form.Item
+                name="title"
+                rules={[{ required: true, message: "Title is required" }]}
+                noStyle
+              >
+                <Input
                   placeholder="Enter achievement title"
                   className="json-value"
-                  required
                 />
-              </div>
-              <div className="json-field">
-                <label className="json-key">"description":</label>
-                <Form.Control
-                  as="textarea"
+              </Form.Item>
+            </div>
+            <div className="json-field">
+              <label className="json-key">"description":</label>
+              <Form.Item
+                name="description"
+                rules={[{ required: true, message: "Description is required" }]}
+                noStyle
+              >
+                <Input.TextArea
                   rows={3}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter achievement description"
                   className="json-value"
-                  required
                 />
-              </div>
-              <div className="json-field">
-                <label className="json-key">"details":</label>
-                <Form.Control
-                  as="textarea"
+              </Form.Item>
+            </div>
+            <div className="json-field">
+              <label className="json-key">"details":</label>
+              <Form.Item
+                name="details"
+                rules={[{ required: true, message: "Details are required" }]}
+                noStyle
+              >
+                <Input.TextArea
                   rows={5}
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
                   placeholder="Enter achievement details"
                   className="json-value"
-                  required
                 />
-              </div>
+              </Form.Item>
             </div>
-            <div className="json-brace">{"}"}</div>
           </div>
+          <div className="json-brace">{"}"}</div>
+        </div>
 
-          {error && (
-            <Alert variant="danger" className="mt-3">
-              {error}
-            </Alert>
-          )}
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            style={{ marginTop: 16 }}
+          />
+        )}
+      </Form>
+      <div style={{ marginTop: 24, textAlign: "right" }}>
+        <Button
+          style={{ marginRight: 8 }}
+          onClick={onClose}
+          disabled={isLoading}
+        >
           Cancel
         </Button>
-        <Button variant="primary" type="submit" form="achievement-modal-form">
+        <Button
+          type="primary"
+          htmlType="submit"
+          form="achievement-modal-form"
+          loading={isLoading}
+        >
           {isEditMode ? "Save Changes" : "Add Achievement"}
         </Button>
-      </Modal.Footer>
+      </div>
     </Modal>
   );
 };

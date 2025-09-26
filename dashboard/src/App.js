@@ -3,8 +3,10 @@ import { useLocation } from "react-router-dom";
 import Sidebar from "./components/Common/Sidebar";
 import Footer from "./components/Common/Footer";
 import AppRoutes from "./Router/Router";
+import "antd/dist/reset.css";
 function App() {
   const location = useLocation();
+  const user = localStorage.getItem("authToken");
   const isAuthPage = [
     "/login",
     "/signup",
@@ -15,6 +17,7 @@ function App() {
     "/coming-soon",
     "/no-access",
     "/verify-account",
+    "/*",
   ].includes(location.pathname);
   return (
     <div class="page-wrapper compact-wrapper" id="pageWrapper">

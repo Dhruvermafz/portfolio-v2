@@ -1,0 +1,111 @@
+/* Import Google Fonts from the provided stylesheet */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&display=swap");
+
+/* Contribution Calendar Styles */
+.contribution-calendar {
+  font-family: var(--font-family);
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px 0 rgba(26, 31, 44, 0.25); /* Match header-area shadow */
+  position: relative;
+  z-index: 1;
+}
+
+.contribution-calendar h2 {
+  font-size: 24px; /* Match card-title font-size */
+  font-weight: 600; /* Match card-title font-weight */
+  line-height: 1.333em; /* Match card-title line-height */
+  color: var(--black);
+  text-align: center;
+  margin-bottom: 24px; /* Match .mb-24 */
+}
+
+.calendar-grid {
+  display: flex;
+  gap: 10px; /* Consistent with header-area gap */
+}
+
+.day-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 40px;
+  font-size: 0.875em; /* Slightly smaller for readability */
+  font-weight: var(--font-weight);
+  color: var(--paragraph);
+  text-align: right;
+  margin-right: 10px;
+}
+
+.day-labels div {
+  height: 14px; /* Adjusted for larger squares */
+  line-height: 14px;
+}
+
+.weeks {
+  display: flex;
+  gap: 2px; /* Small gap between weeks */
+}
+
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Small gap between days */
+}
+
+.day {
+  width: 14px; /* Larger squares for better visibility */
+  height: 14px;
+  margin: 1px;
+  border-radius: 4px; /* Slightly larger radius for consistency */
+  transition: var(--transision); /* Use transition from root */
+}
+
+.day:hover {
+  transform: scale(1.1); /* Subtle hover effect */
+  box-shadow: 0 1px 2px rgba(26, 31, 44, 0.25); /* Match header shadow */
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px; /* Match .mt-24 */
+  font-size: 0.9em;
+  color: var(--paragraph);
+}
+
+.legend-box {
+  width: 14px;
+  height: 14px;
+  margin: 0 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border); /* Use border from root */
+}
+
+.legend span {
+  font-size: 0.9em;
+  margin: 0 8px;
+  color: var(--light-black); /* Softer color for legend text */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contribution-calendar {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .day {
+    width: 12px;
+    height: 12px;
+  }
+
+  .legend-box {
+    width: 12px;
+    height: 12px;
+  }
+}

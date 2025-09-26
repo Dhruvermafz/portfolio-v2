@@ -1,18 +1,29 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  Container,
   Row,
   Col,
-  Form,
+  Input,
   Button,
   Pagination,
-  Spinner,
-} from "react-bootstrap";
-import { FaPlus, FaSearch } from "react-icons/fa";
-import { Link } from "react-router-dom";
+  Spin,
+  Card,
+  Tag,
+  Radio,
+  Modal,
+  Alert,
+} from "antd";
+import {
+  PlusOutlined,
+  SearchOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import { useGetAllBlogsQuery, useDeleteBlogMutation } from "../api/blogApi";
+import DeleteModal from "../components/Common/DeleteModal";
+
+// Placeholder AdminBlogCard (to be replaced with actual code)
 import AdminBlogCard from "../components/Blogs/AdminBlogCard";
-import DeleteModal from "../components/Achivements/DeleteModal"; // Reusing Achievements' DeleteModal
 
 const Blogs = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,17 +44,17 @@ const Blogs = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      const token = localStorage.getItem("authToken"); // Added for consistency with Achievements
+      const token = localStorage.getItem("authToken");
       await deleteBlog({
         id: selectedBlog._id,
         headers: { Authorization: `Bearer ${token}` },
       }).unwrap();
       setDeleteModalOpen(false);
       setSelectedBlog(null);
-      alert("Blog post deleted successfully!");
+      Modal.success({ content: "Blog post deleted successfully!" });
     } catch (error) {
       console.error("Error deleting blog:", error);
-      alert("Failed to delete blog post.");
+      Modal.error({ content: "Failed to delete blog post." });
     }
   };
 
@@ -64,145 +75,114 @@ const Blogs = () => {
   );
 
   return (
-    <Container fluid className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <div className="title-header d-sm-flex align-items-center justify-content-between mb-4">
-                <h5 className="mb-0">Blogs</h5>
-                <div className="right-options">
-                  <ul className="list-inline mb-0">
-                    <li className="list-inline-item">
-                      <Link to="/blogs/create">
-                        <Button variant="success">
-                          <FaPlus className="me-2" /> Add Blog
-                        </Button>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+    <div style={{ padding: "20px" }}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card
+            title="Blogs"
+            extra={
+              <Link to="/blogs/create">
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Add Blog
+                </Button>
+              </Link>
+            }
+          >
+            <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+              <Col xs={24} md={12}>
+                <Input
+                  prefix={<SearchOutlined />}
+                  placeholder="Search blogs by title..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  style={{ width: "100%" }}
+                />
+              </Col>
+              <Col xs={24} md={12} style={{ textAlign: "right" }}>
+                <Radio.Group
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <Radio.Button value="newest">Newest</Radio.Button>
+                </Radio.Group>
+              </Col>
+            </Row>
 
-              <Row className="mb-4 align-items-center">
-                <Col md={6}>
-                  <Form.Group className="position-relative">
-                    <FaSearch className="search-icon" />
-                    <Form.Control
-                      type="text"
-                      placeholder="Search blogs by title..."
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="blog-search-input ps-5"
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6} className="d-flex justify-content-end">
-                  <div className="btn-group">
-                    <input
-                      type="radio"
-                      name="sort"
-                      id="newest"
-                      className="btn-check"
-                      checked={sortBy === "newest"}
-                      onChange={() => setSortBy("newest")}
-                    />
-                    <label className="btn btn-outline-primary" htmlFor="newest">
-                      Newest
-                    </label>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} lg={18}>
+                {isLoading ? (
+                  <div style={{ textAlign: "center", padding: "20px" }}>
+                    <Spin size="large" />
                   </div>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col lg={9}>
-                  {isLoading ? (
-                    <div className="text-center">
-                      <Spinner animation="border" />
-                    </div>
-                  ) : isError ? (
-                    <div className="text-center">
-                      <p className="text-danger">Error loading blogs</p>
-                      <Button variant="link" onClick={refetch}>
-                        Retry
-                      </Button>
-                    </div>
-                  ) : paginatedBlogs.length === 0 ? (
-                    <div className="text-center">No blogs found.</div>
-                  ) : (
-                    <Row>
-                      {paginatedBlogs.map((blog) => (
-                        <AdminBlogCard
-                          key={blog._id}
-                          post={blog}
-                          onDelete={handleDeleteClick}
-                        />
-                      ))}
-                    </Row>
-                  )}
-                  {totalPages > 1 && (
-                    <Pagination className="justify-content-center mt-5">
-                      <Pagination.Prev
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                        disabled={currentPage === 1}
-                      />
-                      {[...Array(totalPages).keys()].map((page) => (
-                        <Pagination.Item
-                          key={page + 1}
-                          active={page + 1 === currentPage}
-                          onClick={() => setCurrentPage(page + 1)}
-                        >
-                          {page + 1}
-                        </Pagination.Item>
-                      ))}
-                      <Pagination.Next
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages)
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      />
-                    </Pagination>
-                  )}
-                </Col>
-                <Col lg={3}>
-                  <div className="card shadow-sm">
-                    <div className="card-header">
-                      <h6>Trending Tags</h6>
-                    </div>
-                    <div className="card-body">
-                      {blogs
-                        .flatMap((blog) => blog.tags || [])
-                        .filter(
-                          (tag, index, self) => self.indexOf(tag) === index
-                        )
-                        .slice(0, 5)
-                        .map((tag) => (
-                          <a
-                            key={tag}
-                            href="#"
-                            className="badge badge-lg bg-light text-primary me-1 my-1"
-                          >
-                            {tag}
-                          </a>
-                        ))}
-                      {blogs.every(
-                        (blog) => !blog.tags || blog.tags.length === 0
-                      ) && (
-                        <p className="text-muted small">No tags available.</p>
-                      )}
-                    </div>
+                ) : isError ? (
+                  <div style={{ textAlign: "center" }}>
+                    <Alert
+                      message="Error"
+                      description="Error loading blogs"
+                      type="error"
+                      showIcon
+                      style={{ marginBottom: 16 }}
+                    />
+                    <Button type="link" onClick={refetch}>
+                      Retry
+                    </Button>
                   </div>
-                </Col>
-              </Row>
-            </div>
-          </div>
+                ) : paginatedBlogs.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "20px" }}>
+                    No blogs found.
+                  </div>
+                ) : (
+                  <Row gutter={[16, 16]}>
+                    {paginatedBlogs.map((blog) => (
+                      <AdminBlogCard
+                        key={blog._id}
+                        post={blog}
+                        onDelete={handleDeleteClick}
+                      />
+                    ))}
+                  </Row>
+                )}
+                {totalPages > 1 && (
+                  <Pagination
+                    current={currentPage}
+                    total={filteredBlogs.length}
+                    pageSize={blogsPerPage}
+                    onChange={(page) => setCurrentPage(page)}
+                    style={{ marginTop: 24, textAlign: "center" }}
+                    showSizeChanger={false}
+                  />
+                )}
+              </Col>
+              <Col xs={24} lg={6}>
+                <Card title="Trending Tags">
+                  {blogs
+                    .flatMap((blog) => blog.tags || [])
+                    .filter((tag, index, self) => self.indexOf(tag) === index)
+                    .slice(0, 5)
+                    .map((tag) => (
+                      <Tag
+                        key={tag}
+                        color="blue"
+                        style={{ margin: 4, cursor: "pointer" }}
+                        onClick={(e) => e.preventDefault()}
+                      >
+                        {tag}
+                      </Tag>
+                    ))}
+                  {blogs.every(
+                    (blog) => !blog.tags || blog.tags.length === 0
+                  ) && (
+                    <p style={{ color: "#595959", fontSize: 12 }}>
+                      No tags available.
+                    </p>
+                  )}
+                </Card>
+              </Col>
+            </Row>
+          </Card>
         </Col>
       </Row>
 
@@ -213,7 +193,7 @@ const Blogs = () => {
         onConfirm={handleDeleteConfirm}
         itemName={selectedBlog?.title || "blog post"}
       />
-    </Container>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
-import { Card, Badge, Button } from "react-bootstrap";
+import { Card, Tag, Button, Image } from "antd";
 import { Link } from "react-router-dom";
-import { FaEdit, FaTrash, FaBookOpen } from "react-icons/fa";
+import { EditOutlined, DeleteOutlined, ReadOutlined } from "@ant-design/icons";
 import placeholder from "../../assets/images/product/1.png";
 import { PORTFOLIO_URL } from "../../config";
 
@@ -26,61 +26,81 @@ const AdminBlogCard = ({ post, onDelete }) => {
 
   return (
     <div className="col-xl-4 col-lg-6 col-md-6 mb-4">
-      <Card className="blog-card shadow-sm h-100">
-        <div className="blog-card-img-wrapper">
-          <Card.Img
-            variant="top"
-            src={post.image || placeholder}
-            alt={title}
-            className="blog-card-img"
-            style={{ height: "200px", objectFit: "cover" }}
-          />
-          <Badge
-            bg={isPublished ? "success" : "warning"}
-            className="blog-status-badge"
-          >
-            {isPublished ? "Published" : "Draft"}
-          </Badge>
-        </div>
-        <Card.Body className="d-flex flex-column">
-          <Card.Title className="blog-title">
+      <Card
+        className="blog-card"
+        hoverable
+        cover={
+          <div className="blog-card-img-wrapper">
+            <Image
+              src={post.image || placeholder}
+              alt={title}
+              className="blog-card-img"
+              style={{ height: 200, objectFit: "cover" }}
+              preview={false}
+            />
+            <Tag
+              color={isPublished ? "green" : "orange"}
+              className="blog-status-badge"
+            >
+              {isPublished ? "Published" : "Draft"}
+            </Tag>
+          </div>
+        }
+      >
+        <Card.Meta
+          title={
             <Link
               to={`${PORTFOLIO_URL}blogs/${_id}`}
               className="blog-title-link"
             >
               {title}
             </Link>
-          </Card.Title>
-          <Card.Text className="blog-meta text-muted small">
-            {readingTime} min read • {formattedDate}
-          </Card.Text>
-          <Card.Text className="blog-excerpt">{getExcerpt(content)}</Card.Text>
-          <div className="mt-auto d-flex justify-content-end gap-2">
-            <Button
-              variant="outline-primary"
-              size="sm"
-              as={Link}
-              to={`/blogs/${_id}/edit`}
-            >
-              <FaEdit className="me-1" /> Edit
-            </Button>
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={() => onDelete?.(post)}
-            >
-              <FaTrash className="me-1" /> Delete
-            </Button>
-            <Button
-              variant="outline-secondary"
-              size="sm"
-              as={Link}
-              to={`${PORTFOLIO_URL}blogs/${_id}`}
-            >
-              <FaBookOpen className="me-1" /> Read
-            </Button>
-          </div>
-        </Card.Body>
+          }
+          description={
+            <div className="d-flex flex-column">
+              <div
+                className="blog-meta"
+                style={{ color: "#999", fontSize: "12px" }}
+              >
+                {readingTime} min read • {formattedDate}
+              </div>
+              <div className="blog-excerpt">{getExcerpt(content)}</div>
+              <div
+                style={{
+                  marginTop: "auto",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 8,
+                }}
+              >
+                <Button
+                  type="default"
+                  size="small"
+                  href={`/blogs/${_id}/edit`}
+                  icon={<EditOutlined />}
+                >
+                  Edit
+                </Button>
+                <Button
+                  danger
+                  size="small"
+                  onClick={() => onDelete?.(post)}
+                  icon={<DeleteOutlined />}
+                >
+                  Delete
+                </Button>
+                <Button
+                  type="default"
+                  size="small"
+                  href={`${PORTFOLIO_URL}blogs/${_id}`}
+                  icon={<ReadOutlined />}
+                >
+                  Read
+                </Button>
+              </div>
+            </div>
+          }
+        />
       </Card>
     </div>
   );

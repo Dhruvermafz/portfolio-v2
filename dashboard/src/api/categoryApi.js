@@ -5,6 +5,14 @@ export const categoryApi = createApi({
   reducerPath: "categoryApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${API_URL}/categories`,
+    prepareHeaders: (headers, { getState }) => {
+      const token = localStorage.getItem("authToken");
+
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ["Categories"],
   endpoints: (builder) => ({
