@@ -31,6 +31,7 @@ exports.getBooks = async (req, res) => {
       title,
       author,
       language,
+      series_name,
       is_series,
       status,
       shelf_status,
@@ -56,6 +57,11 @@ exports.getBooks = async (req, res) => {
     // Filter by language (exact match)
     if (language) {
       query.language = language;
+    }
+
+    // Filter by series_name (exact match)
+    if (series_name) {
+      query.series_name = series_name;
     }
 
     // Filter by is_series (boolean)
@@ -104,7 +110,6 @@ exports.getBooks = async (req, res) => {
       .json({ message: "Error retrieving books", error: error.message });
   }
 };
-
 // Get a single book by ID
 exports.getBookById = async (req, res) => {
   try {
@@ -181,5 +186,30 @@ exports.deleteBook = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting book", error: error.message });
+  }
+};
+exports.filterBooks = async (req, res) => {
+  try {
+    // Fetch unique languages and series names concurrently
+    const [languages, series] = await Promise.all([
+      Book.distinct("language").exec(),
+      Book.distinct("series_name").exec(),
+    ]);
+
+    // Filter out falsy values and sort for consistent display
+    const filteredLanguages = languages.filter(Boolean).sort();
+    const filteredSeries = series.filter(Boolean).sort();
+
+    // Return response matching frontend expectations
+    res.status(200).json({
+      languages: filteredLanguages,
+      series: filteredSeries,
+    });
+  } catch (error) {
+    console.error("Error fetching filters:", error);
+    res.status(500).json({
+      message: "Error fetching filters",
+      error: error.message || "Internal server error",
+    });
   }
 };

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useGetUserByIdQuery } from "../api/userApi";
 
 const AuthContext = createContext();
 
@@ -12,17 +13,43 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  const login = (token) => {
+  // Fetch user details if token exists
+  const {
+    data: userData,
+    isLoading,
+    isError,
+  } = useGetUserByIdQuery("me", {
+    skip: !user?.token,
+  });
+
+  useEffect(() => {
+    console.log("userData:", userData); // Debug API response
+    if (userData) {
+      setUser((prev) => ({
+        ...prev,
+        id: userData.id,
+        name: userData.username, // Map username to name
+        avatar: userData.photo || "https://example.com/default-avatar.png", // Fallback avatar
+        role: userData.role || "user", // Default role
+      }));
+    }
+  }, [userData]);
+
+  const login = (token, userDetails) => {
     localStorage.setItem("authToken", token);
-    setUser({ token });
+    setUser({
+      token,
+      id: userDetails.id,
+      name: userDetails.username,
+      avatar: userDetails.photo || "https://example.com/default-avatar.png",
+      role: userDetails.role || "user",
+    });
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken"); // Fixed: remove token on logout
+    localStorage.removeItem("authToken");
     setUser(null);
   };
-
-  const isLoggedIn = !!user?.token;
 
   return (
     <AuthContext.Provider
@@ -32,7 +59,9 @@ export const AuthProvider = ({ children }) => {
         role: user?.role || null,
         login,
         logout,
-        isLoggedIn,
+        isLoggedIn: !!user?.token,
+        isLoading,
+        isError,
       }}
     >
       {children}

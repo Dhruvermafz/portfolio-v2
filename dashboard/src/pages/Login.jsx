@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../api/userApi";
+import { useAuth } from "../context/auth"; // Import AuthContext
 import {
   Form,
   Input,
@@ -27,6 +28,7 @@ const Login = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [loginUser, { isLoading }] = useLoginUserMutation();
+  const { login } = useAuth(); // Get login function from AuthContext
 
   const onFinish = async (values) => {
     setError("");
@@ -34,7 +36,13 @@ const Login = () => {
     try {
       const response = await loginUser(values).unwrap();
       if (response?.token) {
-        localStorage.setItem("authToken", response.token);
+        // Call AuthContext login with user details
+        login(response.token, {
+          id: response.id,
+          username: response.username,
+          photo: response.photo || "https://example.com/default-avatar.png",
+          role: response.role || "user",
+        });
         setSuccess("User logged in successfully!");
         setTimeout(() => {
           navigate("/");

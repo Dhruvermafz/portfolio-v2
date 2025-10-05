@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Row, Col, Card, Table, Button, Image, Modal, Alert, Spin } from "antd";
+import { Row, Col, Card, Table, Button, Modal, Alert, Spin } from "antd";
 import {
   PlusOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import Avatar from "react-avatar";
 import { useGetUsersQuery, useDeleteUserMutation } from "../api/userApi";
 
-// DeleteModal Component (added for delete functionality)
+// DeleteModal Component
 const DeleteModal = ({ isOpen, onClose, onConfirm, itemName }) => {
   return (
     <Modal
@@ -55,60 +56,81 @@ const AllUsers = () => {
       Modal.success({ content: "User deleted successfully!" });
     } catch (error) {
       console.error("Error deleting user:", error);
-      Modal.error({ content: "Failed to delete user." });
+      Modal.error({
+        content: `Failed to delete user: ${
+          error?.data?.message || "Unknown error"
+        }`,
+      });
     }
   };
 
   // Table columns
-  const columns = [
-    {
-      title: "User",
-      key: "photo",
-      render: (_, user) => (
-        <Image
-          src={user.photo || "assets/images/users/default.jpg"}
-          alt={user.username}
-          style={{ maxWidth: 50, borderRadius: "50%" }}
-          preview={false}
-        />
-      ),
-    },
-    {
-      title: "Name",
-      dataIndex: "username",
-      key: "username",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Role",
-      dataIndex: "role",
-      key: "role",
-    },
-    {
-      title: "Option",
-      key: "option",
-      render: (_, user) => (
-        <div style={{ display: "flex", gap: 8 }}>
-          <Link to={`/users/${user.id}`}>
-            <Button type="link" icon={<EyeOutlined />} />
-          </Link>
-          <Link to={`/users/edit/${user.id}`}>
-            <Button type="link" icon={<EditOutlined />} />
-          </Link>
-          <Button
-            type="link"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => handleDeleteClick(user)}
+  const columns = useMemo(
+    () => [
+      {
+        title: "User",
+        key: "photo",
+        render: (_, user) => (
+          <Avatar
+            src={user.photo}
+            name={user.username || user.email || "Unknown"}
+            size="40"
+            round={true}
+            alt={`${user.username || user.email}'s avatar`}
+            maxInitials={2}
+            textSizeRatio={2.5}
+            color={Avatar.getRandomColor("sitebase", {
+              lightness: [0.4, 0.5, 0.6],
+              saturation: [0.4, 0.5, 0.6],
+            })}
+            onError={() =>
+              console.warn(`Failed to load avatar for ${user.username}`)
+            }
           />
-        </div>
-      ),
-    },
-  ];
+        ),
+      },
+      {
+        title: "Name",
+        dataIndex: "username",
+        key: "username",
+        render: (username) => username || "N/A",
+      },
+      {
+        title: "Email",
+        dataIndex: "email",
+        key: "email",
+        render: (email) => email || "N/A",
+      },
+      {
+        title: "Role",
+        dataIndex: "role",
+        key: "role",
+        render: (role) => role || "N/A",
+      },
+      {
+        title: "Option",
+        key: "option",
+        render: (_, user) => (
+          <div style={{ display: "flex", gap: 8 }}>
+            <Link to={`/users/${user.id}`}>
+              <Button type="link" icon={<EyeOutlined />} title="View Details" />
+            </Link>
+            <Link to={`/users/edit/${user.id}`}>
+              <Button type="link" icon={<EditOutlined />} title="Edit User" />
+            </Link>
+            <Button
+              type="link"
+              icon={<DeleteOutlined />}
+              danger
+              onClick={() => handleDeleteClick(user)}
+              title="Delete User"
+            />
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div style={{ padding: "20px" }}>
@@ -132,7 +154,9 @@ const AllUsers = () => {
             ) : error ? (
               <Alert
                 message="Error"
-                description={error.data?.message || "Failed to load users"}
+                description={
+                  error?.data?.message || error?.error || "Failed to load users"
+                }
                 type="error"
                 showIcon
                 style={{ marginBottom: 16 }}
@@ -159,7 +183,7 @@ const AllUsers = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        itemName={selectedUser?.username || "user"}
+        itemName={selectedUser?.username || selectedUser?.email || "user"}
       />
     </div>
   );

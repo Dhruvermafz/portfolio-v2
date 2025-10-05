@@ -1,25 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useGetUserByIdQuery } from "../../api/userApi";
-import { setCredentials } from "../../api/slices/authSlice";
-import {
-  Form,
-  Image,
-  Input,
-  Dropdown,
-  Menu,
-  Spin,
-  Avatar as AntDAvatar,
-} from "antd";
+import { useAuth } from "../../context/auth";
+import { Form, Image, Input, Dropdown, Menu, Spin } from "antd";
 import {
   SearchOutlined,
   MenuOutlined,
   DownOutlined,
   UserOutlined,
   ShoppingOutlined,
-  PhoneOutlined,
-  SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import logo_light from "../../assets/images/logo/logo-new.png";
@@ -28,36 +16,18 @@ import Avatar from "react-avatar";
 
 const Header = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { user, logout, isLoggedIn, isLoading, isError } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Fetch authenticated user data
-  const token = localStorage.getItem("authToken");
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useGetUserByIdQuery("me", {
-    skip: !token,
-  });
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    dispatch(setCredentials({ user: null, token: null }));
-    navigate("/login");
-  };
 
   // Handle search
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
-    // Implement global search logic, e.g., navigate(`/search?q=${encodeURIComponent(e.target.value)}`);
+    // Implement search logic
   };
 
   // Sidebar toggle stub
   const initSidebar = () => {
     console.log("Sidebar toggle clicked");
-    // Add sidebar toggle logic if defined
   };
 
   // Profile dropdown menu
@@ -73,10 +43,9 @@ const Header = () => {
         </a>
       </Menu.Item>
       <Menu.Item key="account" icon={<ShoppingOutlined />}>
-        <Link to="/u/:userId">Account</Link>
+        <Link to={`/u/${user?.id || "me"}`}>Account</Link>
       </Menu.Item>
-
-      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={handleLogout}>
+      <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={logout}>
         Log out
       </Menu.Item>
     </Menu>
@@ -134,24 +103,26 @@ const Header = () => {
             <li className="profile-nav">
               <Dropdown overlay={profileMenu} trigger={["click"]}>
                 <div className="media profile-media">
-                  <Avatar
-                    name={user?.name || "Guest"}
-                    src={user?.avatar}
-                    size="40"
-                    round={true}
-                    className="user-profile"
-                    alt={user?.name || "User"}
-                  />
+                  {isLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <Avatar
+                      name={user?.name || "Guest"}
+                      src={
+                        user?.avatar || "https://example.com/default-avatar.png"
+                      }
+                      size="40"
+                      round={true}
+                      className="user-profile"
+                      alt={user?.name || "User"}
+                    />
+                  )}
                   <div className="user-name-hide media-body">
                     <span>
-                      {isLoading
-                        ? "Loading..."
-                        : isError || !user
-                        ? "Guest"
-                        : user.name}
+                      {isLoading ? "Loading..." : user?.name || "Guest"}
                     </span>
                     <p className="mb-0 font-roboto">
-                      {isError || !user ? "Guest" : "Admin"}
+                      {isError ? "Error" : user?.role || "Guest"}{" "}
                       <DownOutlined className="middle" />
                     </p>
                   </div>

@@ -31,6 +31,7 @@ import DeleteModal from "../components/Common/DeleteModal";
 const Books = () => {
   const [search, setSearch] = useState("");
   const [languageFilter, setLanguageFilter] = useState("All");
+  const [seriesFilter, setSeriesFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
@@ -38,7 +39,7 @@ const Books = () => {
 
   const navigate = useNavigate();
 
-  // Fetch books using RTK Query with pagination
+  // Fetch books using RTK Query with pagination, search, language, and series filters
   const {
     data = {
       books: [],
@@ -49,6 +50,7 @@ const Books = () => {
   } = useGetBooksQuery({
     title: search,
     language: languageFilter === "All" ? "" : languageFilter,
+    series_name: seriesFilter === "All" ? "" : seriesFilter,
     page: currentPage,
     limit: booksPerPage,
   });
@@ -59,12 +61,15 @@ const Books = () => {
   const totalPages = data?.pagination?.totalPages || 1;
   const currentBooks = data.books || [];
 
-  // Get all languages from current page
+  // Get all languages and series from current page
   const languages = [
     ...new Set((data.books || []).map((b) => b.language).filter(Boolean)),
   ];
+  const series = [
+    ...new Set((data.books || []).map((b) => b.series_name).filter(Boolean)),
+  ];
 
-  // Table columns
+  // Table columns for library management
   const columns = [
     {
       title: "Title",
@@ -83,13 +88,42 @@ const Books = () => {
       render: (authors) => authors?.join(", ") || "N/A",
     },
     {
+      title: "Series",
+      key: "series",
+      render: (_, book) =>
+        book.is_series && book.series_name
+          ? `${book.series_name} (Part ${book.series_part || "N/A"} of ${
+              book.series_total_parts || "N/A"
+            })`
+          : "N/A",
+    },
+    {
       title: "Language",
       dataIndex: "language",
       key: "language",
       render: (language) => language || "N/A",
     },
     {
-      title: "Status",
+      title: "Shelf Status",
+      dataIndex: "shelf_status",
+      key: "shelf_status",
+      render: (shelf_status) => (
+        <span
+          style={{
+            color:
+              shelf_status === "idle"
+                ? "#52c41a"
+                : shelf_status === "borrowed"
+                ? "#ff4d4f"
+                : "#faad14",
+          }}
+        >
+          {shelf_status || "N/A"}
+        </span>
+      ),
+    },
+    {
+      title: "Reading Status",
       dataIndex: "status",
       key: "status",
       render: (status) => (
@@ -98,12 +132,12 @@ const Books = () => {
             color:
               status === "completed"
                 ? "#52c41a"
-                : status === "not_started"
+                : status === "unread"
                 ? "#ff4d4f"
                 : "#faad14",
           }}
         >
-          {status}
+          {status || "N/A"}
         </span>
       ),
     },
@@ -116,11 +150,13 @@ const Books = () => {
             type="link"
             icon={<EyeOutlined />}
             onClick={() => navigate(`/book/${book._id}`)}
+            title="View Details"
           />
           <Button
             type="link"
             icon={<EditOutlined />}
             onClick={() => navigate(`/book/${book._id}/edit`)}
+            title="Edit Book"
           />
           <Button
             type="link"
@@ -130,6 +166,7 @@ const Books = () => {
               setSelectedBook(book);
               setDeleteModalOpen(true);
             }}
+            title="Delete Book"
           />
         </div>
       ),
@@ -142,10 +179,10 @@ const Books = () => {
       await deleteBook(selectedBook._id).unwrap();
       setDeleteModalOpen(false);
       setSelectedBook(null);
-      message.success("Book deleted successfully!");
+      message.success("Book removed from library successfully!");
     } catch (error) {
       message.error(
-        `Failed to delete book: ${error?.data?.message || "Unknown error"}`
+        `Failed to remove book: ${error?.data?.message || "Unknown error"}`
       );
     }
   };
@@ -153,11 +190,11 @@ const Books = () => {
   // Reset page to 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, languageFilter]);
+  }, [search, languageFilter, seriesFilter]);
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* Stats Cards */}
+      {/* Library Stats Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
@@ -177,7 +214,7 @@ const Books = () => {
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Books
+                  Total Books
                 </p>
                 <h5 style={{ margin: 0 }}>{totalBooks}</h5>
               </div>
@@ -229,17 +266,39 @@ const Books = () => {
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Books in Progress
+                  Borrowed Books
                 </p>
                 <h5 style={{ margin: 0 }}>
                   {
-                    currentBooks.filter((b) =>
-                      ["not_even_half", "mid_half", "more_than_half"].includes(
-                        b.status
-                      )
-                    ).length
+                    currentBooks.filter((b) => b.shelf_status === "borrowed")
+                      .length
                   }
                 </h5>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <div
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 8,
+                  backgroundColor: "#e6fffb",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <BookOutlined style={{ fontSize: 24, color: "#13c2c2" }} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
+                  Book Series
+                </p>
+                <h5 style={{ margin: 0 }}>{series.length}</h5>
               </div>
             </div>
           </Card>
@@ -249,7 +308,7 @@ const Books = () => {
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card
-            title="Book List"
+            title="Library Catalog"
             extra={
               <Link to="/book/add">
                 <Button type="primary" icon={<PlusOutlined />}>
@@ -262,7 +321,7 @@ const Books = () => {
               <Col xs={24} sm={12} md={8}>
                 <Input
                   prefix={<SearchOutlined />}
-                  placeholder="Search books..."
+                  placeholder="Search books by title..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -272,6 +331,7 @@ const Books = () => {
                   value={languageFilter}
                   onChange={(value) => setLanguageFilter(value)}
                   style={{ width: "100%" }}
+                  placeholder="Filter by Language"
                 >
                   <Select.Option value="All">All Languages</Select.Option>
                   {languages.map((language) => (
@@ -281,22 +341,38 @@ const Books = () => {
                   ))}
                 </Select>
               </Col>
+              <Col xs={24} sm={12} md={4}>
+                <Select
+                  value={seriesFilter}
+                  onChange={(value) => setSeriesFilter(value)}
+                  style={{ width: "100%" }}
+                  placeholder="Filter by Series"
+                >
+                  <Select.Option value="All">All Series</Select.Option>
+                  {series.map((seriesName) => (
+                    <Select.Option key={seriesName} value={seriesName}>
+                      {seriesName}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Col>
             </Row>
 
             {isLoading ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
                 <Spin size="large" />
-                <p style={{ marginTop: 8 }}>Loading books...</p>
+                <p style={{ marginTop: 8 }}>Loading library catalog...</p>
               </div>
             ) : error ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
                 <p style={{ color: "#ff4d4f" }}>
-                  Error loading books: {error?.data?.message || "Unknown error"}
+                  Error loading library catalog:{" "}
+                  {error?.data?.message || "Unknown error"}
                 </p>
               </div>
             ) : currentBooks.length === 0 ? (
               <div style={{ textAlign: "center", padding: "20px" }}>
-                No books found.
+                No books found in the library catalog.
               </div>
             ) : (
               <Table
@@ -304,7 +380,7 @@ const Books = () => {
                 dataSource={currentBooks}
                 rowKey="_id"
                 pagination={false}
-                locale={{ emptyText: "No books found" }}
+                locale={{ emptyText: "No books found in the library catalog" }}
               />
             )}
 

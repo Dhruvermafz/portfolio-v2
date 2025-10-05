@@ -72,6 +72,12 @@ const masterRoutes = [
         element: <AddNewUser />,
         isSidebarActive: false,
       },
+      {
+        path: "/users/edit/:id", // Fixed typo
+        name: "Edit User",
+        element: <AddNewUser />,
+        isSidebarActive: false,
+      },
     ],
   },
   {
