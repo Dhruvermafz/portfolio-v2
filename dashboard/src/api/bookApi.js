@@ -49,6 +49,48 @@ export const bookApi = createApi({
         "Books",
       ],
     }),
+    getAllSeries: builder.query({
+      query: () => "/series",
+    }),
+    getSeries: builder.query({
+      query: ({ series_name, page, limit, sort_by, order }) => ({
+        url: "/series/details",
+        params: { series_name, page, limit, sort_by, order },
+      }),
+    }),
+    getAllAuthors: builder.query({
+      query: () => "/authors",
+      providesTags: ["Filters"],
+    }),
+    getAuthors: builder.query({
+      query: ({
+        author_name,
+        page,
+        limit,
+        sort_by,
+        order,
+        language,
+        status,
+        shelf_status,
+      }) => ({
+        url: author_name.includes("-")
+          ? `/authors/${author_name}`
+          : "/authors/details",
+        params: author_name.includes("-")
+          ? { page, limit, sort_by, order, language, status, shelf_status }
+          : {
+              author_name,
+              page,
+              limit,
+              sort_by,
+              order,
+              language,
+              status,
+              shelf_status,
+            },
+      }),
+      providesTags: ["Books"],
+    }),
     deleteBook: builder.mutation({
       query: (id) => ({
         url: `/${id}`,
@@ -65,5 +107,9 @@ export const {
   useCreateBookMutation,
   useUpdateBookMutation,
   useDeleteBookMutation,
+  useGetAllAuthorsQuery,
+  useGetAuthorsQuery,
   useGetFiltersQuery,
+  useGetAllSeriesQuery,
+  useGetSeriesQuery,
 } = bookApi;

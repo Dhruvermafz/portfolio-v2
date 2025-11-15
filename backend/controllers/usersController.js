@@ -217,6 +217,29 @@ const addUser = async (req, res) => {
     res.status(500).json({ message: "Failed to add user" });
   }
 };
+// controllers/userController.js (add this function)
+
+const getCurrentUser = async (req, res) => {
+  try {
+    // req.user comes from authenticateUser middleware
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      photo: user.photo,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to retrieve current user" });
+  }
+};
+
 module.exports = {
   addUser,
   registerUser,
@@ -225,4 +248,5 @@ module.exports = {
   getUsers,
   deleteUser,
   updateUser,
+  getCurrentUser,
 };

@@ -12,12 +12,10 @@ const ItsBlogDetails = () => {
   useEffect(() => {
     const fetchBlogDetails = async () => {
       try {
-        console.log("Fetching blog with ID:", id); // Debugging ID
         const response = await axios.get(
           `${BLOG_API_URL}/posts/${id}` // Use the specific endpoint
         );
-        console.log(id);
-        console.log("Fetched blog data:", response.data); // Log the fetched blog data
+
         setBlog(response.data); // Set the blog state directly
       } catch (error) {
         console.error("Error fetching blog details:", error);

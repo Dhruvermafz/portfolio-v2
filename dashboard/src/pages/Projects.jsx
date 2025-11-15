@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/components/Projects.jsx
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Row,
@@ -12,6 +13,17 @@ import {
   Spin,
   Image,
   message,
+  Tooltip,
+  Dropdown,
+  Menu,
+  Space,
+  Tag,
+  Avatar,
+  Switch,
+  Badge,
+  Divider,
+  Typography,
+  Radio,
 } from "antd";
 import {
   SearchOutlined,
@@ -21,8 +33,16 @@ import {
   FolderOpenOutlined,
   TeamOutlined,
   CheckSquareOutlined,
-  GlobalOutlined,
   PlusOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  MoreOutlined,
+  GithubOutlined,
+  GlobalOutlined,
+  StarOutlined,
+  CodeOutlined,
+  MoonOutlined,
+  SunOutlined,
 } from "@ant-design/icons";
 import {
   useGetAllProjectsQuery,
@@ -30,313 +50,419 @@ import {
 } from "../api/projectApi";
 import DeleteModal from "../components/Common/DeleteModal";
 
+const { Text, Title } = Typography;
+
 const Projects = () => {
   const [search, setSearch] = useState("");
   const [clientFilter, setClientFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState("card");
+
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
   const navigate = useNavigate();
-
-  // Fetching projects using RTK Query
   const { data: projects = [], isLoading, error } = useGetAllProjectsQuery();
   const [deleteProject] = useDeleteProjectMutation();
 
-  const projectsPerPage = 10;
-  const totalProjects = projects.length;
+  const projectsPerPage = 12;
   const clients = [...new Set(projects.map((p) => p.client).filter(Boolean))];
 
-  // Filter and Search
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch = project.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesClient =
-      clientFilter === "All" || project.client === clientFilter;
+  const filteredProjects = projects.filter((p) => {
+    const matchesSearch =
+      p.title.toLowerCase().includes(search.toLowerCase()) ||
+      p.techStack?.some((t) => t.toLowerCase().includes(search.toLowerCase()));
+    const matchesClient = clientFilter === "All" || p.client === clientFilter;
     return matchesSearch && matchesClient;
   });
 
-  // Pagination Logic
   const indexOfLast = currentPage * projectsPerPage;
   const indexOfFirst = indexOfLast - projectsPerPage;
   const currentProjects = filteredProjects.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
 
-  // Table columns
-  const columns = [
-    {
-      title: "Project Image",
-      key: "mainImage",
-      render: (_, project) => (
-        <Image
-          src={project.mainImage || "assets/img/modern-ai-image/pet-1.jpg"}
-          alt={project.title}
-          style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 4 }}
-          preview={false}
-        />
-      ),
-    },
-    {
-      title: "Project Title",
-      dataIndex: "title",
-      key: "title",
-    },
-    {
-      title: "Client",
-      dataIndex: "client",
-      key: "client",
-      render: (client) => client || "N/A",
-    },
-    {
-      title: "Links",
-      key: "links",
-      render: (_, project) => (
-        <div
-          style={{
-            color:
-              project.status === "Completed"
-                ? "#52c41a"
-                : project.status === "In Progress"
-                ? "#faad14"
-                : "#ff4d4f",
-          }}
-        >
-          <a href={project.ghLink} target="_blank" rel="noopener noreferrer">
-            GH LINK
-          </a>
-          <br />
-          <a href={project.website} target="_blank" rel="noopener noreferrer">
-            LIVE LINK
-          </a>
-        </div>
-      ),
-    },
-    {
-      title: "Option",
-      key: "option",
-      render: (_, project) => (
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/projects/${project._id}`)}
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/projects/${project._id}/edit`)}
-          />
-          <Button
-            type="link"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => {
-              setSelectedProject(project);
-              setDeleteModalOpen(true);
-            }}
-          />
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => handleMove(project._id)}
-          >
-            Move
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Handle Delete
   const handleDeleteConfirm = async () => {
     try {
       await deleteProject(selectedProject._id).unwrap();
       setDeleteModalOpen(false);
       setSelectedProject(null);
-      message.success("Project deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      message.error(
-        `Failed to delete project: ${error?.data?.message || "Unknown error"}`
-      );
+      message.success("Project deleted");
+    } catch (err) {
+      message.error(err?.data?.message || "Failed to delete");
     }
   };
 
-  // Handle Move (Placeholder)
-  const handleMove = (projectId) => {
-    message.info(
-      `Move functionality for project ${projectId} not implemented yet.`
-    );
+  const getActionMenu = (p) => (
+    <Menu>
+      <Menu.Item
+        icon={<EyeOutlined />}
+        onClick={() => navigate(`/projects/${p._id}`)}
+      >
+        View Details
+      </Menu.Item>
+      <Menu.Item
+        icon={<EditOutlined />}
+        onClick={() => navigate(`/projects/${p._id}/edit`)}
+      >
+        Edit
+      </Menu.Item>
+      <Menu.Item
+        danger
+        icon={<DeleteOutlined />}
+        onClick={() => {
+          setSelectedProject(p);
+          setDeleteModalOpen(true);
+        }}
+      >
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
+  const stats = {
+    total: projects.length,
+    inProgress: projects.filter((p) => p.status === "In Progress").length,
+    completed: projects.filter((p) => p.status === "Completed").length,
+    clients: clients.length,
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      {/* Stats Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <div
+      style={{
+        padding: 24,
+
+        minHeight: "100vh",
+      }}
+    >
+      {/* === Stats Dashboard === */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
               <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#e6f7ff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ background: "#e6f7ff", padding: 12, borderRadius: 8 }}
               >
                 <FolderOpenOutlined
                   style={{ fontSize: 24, color: "#1890ff" }}
                 />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Projects
-                </p>
-                <h5 style={{ margin: 0 }}>{totalProjects}</h5>
+                <Text type="secondary">Total</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.total}
+                </div>
               </div>
-            </div>
+            </Space>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
               <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#f0e4ff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ background: "#fff2e8", padding: 12, borderRadius: 8 }}
+              >
+                <CodeOutlined style={{ fontSize: 24, color: "#fa8c16" }} />
+              </div>
+              <div>
+                <Text type="secondary">In Progress</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.inProgress}
+                </div>
+              </div>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
+              <div
+                style={{ background: "#f6ffed", padding: 12, borderRadius: 8 }}
+              >
+                <CheckSquareOutlined
+                  style={{ fontSize: 24, color: "#52c41a" }}
+                />
+              </div>
+              <div>
+                <Text type="secondary">Completed</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.completed}
+                </div>
+              </div>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
+              <div
+                style={{ background: "#f0f5ff", padding: 12, borderRadius: 8 }}
               >
                 <TeamOutlined style={{ fontSize: 24, color: "#722ed1" }} />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Clients
-                </p>
-                <h5 style={{ margin: 0 }}>{clients.length}</h5>
+                <Text type="secondary">Clients</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.clients}
+                </div>
               </div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#fff7e6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <CheckSquareOutlined
-                  style={{ fontSize: 24, color: "#fa8c16" }}
-                />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Tasks in Progress
-                </p>
-                <h5 style={{ margin: 0 }}>
-                  {projects.filter((p) => p.status === "In Progress").length}
-                </h5>
-              </div>
-            </div>
+            </Space>
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card
-            title="Project List"
-            extra={
-              <Link to="/projects/add">
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Add New Project
-                </Button>
-              </Link>
-            }
-          >
-            <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-              <Col xs={24} sm={12} md={8}>
-                <Input
-                  prefix={<SearchOutlined />}
-                  placeholder="Search projects..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </Col>
-              <Col xs={24} sm={12} md={4}>
-                <Select
-                  value={clientFilter}
-                  onChange={(value) => setClientFilter(value)}
-                  style={{ width: "100%" }}
+      {/* === Main Card === */}
+      <Card
+        title={
+          <Space size="middle">
+            <CodeOutlined style={{ fontSize: 20 }} />
+            <Title level={4} style={{ margin: 0 }}>
+              Project Master Hub
+            </Title>
+          </Space>
+        }
+        extra={
+          <Space>
+            <Radio.Group
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value)}
+              buttonStyle="solid"
+            >
+              <Radio.Button value="card">
+                <AppstoreOutlined />
+              </Radio.Button>
+              <Radio.Button value="table">
+                <UnorderedListOutlined />
+              </Radio.Button>
+            </Radio.Group>
+            <Link to="/projects/add">
+              <Button type="primary" icon={<PlusOutlined />}>
+                New Project
+              </Button>
+            </Link>
+          </Space>
+        }
+      >
+        {/* Filters */}
+        <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+          <Col xs={24} md={10}>
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder="Search by title, tech..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              allowClear
+            />
+          </Col>
+          <Col xs={12} sm={8} md={4}>
+            <Select
+              value={clientFilter}
+              onChange={(v) => {
+                setClientFilter(v);
+                setCurrentPage(1);
+              }}
+              style={{ width: "100%" }}
+              placeholder="Client"
+            >
+              <Select.Option value="All">All Clients</Select.Option>
+              {clients.map((c) => (
+                <Select.Option key={c} value={c}>
+                  {c}
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+
+        {/* Content */}
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: 40 }}>
+            <Spin size="large" 念 />
+          </div>
+        ) : currentProjects.length === 0 ? (
+          <div style={{ textAlign: "center", padding: 40, color: "#999" }}>
+            <FolderOpenOutlined
+              style={{ fontSize: 48, marginBottom: 16, color: "#ddd" }}
+            />
+            <Text type="secondary">No projects found</Text>
+          </div>
+        ) : viewMode === "table" ? (
+          <Table
+            dataSource={currentProjects}
+            rowKey="_id"
+            pagination={false}
+            columns={[
+              {
+                title: "Project",
+                render: (_, p) => (
+                  <Space>
+                    <Image
+                      width={40}
+                      src={p.mainImage || "https://via.placeholder.com/40"}
+                      style={{ borderRadius: 4 }}
+                    />
+                    <div>
+                      <Text strong>{p.title}</Text>
+                      <br />
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {p.client || "Personal"}
+                      </Text>
+                    </div>
+                  </Space>
+                ),
+              },
+              {
+                title: "Status",
+                render: (_, p) => (
+                  <Badge
+                    status={p.status === "Completed" ? "success" : "processing"}
+                    text={p.status}
+                  />
+                ),
+              },
+              {
+                title: "Links",
+                render: (_, p) => (
+                  <Space split={<Divider type="vertical" />}>
+                    {p.ghLink && (
+                      <a href={p.ghLink} target="_blank">
+                        <GithubOutlined />
+                      </a>
+                    )}
+                    {p.website && (
+                      <a href={p.website} target="_blank">
+                        <GlobalOutlined />
+                      </a>
+                    )}
+                  </Space>
+                ),
+              },
+              {
+                title: "Actions",
+                render: (_, p) => (
+                  <Space>
+                    <Button
+                      size="small"
+                      icon={<EyeOutlined />}
+                      onClick={() => navigate(`/projects/${p._id}`)}
+                    />
+                    <Button
+                      size="small"
+                      icon={<EditOutlined />}
+                      onClick={() => navigate(`/projects/${p._id}/edit`)}
+                    />
+                    <Dropdown overlay={getActionMenu(p)} trigger={["click"]}>
+                      <Button size="small" icon={<MoreOutlined />} />
+                    </Dropdown>
+                  </Space>
+                ),
+              },
+            ]}
+          />
+        ) : (
+          /* === CARD VIEW === */
+          <Row gutter={[16, 24]}>
+            {currentProjects.map((p) => (
+              <Col key={p._id} xs={24} sm={12} md={8} lg={6}>
+                <Card
+                  hoverable
+                  style={{ borderRadius: 12, overflow: "hidden" }}
+                  cover={
+                    <div style={{ height: 160, background: "#f0f0f0" }}>
+                      <Image
+                        src={
+                          p.mainImage ||
+                          "https://via.placeholder.com/300x160/eee/ccc?text=Project"
+                        }
+                        alt={p.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                        preview={false}
+                      />
+                    </div>
+                  }
+                  actions={[
+                    <Tooltip title="View">
+                      <EyeOutlined
+                        onClick={() => navigate(`/projects/${p._id}`)}
+                      />
+                    </Tooltip>,
+                    <Tooltip title="Edit">
+                      <EditOutlined
+                        onClick={() => navigate(`/projects/${p._id}/edit`)}
+                      />
+                    </Tooltip>,
+                    <Dropdown
+                      overlay={getActionMenu(p)}
+                      trigger={["click"]}
+                      placement="bottomRight"
+                    >
+                      <MoreOutlined style={{ fontSize: 18 }} />
+                    </Dropdown>,
+                  ]}
                 >
-                  <Select.Option value="All">All Clients</Select.Option>
-                  {clients.map((client) => (
-                    <Select.Option key={client} value={client}>
-                      {client}
-                    </Select.Option>
-                  ))}
-                </Select>
+                  <Card.Meta
+                    title={
+                      <Text strong ellipsis>
+                        {p.title}
+                      </Text>
+                    }
+                    description={
+                      <Space
+                        direction="vertical"
+                        size={4}
+                        style={{ width: "100%" }}
+                      >
+                        <Text type="secondary" ellipsis>
+                          {p.client || "Personal Project"}
+                        </Text>
+                        <Space wrap>
+                          {p.techStack?.map((t) => (
+                            <Tag key={t} color="geekblue" size="small">
+                              {t}
+                            </Tag>
+                          ))}
+                        </Space>
+                        <Space>
+                          {p.ghLink && (
+                            <Badge count={p.stars || 0} size="small">
+                              <a href={p.ghLink} target="_blank">
+                                <GithubOutlined />
+                              </a>
+                            </Badge>
+                          )}
+                          {p.website && (
+                            <a href={p.website} target="_blank">
+                              <GlobalOutlined style={{ color: "#52c41a" }} />
+                            </a>
+                          )}
+                        </Space>
+                      </Space>
+                    }
+                  />
+                </Card>
               </Col>
-            </Row>
+            ))}
+          </Row>
+        )}
 
-            {isLoading ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <Spin size="large" />
-                <p style={{ marginTop: 8 }}>Loading projects...</p>
-              </div>
-            ) : error ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <p style={{ color: "#ff4d4f" }}>
-                  Error loading projects:{" "}
-                  {error?.data?.message || "Unknown error"}
-                </p>
-              </div>
-            ) : currentProjects.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                No projects found.
-              </div>
-            ) : (
-              <Table
-                columns={columns}
-                dataSource={currentProjects}
-                rowKey="_id"
-                pagination={false}
-                locale={{ emptyText: "No projects found" }}
-              />
-            )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Pagination
+            current={currentPage}
+            total={filteredProjects.length}
+            pageSize={projectsPerPage}
+            onChange={setCurrentPage}
+            style={{ marginTop: 24, textAlign: "center" }}
+          />
+        )}
+      </Card>
 
-            {totalPages > 1 && (
-              <Pagination
-                current={currentPage}
-                total={filteredProjects.length}
-                pageSize={projectsPerPage}
-                onChange={(page) => paginate(page)}
-                style={{ marginTop: 16, textAlign: "center" }}
-                showSizeChanger={false}
-              />
-            )}
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Delete Modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

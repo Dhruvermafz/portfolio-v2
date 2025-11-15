@@ -66,6 +66,10 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["Users"], // Invalidate Users cache to refresh user list
     }),
+    getCurrentUser: builder.query({
+      query: () => "/me",
+      providesTags: (result) => [{ type: "Users", id: result?.id }],
+    }),
   }),
 });
 
@@ -77,4 +81,5 @@ export const {
   useDeleteUserMutation,
   useUpdateUserMutation,
   useAddUserMutation, // Export the new hook
+  useGetCurrentUserQuery,
 } = userApi;

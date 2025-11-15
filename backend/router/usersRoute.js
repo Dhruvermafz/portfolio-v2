@@ -7,6 +7,7 @@ const {
   deleteUser,
   updateUser,
   addUser,
+  getCurrentUser,
 } = require("../controllers/usersController");
 const jwt = require("../middlewares/jwt");
 const isAdmin = require("../middlewares/isAdmin");
@@ -20,4 +21,5 @@ authRouter.get("/:id", jwt.verifyToken, getUserById);
 authRouter.get("/", getUsers);
 authRouter.delete("/:id", jwt.verifyToken, isAdmin, deleteUser);
 authRouter.put("/:id", jwt.verifyToken, isAdmin, updateUser);
+authRouter.get("/me", jwt.verifyToken, getCurrentUser);
 module.exports = authRouter;

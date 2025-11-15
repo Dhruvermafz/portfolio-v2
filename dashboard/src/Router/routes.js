@@ -14,7 +14,6 @@ import {
 import { GiBookshelf } from "react-icons/gi";
 import CreateBlog from "../pages/CreateBlog";
 import CreateProject from "../components/Projects/CreateProject";
-import TodoList from "../components/ToDo/TodoList";
 import Dashboard from "../pages/Dashboard";
 import Blogs from "../pages/Blogs";
 import Categories from "../pages/Categories";
@@ -31,6 +30,8 @@ import AddNewUser from "../pages/AddNewUser";
 import Profile from "../pages/Profile";
 import Books from "../pages/Books";
 import BookForm from "../components/Books/BookForm";
+import SeriesDetails from "../pages/SeriesDetails";
+import AuthorDetails from "../pages/AuthorDetails";
 const masterRoutes = [
   {
     path: "/",
@@ -38,34 +39,70 @@ const masterRoutes = [
     icon: <RiHomeLine />,
     isSidebarActive: true,
     element: <Dashboard />,
-    submenu: [],
   },
   {
-    path: "#",
+    path: "/category/list",
     name: "Category",
     icon: <RiListCheck2 />,
     isSidebarActive: true,
-    submenu: [
-      {
-        path: "/category/list",
-        name: "Category List",
-        element: <Categories />,
-        isSidebarActive: true,
-      },
-    ],
+    element: <Categories />,
   },
   {
-    path: "#",
-    name: "Users",
+    path: "/users/list",
+    name: "All Users",
     icon: <RiUser3Line />,
+    element: <AllUsers />,
     isSidebarActive: true,
+  },
+  {
+    path: "/media",
+    name: "Media",
+    icon: <RiPriceTag3Line />,
+    isSidebarActive: true,
+    element: <MediaWrapper />,
+  },
+  {
+    path: "/blogs/list",
+    name: "Blogs",
+    icon: <RiArticleLine />,
+    isSidebarActive: true,
+    element: <Blogs />,
+  },
+  {
+    path: "/boookshelf",
+    name: "Bookshelf",
+    icon: <GiBookshelf />,
+    isSidebarActive: true,
+    element: <Books />,
+  },
+  {
+    path: "/contact",
+    element: <Queries />,
+    name: "Queries",
+    icon: <RiQuestionAnswerLine />,
+    isSidebarActive: true,
+  },
+  {
+    path: "/projects/list",
+    name: "Projects",
+    icon: <RiFolderOpenLine />,
+    isSidebarActive: true,
+    element: <Projects />,
+  },
+  {
+    path: "/achievements/list",
+    element: <Achievements />,
+    name: "Achievements",
+    icon: <RiMedalLine />,
+    isSidebarActive: true,
+  },
+
+  {
+    path: "#",
+    name: "Auth",
+    isSidebarActive: false,
+    icon: <RiLoginBoxFill />,
     submenu: [
-      {
-        path: "/users/list",
-        name: "All Users",
-        element: <AllUsers />,
-        isSidebarActive: true,
-      },
       {
         path: "/users/add", // Fixed typo
         name: "Add New User",
@@ -78,29 +115,6 @@ const masterRoutes = [
         element: <AddNewUser />,
         isSidebarActive: false,
       },
-    ],
-  },
-  {
-    path: "/media",
-    name: "Media",
-    icon: <RiPriceTag3Line />,
-    isSidebarActive: true,
-    element: <MediaWrapper />,
-    submenu: [],
-  },
-  {
-    path: "#",
-    name: "Blogs",
-    icon: <RiArticleLine />,
-    isSidebarActive: true,
-    submenu: [
-      {
-        path: "/blogs/list",
-        element: <Blogs />,
-        name: "Blogs",
-        icon: <RiArticleLine />,
-        isSidebarActive: true,
-      },
       {
         path: "/blogs/create",
         element: <CreateBlog />,
@@ -112,22 +126,6 @@ const masterRoutes = [
         element: <CreateBlog />,
         name: "Edit Blog",
         isSidebarActive: false,
-      },
-    ],
-  },
-  {
-    path: "#",
-    name: "Bookshelf",
-    icon: <GiBookshelf />,
-    isSidebarActive: true,
-
-    submenu: [
-      {
-        path: "/boookshelf",
-        name: "Bookshelf",
-        icon: <GiBookshelf />,
-        isSidebarActive: true,
-        element: <Books />,
       },
       {
         path: "/book/add",
@@ -143,28 +141,19 @@ const masterRoutes = [
         isSidebarActive: false,
         element: <BookForm />,
       },
-    ],
-  },
-  {
-    path: "/contact",
-    element: <Queries />,
-    name: "Queries",
-    icon: <RiQuestionAnswerLine />,
-    isSidebarActive: true,
-    submenu: [],
-  },
-  {
-    path: "#",
-    name: "Projects",
-    icon: <RiFolderOpenLine />,
-    isSidebarActive: true,
-    submenu: [
       {
-        path: "/projects/list",
-        element: <Projects />,
-        name: "Projects",
-        icon: <RiFolderOpenLine />,
-        isSidebarActive: true,
+        path: "/series/:slug",
+        name: "Series",
+        icon: <GiBookshelf />,
+        isSidebarActive: false,
+        element: <SeriesDetails />,
+      },
+      {
+        path: "/authors/:slug",
+        name: "Author",
+        icon: <GiBookshelf />,
+        isSidebarActive: false,
+        element: <AuthorDetails />,
       },
       {
         path: "/projects/add",
@@ -179,30 +168,6 @@ const masterRoutes = [
         name: "Edit Project",
         isSidebarActive: false,
       },
-    ],
-  },
-  {
-    path: "/achievements/list",
-    element: <Achievements />,
-    name: "Achievements",
-    icon: <RiMedalLine />,
-    isSidebarActive: true,
-    submenu: [],
-  },
-  {
-    path: "/todo/list",
-    element: <TodoList />,
-    name: "ToDo",
-    icon: <RiTodoLine />,
-    isSidebarActive: true,
-    submenu: [],
-  },
-  {
-    path: "#",
-    name: "Auth",
-    isSidebarActive: false,
-    icon: <RiLoginBoxFill />,
-    submenu: [
       {
         path: "/login",
         element: <Login />,

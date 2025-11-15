@@ -6,12 +6,9 @@ import { categoryApi } from "../api/categoryApi";
 import { blogApi } from "../api/blogApi";
 import { projectApi } from "../api/projectApi";
 import { achievementApi } from "../api/achievementsApi";
-import { todoApi } from "../api/todoApi";
-import authReducer from "../api/slices/authSlice";
 import { bookApi } from "../api/bookApi";
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
     [bookApi.reducerPath]: bookApi.reducer,
     [achievementApi.reducerPath]: achievementApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
@@ -19,7 +16,6 @@ export const store = configureStore({
     [blogApi.reducerPath]: blogApi.reducer,
     [projectApi.reducerPath]: projectApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
-    [todoApi.reducerPath]: todoApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -29,7 +25,6 @@ export const store = configureStore({
       contactApi.middleware,
       blogApi.middleware,
       projectApi.middleware,
-      categoryApi.middleware,
-      todoApi.middleware
+      categoryApi.middleware
     ),
 });

@@ -213,3 +213,173 @@ exports.filterBooks = async (req, res) => {
     });
   }
 };
+
+// Get all unique series names
+exports.getAllSeries = async (req, res) => {
+  try {
+    const series = await Book.distinct("series_name")
+      .where("series_name")
+      .ne(null)
+      .sort(); // Sort alphabetically
+    res.status(200).json(series);
+  } catch (error) {
+    console.error("Error fetching series:", error);
+    res.status(500).json({
+      message: "Error fetching series",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+// Get all books for a specific series
+// controllers/bookController.js
+exports.getSeries = async (req, res) => {
+  try {
+    let {
+      series_name,
+      page = 1,
+      limit = 10,
+      sort_by = "series_part",
+      order = "asc",
+    } = req.query;
+
+    // Handle slug from /series/:slug route
+    if (req.params.slug) {
+      series_name = decodeURIComponent(req.params.slug)
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    if (!series_name) {
+      return res.status(400).json({ message: "Series name is required" });
+    }
+
+    // Case-insensitive query
+    const query = {
+      series_name: { $regex: `^${series_name}$`, $options: "i" },
+      is_series: true,
+    };
+
+    console.log("getSeries query:", query); // Debugging
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+    const sort = { [sort_by]: order === "asc" ? 1 : -1 };
+
+    const books = await Book.find(query).sort(sort).skip(skip).limit(limitNum);
+    const total = await Book.countDocuments(query);
+
+    res.status(200).json({
+      message: `Books in series "${series_name}" retrieved successfully`,
+      series_name,
+      books,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    });
+  } catch (error) {
+    console.error(
+      `Error fetching series "${series_name || req.params.slug}":`,
+      error
+    );
+    res.status(500).json({
+      message: "Error fetching series",
+      error: error.message || "Internal server error",
+    });
+  }
+};
+
+// controllers/bookController.js
+exports.getAuthors = async (req, res) => {
+  try {
+    let {
+      author_name,
+      page = 1,
+      limit = 10,
+      sort_by = "title",
+      order = "asc",
+      language,
+      status,
+      shelf_status,
+    } = req.query;
+
+    // Handle slug from /authors/:slug route
+    let displayAuthorName = author_name;
+    if (req.params.slug) {
+      // Normalize slug to match database format
+      author_name = decodeURIComponent(req.params.slug).replace(/-/g, " ");
+      displayAuthorName = author_name
+        .split(" ")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ")
+        .trim();
+    }
+
+    if (!author_name && !req.params.slug) {
+      return res
+        .status(400)
+        .json({ message: "Author name or slug is required" });
+    }
+
+    // Build query
+    const query = {};
+    if (req.params.slug) {
+      // Query author_slugs with case-insensitive regex
+      const slug = req.params.slug.toLowerCase();
+      query.author_slugs = { $regex: `^${slug}$`, $options: "i" };
+    } else {
+      // Query authors field with case-insensitive regex
+      const normalizedAuthorName = author_name
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/\.\s*/g, ". ");
+      query.authors = { $regex: `^${normalizedAuthorName}$`, $options: "i" };
+    }
+
+    // Additional filters
+    if (language) query.language = language;
+    if (status) query.status = status;
+    if (shelf_status) query.shelf_status = shelf_status;
+
+    console.log("getAuthors query:", JSON.stringify(query, null, 2));
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+    const sort = { [sort_by]: order === "asc" ? 1 : -1 };
+
+    const books = await Book.find(query).sort(sort).skip(skip).limit(limitNum);
+    const total = await Book.countDocuments(query);
+
+    // Use the first book's author name for consistent display
+    displayAuthorName =
+      books[0]?.authors[0] || displayAuthorName || "Unknown Author";
+
+    res.status(200).json({
+      message: `Books by author "${displayAuthorName}" retrieved successfully`,
+      author_name: displayAuthorName,
+      books,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.ceil(total / limitNum),
+      },
+    });
+  } catch (error) {
+    console.error(
+      `Error fetching books by author "${
+        author_name || req.params.slug || "unknown"
+      }":`,
+      error
+    );
+    res.status(500).json({
+      message: "Error fetching books by author",
+      error: error.message || "Internal server error",
+    });
+  }
+};

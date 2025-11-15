@@ -44,7 +44,6 @@ const ContactForm = () => {
       toast.error("Error: " + error.message, {
         position: "top-right",
       });
-      console.log(error.message);
     }
   };
 

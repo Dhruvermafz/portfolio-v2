@@ -23,7 +23,7 @@ const publicRoutes = [
   { path: "/projects", element: <Projects /> },
   { path: "/project/:id", element: <ProjectDetails /> },
   { path: "/blogs", element: <Blogs /> },
-  { path: "/blogsOfItsABlog/:id", element: <Article /> },
+  { path: "/itsablog/:id", element: <Article /> },
   { path: "/blogs/:id", element: <BlogDetails /> },
   { path: "*", element: <NotFound /> },
   { path: "/coming", element: <ComingSoon /> },

@@ -14,7 +14,7 @@ const useAuth = () => {
       localStorage.removeItem("authToken");
       return null;
     }
-    console.log(decodedToken);
+
     return decodedToken; // Contains userId, role, etc.
   } catch (error) {
     console.error("Error decoding token:", error);

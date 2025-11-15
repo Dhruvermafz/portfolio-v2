@@ -1,7 +1,8 @@
+// Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../api/userApi";
-import { useAuth } from "../context/auth"; // Import AuthContext
+import { useAuth } from "../context/auth";
 import {
   Form,
   Input,
@@ -9,15 +10,17 @@ import {
   Checkbox,
   Alert,
   Card,
-  Typography,
   Row,
   Col,
   Space,
+  Typography,
 } from "antd";
 import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   LoadingOutlined,
+  UserOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -28,7 +31,7 @@ const Login = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [loginUser, { isLoading }] = useLoginUserMutation();
-  const { login } = useAuth(); // Get login function from AuthContext
+  const { login } = useAuth();
 
   const onFinish = async (values) => {
     setError("");
@@ -36,158 +39,110 @@ const Login = () => {
     try {
       const response = await loginUser(values).unwrap();
       if (response?.token) {
-        // Call AuthContext login with user details
         login(response.token, {
           id: response.id,
           username: response.username,
-          photo: response.photo || "https://example.com/default-avatar.png",
+          photo: response.photo || "https://via.placeholder.com/80",
           role: response.role || "user",
         });
-        setSuccess("User logged in successfully!");
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        setSuccess("Login successful!");
+        setTimeout(() => navigate("/"), 1000);
       } else {
-        setError("Login failed. Token not received.");
+        setError("Login failed. No token received.");
       }
     } catch (err) {
-      setError(
-        err?.data?.message || "Login failed. Please check your credentials."
-      );
+      setError(err?.data?.message || "Invalid email or password.");
     }
   };
 
   return (
     <div
       style={{
-        minHeight: "calc(100vh - 135px)",
-        background: "#f5f6fa",
+        minHeight: "100vh",
+        background: "#f0f2f5",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
       }}
     >
-      <Row justify="center" align="middle" style={{ width: "100%" }}>
-        <Col xs={24} sm={20} md={14} lg={12} xl={10} xxl={8}>
+      <Row justify="center" style={{ width: "100%" }}>
+        <Col xs={22} sm={18} md={12} lg={10} xl={8}>
           <Card
-            style={{ borderRadius: 12 }}
-            className="adminuiux-card"
+            style={{
+              borderRadius: 12,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
             bodyStyle={{ padding: 32 }}
-            bordered={false}
-            shadow="sm"
           >
-            <div style={{ textAlign: "center", marginBottom: 28 }}>
-              <Title level={2} style={{ marginBottom: 4, color: "#1890ff" }}>
+            {/* Header */}
+            <div style={{ textAlign: "center", marginBottom: 24 }}>
+              <Title level={3} style={{ margin: 0, color: "#262626" }}>
                 Login
               </Title>
-              <Text type="secondary">
-                Take a deep dive into the new modern era
-              </Text>
             </div>
-            <Space direction="vertical" style={{ width: "100%" }}>
-              {error && (
-                <Alert
-                  message={error}
-                  type="error"
-                  showIcon
-                  style={{ marginBottom: 16 }}
-                />
-              )}
-              {success && (
-                <Alert
-                  message={success}
-                  type="success"
-                  showIcon
-                  style={{ marginBottom: 16 }}
-                />
-              )}
+
+            {/* Alerts */}
+            <Space
+              direction="vertical"
+              style={{ width: "100%", marginBottom: 16 }}
+            >
+              {error && <Alert message={error} type="error" showIcon />}
+              {success && <Alert message={success} type="success" showIcon />}
             </Space>
+
+            {/* Form */}
             <Form
               form={form}
               layout="vertical"
               onFinish={onFinish}
-              requiredMark={false}
               autoComplete="off"
-              initialValues={{
-                email: "",
-                password: "",
-                rememberme: false,
-              }}
+              requiredMark={false}
             >
               <Form.Item
                 name="email"
-                label="Email Address"
                 rules={[
-                  { required: true, message: "Please input your email!" },
-                  { type: "email", message: "Please enter a valid email!" },
+                  { required: true, message: "Email is required" },
+                  { type: "email", message: "Enter a valid email" },
                 ]}
               >
                 <Input
-                  placeholder="Enter email address"
+                  prefix={<UserOutlined />}
+                  placeholder="Email address"
                   size="large"
-                  autoComplete="email"
                 />
               </Form.Item>
+
               <Form.Item
                 name="password"
-                label="Password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
+                rules={[{ required: true, message: "Password is required" }]}
               >
                 <Input.Password
-                  placeholder="Enter your password"
+                  prefix={<LockOutlined />}
+                  placeholder="Password"
                   size="large"
                   iconRender={(visible) =>
                     visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
                   }
                 />
               </Form.Item>
-              <Row
-                justify="space-between"
-                align="middle"
-                style={{ marginBottom: 16 }}
-                gutter={16}
+
+              <Row justify="space-between" style={{ marginBottom: 16 }}>
+                <Form.Item name="rememberme" valuePropName="checked" noStyle>
+                  <Checkbox>Remember me</Checkbox>
+                </Form.Item>
+              </Row>
+
+              <Button
+                type="primary"
+                htmlType="submit"
+                size="large"
+                block
+                loading={isLoading}
+                style={{ height: 44 }}
               >
-                <Col>
-                  <Form.Item name="rememberme" valuePropName="checked" noStyle>
-                    <Checkbox>Remember me</Checkbox>
-                  </Form.Item>
-                </Col>
-                <Col>
-                  <Button
-                    type="link"
-                    href="adminux-forgot-password.html"
-                    style={{ padding: 0 }}
-                  >
-                    Forgot Password?
-                  </Button>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    size="large"
-                    block
-                    loading={isLoading}
-                  >
-                    {isLoading ? <LoadingOutlined /> : "Login"}
-                  </Button>
-                </Col>
-                <Col span={12}>
-                  <Button
-                    type="link"
-                    href="adminux-signup.html"
-                    block
-                    size="large"
-                  >
-                    Signup <i className="bi bi-chevron-right"></i>
-                  </Button>
-                </Col>
-              </Row>
+                {isLoading ? <LoadingOutlined /> : "Sign In"}
+              </Button>
             </Form>
           </Card>
         </Col>

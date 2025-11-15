@@ -8,13 +8,11 @@ const Blogs = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.time("Page Load Time");
     setLoading(true);
 
     // Simulate API load (use actual API calls in real usage)
     setTimeout(() => {
       setLoading(false);
-      console.timeEnd("Page Load Time");
     }, 1000); // Replace with actual API loading time
   }, []);
 

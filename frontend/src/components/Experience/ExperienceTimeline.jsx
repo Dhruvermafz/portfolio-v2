@@ -110,7 +110,7 @@ const ExperienceTimeline = () => {
       {/* Modal for experience details */}
       {selectedExperience && (
         <Modal show={showModal} onHide={handleCloseModal} centered>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>{selectedExperience.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -136,11 +136,6 @@ const ExperienceTimeline = () => {
               </div>
             </div>
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseModal}>
-              Close
-            </Button>
-          </Modal.Footer>
         </Modal>
       )}
     </div>

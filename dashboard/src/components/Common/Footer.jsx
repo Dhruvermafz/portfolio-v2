@@ -8,25 +8,19 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <AntFooter
-      style={{
-        textAlign: "center",
-        background: "transparent",
-        padding: "18px 0",
-      }}
-    >
-      <Text type="secondary">
-        Copyright &copy;{currentYear}, Creatively designed by{" "}
-        <a
-          href="https://dhruvermafz.in/"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: "#16b3ac" }}
-        >
-          Dhruv Verma
-        </a>
-      </Text>
-    </AntFooter>
+    <footer class="footer mt-auto py-3 text-center">
+      <div class="container">
+        <span class="text-muted">
+          {" "}
+          Copyright © <span id="year">{currentYear}</span> . Designed with{" "}
+          <span class="bi bi-heart-fill text-danger"></span> by{" "}
+          <a href="https://dhruvermafz.in/" target="_blank">
+            <span class="fw-medium text-primary"> Dhruv Verma</span>
+          </a>{" "}
+          All rights reserved
+        </span>
+      </div>
+    </footer>
   );
 };
 

@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { FaReply, FaSearch, FaStar, FaFlag, FaTrash } from "react-icons/fa";
-import { useGetAllContactsQuery } from "../api/contactApi";
+import React, { useState, useEffect, useMemo } from "react";
+import { FaReply, FaSearch } from "react-icons/fa";
+import {
+  useGetAllContactsQuery,
+  useStarContactMutation,
+  useFlagContactMutation,
+  useDeleteContactMutation,
+} from "../api/contactApi";
 import {
   Card,
   Input,
-  Table,
-  Button,
-  Pagination,
-  Modal,
+  List,
   Avatar,
-  Tooltip,
+  Tag,
   Space,
   Typography,
-  Tag,
+  Button,
+  Modal,
+  Empty,
+  Badge,
+  Tooltip,
+  Dropdown,
+  Menu,
+  Pagination,
 } from "antd";
 import {
   StarOutlined,
@@ -21,299 +30,342 @@ import {
   FlagFilled,
   DeleteOutlined,
   EyeOutlined,
+  MoreOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
 import DeleteModal from "../components/Common/DeleteModal";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const Queries = () => {
-  const [filteredQueries, setFilteredQueries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState(null);
+  const [deleteModal, setDeleteModal] = useState(false);
+
   const queriesPerPage = 20;
 
-  // Fetch queries using RTK Query
-  const {
-    data: queries = { data: [] },
-    isLoading,
-    isError,
-  } = useGetAllContactsQuery();
+  const { data: response = { data: [] }, isLoading } = useGetAllContactsQuery();
+  const queries = response.data || [];
 
-  // Handle search filter
-  useEffect(() => {
-    if (queries.data) {
-      const lowerSearch = searchTerm.toLowerCase();
-      const results = queries.data.filter(
-        (query) =>
-          query.name.toLowerCase().includes(lowerSearch) ||
-          query.email.toLowerCase().includes(lowerSearch)
-      );
-      setFilteredQueries(results);
-      setCurrentPage(1);
-    }
-  }, [searchTerm, queries]);
+  const [star] = useStarContactMutation();
+  const [flag] = useFlagContactMutation();
+  const [remove] = useDeleteContactMutation();
 
-  // Pagination
-  const indexOfLastQuery = currentPage * queriesPerPage;
-  const indexOfFirstQuery = indexOfLastQuery - queriesPerPage;
-  const currentQueries = filteredQueries.slice(
-    indexOfFirstQuery,
-    indexOfLastQuery
-  );
-  const totalPages = Math.ceil(filteredQueries.length / queriesPerPage);
+  // === Search Filter ===
+  const filtered = useMemo(() => {
+    if (!searchTerm) return queries;
+    const lower = searchTerm.toLowerCase();
+    return queries.filter(
+      (q) =>
+        q.name.toLowerCase().includes(lower) ||
+        q.email.toLowerCase().includes(lower) ||
+        (q.subject && q.subject.toLowerCase().includes(lower))
+    );
+  }, [queries, searchTerm]);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // === Pagination Logic ===
+  const totalQueries = filtered.length;
+  const indexOfLast = currentPage * queriesPerPage;
+  const indexOfFirst = indexOfLast - queriesPerPage;
+  const currentQueries = filtered.slice(indexOfFirst, indexOfLast);
 
-  // Handlers
-  const handleViewMessage = (query) => {
-    setSelectedQuery(query);
-    setShowMessageModal(true);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleReply = (query) => {
-    const subject = encodeURIComponent(`Re: ${query.subject || "Your Query"}`);
+  // Reset page on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // === Handlers ===
+  const handleReply = (q) => {
+    const subject = encodeURIComponent(`Re: ${q.subject || "Your Query"}`);
     const body = encodeURIComponent(
-      `Dear ${query.name},\n\nThank you for your query. [Your response here]\n\nRegards,\n[Your Name]`
+      `Dear ${q.name},\n\nThank you for reaching out.\n\nBest,\n[Your Name]`
     );
-    window.location.href = `mailto:${query.email}?subject=${subject}&body=${body}`;
-    setShowMessageModal(false);
+    window.location.href = `mailto:${q.email}?subject=${subject}&body=${body}`;
+  };
+
+  const toggleStar = (id, current) => star({ id, isStarred: !current });
+  const toggleFlag = (id, current) => flag({ id, isFlagged: !current });
+
+  const openDelete = (q) => {
+    setSelectedQuery(q);
+    setDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    await remove(selectedQuery._id).unwrap();
+    setDeleteModal(false);
     setSelectedQuery(null);
   };
 
-  // Table columns for Ant Design
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text, record) => (
-        <Space>
-          <Avatar
-            src={record.avatar || "/assets/img/modern-ai-image/user-2.jpg"}
-            alt={record.name}
-          >
-            {record.name && record.name[0]}
-          </Avatar>
-          <span>{text}</span>
-        </Space>
-      ),
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (text) => <Text copyable>{text}</Text>,
-    },
-    {
-      title: "Subject",
-      dataIndex: "subject",
-      key: "subject",
-      render: (text) => text || <Tag color="default">No Subject</Tag>,
-    },
-    {
-      title: "Date",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date) => (
-        <>
-          <Text>{new Date(date).toLocaleDateString()}</Text>{" "}
-          <Text type="secondary">{new Date(date).toLocaleTimeString()}</Text>
-        </>
-      ),
-    },
-    {
-      title: "Option",
-      key: "actions",
-      render: (_, record) => (
-        <Space>
-          <Tooltip title="View Message">
-            <Button
-              icon={<EyeOutlined />}
-              type="text"
-              onClick={() => handleViewMessage(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Reply">
-            <Button
-              icon={<FaReply />}
-              type="text"
-              onClick={() => handleReply(record)}
-            />
-          </Tooltip>
-          <Tooltip title={record.isStarred ? "Unstar" : "Star"}>
-            <Button
-              icon={
-                record.isStarred ? (
-                  <StarFilled style={{ color: "#faad14" }} />
-                ) : (
-                  <StarOutlined />
-                )
-              }
-              type="text"
-              // Add onClick to handle star toggling if you implement it
-            />
-          </Tooltip>
-          <Tooltip title={record.isFlagged ? "Unflag" : "Flag"}>
-            <Button
-              icon={
-                record.isFlagged ? (
-                  <FlagFilled style={{ color: "#faad14" }} />
-                ) : (
-                  <FlagOutlined />
-                )
-              }
-              type="text"
-              // Add onClick to handle flag toggling if you implement it
-            />
-          </Tooltip>
-          <Tooltip title="Delete">
-            <Button
-              icon={<DeleteOutlined />}
-              type="text"
-              danger
-              // Add onClick to handle delete if you implement it
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  // === Dropdown ===
+  const getMenu = (q) => (
+    <Menu>
+      <Menu.Item icon={<EyeOutlined />} onClick={() => setSelectedQuery(q)}>
+        View Message
+      </Menu.Item>
+      <Menu.Item
+        icon={q.isStarred ? <StarFilled /> : <StarOutlined />}
+        onClick={() => toggleStar(q._id, q.isStarred)}
+      >
+        {q.isStarred ? "Unstar" : "Star"}
+      </Menu.Item>
+      <Menu.Item
+        icon={q.isFlagged ? <FlagFilled /> : <FlagOutlined />}
+        onClick={() => toggleFlag(q._id, q.isFlagged)}
+      >
+        {q.isFlagged ? "Unflag" : "Flag"}
+      </Menu.Item>
+      <Menu.Item icon={<DeleteOutlined />} danger onClick={() => openDelete(q)}>
+        Delete
+      </Menu.Item>
+    </Menu>
+  );
+
+  // === Time Ago ===
+  const timeAgo = (date) => {
+    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+    return new Date(date).toLocaleDateString("en-IN");
+  };
 
   return (
-    <>
+    <div style={{ padding: "16px", background: "#f5f5f5", minHeight: "100vh" }}>
       <Card
-        title={
-          <Title level={5} style={{ marginBottom: 0 }}>
-            Query List
-          </Title>
-        }
-        extra={
-          <Input
-            prefix={<FaSearch />}
-            placeholder="Search queries..."
-            style={{ width: 260 }}
-            allowClear
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        }
         bodyStyle={{ padding: 0 }}
+        style={{
+          borderRadius: 12,
+          overflow: "hidden",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        }}
       >
-        <Table
-          columns={columns}
-          dataSource={currentQueries}
+        {/* Header */}
+        <div
+          style={{ padding: "16px 20px", borderBottom: "1px solid #f0f0f0" }}
+        >
+          <Space style={{ width: "100%", justifyContent: "space-between" }}>
+            <Space size="middle">
+              <Text strong style={{ fontSize: 18 }}>
+                Inbox
+              </Text>
+              <Badge
+                count={totalQueries}
+                style={{ backgroundColor: "#1890ff" }}
+              />
+            </Space>
+            <Input
+              prefix={<FaSearch style={{ color: "#8c8c8c" }} />}
+              placeholder="Search name, email, subject..."
+              allowClear
+              style={{ width: 300 }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </Space>
+        </div>
+
+        {/* Email List */}
+        <List
           loading={isLoading}
-          rowKey={(record) => record._id}
-          pagination={false}
-          locale={{
-            emptyText: isError ? (
-              <Text type="danger">Error loading queries</Text>
-            ) : (
-              "No queries found."
-            ),
-          }}
+          dataSource={currentQueries}
+          locale={{ emptyText: <Empty description="No queries found" /> }}
+          renderItem={(q) => (
+            <List.Item
+              style={{
+                padding: "12px 20px",
+                borderBottom: "1px solid #f0f0f0",
+                background: q.isStarred ? "#fffbe6" : "white",
+                cursor: "pointer",
+                transition: "0.2s",
+              }}
+              onClick={() => setSelectedQuery(q)}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    src={q.avatar || "/assets/img/modern-ai-image/user-2.jpg"}
+                    size={40}
+                  >
+                    {q.name[0]}
+                  </Avatar>
+                }
+                title={
+                  <Space size={8}>
+                    <Text strong style={{ fontSize: 15 }}>
+                      {q.name}
+                    </Text>
+                    {q.isFlagged && <FlagFilled style={{ color: "#fa541c" }} />}
+                    {q.isStarred && <StarFilled style={{ color: "#faad14" }} />}
+                  </Space>
+                }
+                description={
+                  <Space
+                    direction="vertical"
+                    size={0}
+                    style={{ width: "100%" }}
+                  >
+                    <Space
+                      style={{ justifyContent: "space-between", width: "100%" }}
+                    >
+                      <Text ellipsis style={{ maxWidth: 300 }}>
+                        <strong>{q.subject || "(no subject)"}</strong>
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {timeAgo(q.createdAt)}
+                      </Text>
+                    </Space>
+                    <Text
+                      ellipsis
+                      style={{ color: "#8c8c8c", fontSize: 13, maxWidth: 500 }}
+                    >
+                      {q.message}
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {q.email}
+                    </Text>
+                  </Space>
+                }
+              />
+
+              {/* Actions */}
+              <Space onClick={(e) => e.stopPropagation()}>
+                <Tooltip title="Reply">
+                  <Button
+                    type="text"
+                    icon={<FaReply />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReply(q);
+                    }}
+                    style={{ color: "#1890ff" }}
+                  />
+                </Tooltip>
+
+                <Dropdown overlay={getMenu(q)} trigger={["click"]}>
+                  <Button
+                    type="text"
+                    icon={<MoreOutlined />}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ fontSize: 18, color: "#8c8c8c" }}
+                  />
+                </Dropdown>
+              </Space>
+            </List.Item>
+          )}
         />
-        {totalPages > 1 && (
-          <div style={{ textAlign: "center", margin: "24px 0" }}>
+
+        {/* Pagination */}
+        {totalQueries > queriesPerPage && (
+          <div
+            style={{
+              padding: "16px 20px",
+              borderTop: "1px solid #f0f0f0",
+              textAlign: "center",
+            }}
+          >
             <Pagination
               current={currentPage}
-              total={filteredQueries.length}
+              total={totalQueries}
               pageSize={queriesPerPage}
-              onChange={paginate}
+              onChange={handlePageChange}
               showSizeChanger={false}
+              showQuickJumper={totalQueries > 100}
+              showTotal={(total, range) =>
+                `${range[0]}-${range[1]} of ${total} queries`
+              }
             />
           </div>
         )}
       </Card>
 
-      {/* Message Modal */}
+      {/* Full Email Modal */}
       <Modal
-        open={showMessageModal && !!selectedQuery}
-        onCancel={() => setShowMessageModal(false)}
+        open={!!selectedQuery}
+        onCancel={() => setSelectedQuery(null)}
         footer={null}
-        width={600}
+        width={700}
         centered
-        title={
-          <Space style={{ width: "100%", justifyContent: "space-between" }}>
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              onClick={() => setShowMessageModal(false)}
-            />
-            <Space>
-              <Button
-                icon={
-                  selectedQuery?.isStarred ? (
-                    <StarFilled style={{ color: "#faad14" }} />
-                  ) : (
-                    <StarOutlined />
-                  )
-                }
-                type="text"
-              />
-              <Button
-                icon={
-                  selectedQuery?.isFlagged ? (
-                    <FlagFilled style={{ color: "#faad14" }} />
-                  ) : (
-                    <FlagOutlined />
-                  )
-                }
-                type="text"
-              />
-              <Button icon={<DeleteOutlined />} type="text" danger />
-            </Space>
-          </Space>
-        }
+        title={null}
+        closeIcon={<Button type="text" icon={<CloseOutlined />} />}
       >
         {selectedQuery && (
-          <>
-            <Space align="start" size={16}>
-              <Avatar
-                size={60}
-                src={
-                  selectedQuery.avatar ||
-                  "/assets/img/modern-ai-image/user-2.jpg"
-                }
-                alt={selectedQuery.name}
-              >
-                {selectedQuery.name && selectedQuery.name[0]}
-              </Avatar>
-              <div>
-                <Title level={5} style={{ margin: 0 }}>
-                  {selectedQuery.name}
-                </Title>
-                <Text copyable>{selectedQuery.email}</Text>
-                <br />
-                <Text type="secondary" style={{ fontSize: 13 }}>
-                  {new Date(selectedQuery.createdAt).toLocaleDateString()}{" "}
-                  {new Date(selectedQuery.createdAt).toLocaleTimeString()}
-                </Text>
-              </div>
+          <div style={{ padding: "8px 0" }}>
+            <Space
+              style={{
+                width: "100%",
+                justifyContent: "space-between",
+                marginBottom: 16,
+              }}
+            >
+              <Space size="middle">
+                <Avatar size={56} src={selectedQuery.avatar}>
+                  {selectedQuery.name[0]}
+                </Avatar>
+                <div>
+                  <Text strong style={{ fontSize: 18 }}>
+                    {selectedQuery.name}
+                  </Text>
+                  <br />
+                  <Text type="secondary">{selectedQuery.email}</Text>
+                </div>
+              </Space>
+              <Space>
+                <Button
+                  icon={
+                    selectedQuery.isStarred ? <StarFilled /> : <StarOutlined />
+                  }
+                  onClick={() =>
+                    toggleStar(selectedQuery._id, selectedQuery.isStarred)
+                  }
+                />
+                <Button
+                  icon={
+                    selectedQuery.isFlagged ? <FlagFilled /> : <FlagOutlined />
+                  }
+                  onClick={() =>
+                    toggleFlag(selectedQuery._id, selectedQuery.isFlagged)
+                  }
+                />
+                <Button
+                  icon={<DeleteOutlined />}
+                  danger
+                  onClick={() => {
+                    setSelectedQuery(null);
+                    openDelete(selectedQuery);
+                  }}
+                />
+              </Space>
             </Space>
-            <div style={{ marginTop: 16 }}>
-              <Text type="secondary" style={{ fontSize: 13 }}>
-                Subject
+
+            <div
+              style={{
+                margin: "16px 0",
+                paddingBottom: 12,
+                borderBottom: "1px solid #f0f0f0",
+              }}
+            >
+              <Text strong style={{ fontSize: 16 }}>
+                {selectedQuery.subject || "(no subject)"}
               </Text>
-              <Title level={5} style={{ margin: 0 }}>
-                {selectedQuery.subject || "No Subject"}
-              </Title>
+              <br />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {new Date(selectedQuery.createdAt).toLocaleString("en-IN")}
+              </Text>
             </div>
-            <div style={{ marginTop: 12, marginBottom: 16 }}>
+
+            <div style={{ margin: "20px 0", lineHeight: 1.7, fontSize: 15 }}>
               <Text>{selectedQuery.message}</Text>
             </div>
-            <Space style={{ width: "100%", justifyContent: "space-between" }}>
-              <Button
-                icon={<DeleteOutlined />}
-                type="default"
-                danger
-                onClick={() => setShowMessageModal(false)}
-              >
-                Close
-              </Button>
+
+            <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+              <Button onClick={() => setSelectedQuery(null)}>Close</Button>
               <Button
                 type="primary"
                 icon={<FaReply />}
@@ -322,10 +374,18 @@ const Queries = () => {
                 Reply
               </Button>
             </Space>
-          </>
+          </div>
         )}
       </Modal>
-    </>
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        onConfirm={confirmDelete}
+        itemName={selectedQuery?.name || "query"}
+      />
+    </div>
   );
 };
 

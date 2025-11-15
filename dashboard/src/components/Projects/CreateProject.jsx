@@ -16,13 +16,21 @@ import {
   Typography,
   message,
   Space,
+  Collapse,
   Divider,
+  Affix,
 } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  UploadOutlined,
+  SaveOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import "./createproject.css";
 
 const { Title } = Typography;
 const { TextArea } = Input;
+const { Panel } = Collapse;
 
 const ProjectForm = () => {
   const navigate = useNavigate();
@@ -36,23 +44,27 @@ const ProjectForm = () => {
     { title: "", challenge: "", solution: "" },
   ]);
 
-  // Fetch project data if in edit mode
+  // Fetch project
   const {
     data: project,
     isLoading,
     isError,
-  } = useGetProjectByIdQuery(_id, { skip: !isEditMode });
+  } = useGetProjectByIdQuery(_id, {
+    skip: !isEditMode,
+  });
 
-  // Populate form data when project is fetched
+  // Populate form
   useEffect(() => {
     window.scrollTo(0, 0);
     if (isEditMode && project) {
       form.setFieldsValue({
         ...project,
-        tags: project.tags ? project.tags.join(", ") : "",
+        tags: project.tags?.join(", ") || "",
       });
       setChallenges(
-        project.challenges || [{ title: "", challenge: "", solution: "" }]
+        project.challenges?.length
+          ? project.challenges
+          : [{ title: "", challenge: "", solution: "" }]
       );
       setMainImageFile(null);
       setImagesFileList([]);
@@ -80,12 +92,13 @@ const ProjectForm = () => {
   };
 
   const handleImagesChange = ({ fileList }) => {
-    setImagesFileList(fileList.map((file) => file.originFileObj));
+    setImagesFileList(fileList.map((f) => f.originFileObj));
   };
 
   const handleSubmit = async (values) => {
     const formData = new FormData();
-    // basic fields
+
+    // Basic fields
     [
       "id",
       "title",
@@ -97,293 +110,314 @@ const ProjectForm = () => {
       "results",
     ].forEach((key) => formData.append(key, values[key] || ""));
 
-    // tags
-    const tagsArray = (values.tags || "")
+    // Tags
+    const tags = (values.tags || "")
       .split(",")
-      .map((tag) => tag.trim())
+      .map((t) => t.trim())
       .filter(Boolean);
-    tagsArray.forEach((tag, i) => {
-      formData.append(`tags[${i}]`, tag);
-    });
+    tags.forEach((tag, i) => formData.append(`tags[${i}]`, tag));
 
-    // challenges
+    // Challenges
     challenges.forEach((ch, i) => {
       formData.append(`challenges[${i}][title]`, ch.title);
       formData.append(`challenges[${i}][challenge]`, ch.challenge);
       formData.append(`challenges[${i}][solution]`, ch.solution);
     });
 
-    // mainImage
-    if (mainImageFile) {
-      formData.append("mainImage", mainImageFile);
-    }
-    // images
-    imagesFileList.forEach((img, i) => {
-      formData.append(`images[${i}]`, img);
-    });
+    // Files
+    if (mainImageFile) formData.append("mainImage", mainImageFile);
+    imagesFileList.forEach((img, i) => formData.append(`images[${i}]`, img));
 
     try {
       if (isEditMode) {
         await updateProject({ id: _id, ...formData }).unwrap();
-        message.success("Project updated successfully!");
+        message.success("Project updated!");
       } else {
         await createProject(formData).unwrap();
-        message.success("Project added successfully!");
+        message.success("Project created!");
       }
       navigate("/projects");
     } catch (err) {
-      message.error(
-        `Failed to ${isEditMode ? "update" : "add"} project: ${
-          err?.message || ""
-        }`
-      );
+      message.error(`Failed: ${err?.data?.message || err.message}`);
     }
   };
 
-  if (isEditMode && isLoading) {
-    return <div>Loading project data...</div>;
-  }
-  if (isEditMode && isError) {
-    return <div>Failed to load project data</div>;
-  }
+  if (isEditMode && isLoading) return <div className="loading">Loading...</div>;
+  if (isEditMode && isError)
+    return <div className="error">Failed to load project</div>;
 
   return (
-    <Card
-      className="my-5 json-container"
-      style={{ maxWidth: 900, margin: "auto" }}
-    >
-      <Row justify="space-between" align="middle" className="json-header">
-        <Col>
-          <Title level={3} style={{ margin: 0 }}>
-            {isEditMode ? "Update Project" : "Create New Project"}
+    <div className="project-form-container">
+      <Card className="form-card">
+        <Row justify="space-between" align="middle" className="form-header">
+          <Title level={3} className="form-title">
+            {isEditMode ? "Edit Project" : "Create Project"}
           </Title>
-        </Col>
-        <Col>
-          <Space>
-            <Button onClick={() => navigate("/projects")}>Discard</Button>
-            <Button type="dashed">Save Draft</Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              form="project-form"
-              loading={isCreating || isUpdating}
+        </Row>
+
+        <Divider className="form-divider" />
+
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          {/* ==== BASIC INFO ==== */}
+          <Card title="Basic Info" className="section-card" size="small">
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">id</span>}
+                  name="id"
+                  rules={[{ required: true, message: "Slug required" }]}
+                >
+                  <Input
+                    disabled={isEditMode}
+                    className="json-value"
+                    placeholder="my-project"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">title</span>}
+                  name="title"
+                  rules={[{ required: true }]}
+                >
+                  <Input className="json-value" placeholder="Project Title" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">client</span>}
+                  name="client"
+                >
+                  <Input className="json-value" placeholder="Client Name" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">services</span>}
+                  name="services"
+                >
+                  <Input
+                    className="json-value"
+                    placeholder="Web, Mobile, SEO..."
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* ==== LINKS ==== */}
+          <Card title="Links" className="section-card" size="small">
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">website</span>}
+                  name="website"
+                >
+                  <Input
+                    className="json-value"
+                    placeholder="https://example.com"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label={<span className="json-key">ghLink</span>}
+                  name="ghLink"
+                >
+                  <Input
+                    className="json-value"
+                    placeholder="https://github.com/..."
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* ==== OVERVIEW & RESULTS ==== */}
+          <Card title="Content" className="section-card" size="small">
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  label={<span className="json-key">overview</span>}
+                  name="overview"
+                >
+                  <TextArea
+                    rows={3}
+                    className="json-value"
+                    placeholder="Project overview..."
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={24}>
+                <Form.Item
+                  label={<span className="json-key">results</span>}
+                  name="results"
+                >
+                  <TextArea
+                    rows={3}
+                    className="json-value"
+                    placeholder="Results & impact..."
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* ==== MEDIA ==== */}
+          <Card title="Media" className="section-card" size="small">
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Form.Item label={<span className="json-key">mainImage</span>}>
+                  <Upload
+                    accept="image/*"
+                    maxCount={1}
+                    beforeUpload={() => false}
+                    onChange={handleMainImageChange}
+                    listType="picture-card"
+                    showUploadList={{ showRemoveIcon: true }}
+                  >
+                    {mainImageFile ? null : (
+                      <div>
+                        <UploadOutlined />
+                        <div style={{ marginTop: 8 }}>Main Image</div>
+                      </div>
+                    )}
+                  </Upload>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label={<span className="json-key">images</span>}>
+                  <Upload
+                    accept="image/*"
+                    multiple
+                    beforeUpload={() => false}
+                    onChange={handleImagesChange}
+                    listType="picture-card"
+                    showUploadList={{ showRemoveIcon: true }}
+                  >
+                    <div>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Add Images</div>
+                    </div>
+                  </Upload>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* ==== CHALLENGES (Collapsible) ==== */}
+          <Card title="Challenges" className="section-card" size="small">
+            <Collapse
+              defaultActiveKey={
+                challenges.some((c) => c.title || c.challenge) ? "1" : []
+              }
             >
-              {isEditMode ? "Update Project" : "Publish Project"}
-            </Button>
-          </Space>
-        </Col>
-      </Row>
+              <Panel header={`Challenges (${challenges.length})`} key="1">
+                {challenges.map((item, idx) => (
+                  <Card
+                    key={idx}
+                    size="small"
+                    className="challenge-card"
+                    style={{ marginBottom: 12 }}
+                  >
+                    <Row gutter={12}>
+                      <Col xs={24} sm={8}>
+                        <Input
+                          placeholder="Title"
+                          value={item.title}
+                          onChange={(e) =>
+                            handleChallengeChange(idx, "title", e.target.value)
+                          }
+                          className="json-value"
+                        />
+                      </Col>
+                      <Col xs={24} sm={8}>
+                        <TextArea
+                          placeholder="Challenge"
+                          value={item.challenge}
+                          rows={2}
+                          onChange={(e) =>
+                            handleChallengeChange(
+                              idx,
+                              "challenge",
+                              e.target.value
+                            )
+                          }
+                          className="json-value"
+                        />
+                      </Col>
+                      <Col xs={24} sm={8}>
+                        <TextArea
+                          placeholder="Solution"
+                          value={item.solution}
+                          rows={2}
+                          onChange={(e) =>
+                            handleChallengeChange(
+                              idx,
+                              "solution",
+                              e.target.value
+                            )
+                          }
+                          className="json-value"
+                        />
+                      </Col>
+                    </Row>
+                  </Card>
+                ))}
+                <Button
+                  type="dashed"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={handleAddChallenge}
+                >
+                  Add Challenge
+                </Button>
+              </Panel>
+            </Collapse>
+          </Card>
 
-      <Divider />
-
-      <Form
-        id="project-form"
-        layout="vertical"
-        form={form}
-        onFinish={handleSubmit}
-        initialValues={{
-          id: "",
-          title: "",
-          client: "",
-          website: "",
-          ghLink: "",
-          overview: "",
-          services: "",
-          results: "",
-          tags: "",
-        }}
-      >
-        {/* id (slug) */}
-        <Form.Item
-          label={<span className="json-key">id</span>}
-          name="id"
-          rules={[{ required: true, message: "Project ID (slug) is required" }]}
-        >
-          <Input
-            className="json-value"
-            placeholder="Enter project slug (e.g., itsablog)"
-            disabled={isEditMode}
-          />
-        </Form.Item>
-
-        {/* title */}
-        <Form.Item
-          label={<span className="json-key">title</span>}
-          name="title"
-          rules={[{ required: true, message: "Title is required" }]}
-        >
-          <Input className="json-value" placeholder="Enter project title" />
-        </Form.Item>
-
-        {/* client */}
-        <Form.Item
-          label={<span className="json-key">client</span>}
-          name="client"
-        >
-          <Input className="json-value" placeholder="Enter client name" />
-        </Form.Item>
-
-        {/* website */}
-        <Form.Item
-          label={<span className="json-key">website</span>}
-          name="website"
-        >
-          <Input className="json-value" placeholder="Enter website URL" />
-        </Form.Item>
-
-        {/* ghLink */}
-        <Form.Item
-          label={<span className="json-key">ghLink</span>}
-          name="ghLink"
-        >
-          <Input className="json-value" placeholder="Enter GitHub URL" />
-        </Form.Item>
-
-        {/* overview */}
-        <Form.Item
-          label={<span className="json-key">overview</span>}
-          name="overview"
-        >
-          <TextArea
-            className="json-value"
-            placeholder="Enter project overview"
-            rows={3}
-          />
-        </Form.Item>
-
-        {/* services */}
-        <Form.Item
-          label={<span className="json-key">services</span>}
-          name="services"
-        >
-          <Input
-            className="json-value"
-            placeholder="Enter services (comma-separated)"
-          />
-        </Form.Item>
-
-        {/* mainImage */}
-        <Form.Item label={<span className="json-key">mainImage</span>}>
-          <Upload
-            accept="image/*"
-            maxCount={1}
-            beforeUpload={() => false}
-            onChange={handleMainImageChange}
-            showUploadList={{ showRemoveIcon: true }}
-          >
-            <Button icon={<UploadOutlined />}>Upload Main Image</Button>
-          </Upload>
-        </Form.Item>
-
-        {/* images */}
-        <Form.Item label={<span className="json-key">images</span>}>
-          <Upload
-            accept="image/*"
-            multiple
-            beforeUpload={() => false}
-            onChange={handleImagesChange}
-            showUploadList={{ showRemoveIcon: true }}
-          >
-            <Button icon={<UploadOutlined />}>Upload Additional Images</Button>
-          </Upload>
-        </Form.Item>
-
-        {/* challenges */}
-        <Form.Item label={<span className="json-key">challenges</span>}>
-          <div className="json-array">
-            <div className="json-brace">[</div>
-            {challenges.map((item, index) => (
-              <Card
-                key={index}
-                size="small"
-                type="inner"
-                style={{ marginBottom: 8, background: "#f8f9fa" }}
-                className="json-nested"
-              >
-                <Row gutter={12}>
-                  <Col xs={24} md={8}>
-                    <Input
-                      value={item.title}
-                      placeholder="Challenge title"
-                      className="json-value"
-                      onChange={(e) =>
-                        handleChallengeChange(index, "title", e.target.value)
-                      }
-                    />
-                  </Col>
-                  <Col xs={24} md={8}>
-                    <TextArea
-                      value={item.challenge}
-                      placeholder="Challenge description"
-                      className="json-value"
-                      rows={2}
-                      onChange={(e) =>
-                        handleChallengeChange(
-                          index,
-                          "challenge",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </Col>
-                  <Col xs={24} md={8}>
-                    <TextArea
-                      value={item.solution}
-                      placeholder="Solution description"
-                      className="json-value"
-                      rows={2}
-                      onChange={(e) =>
-                        handleChallengeChange(index, "solution", e.target.value)
-                      }
-                    />
-                  </Col>
-                </Row>
-              </Card>
-            ))}
-            <Button
-              type="dashed"
-              icon={<PlusOutlined />}
-              onClick={handleAddChallenge}
-              style={{ width: "100%" }}
+          {/* ==== TAGS ==== */}
+          <Card title="Tags" className="section-card" size="small">
+            <Form.Item
+              label={<span className="json-key">tags</span>}
+              name="tags"
             >
-              Add Challenge
-            </Button>
-            <div className="json-brace">]</div>
-          </div>
-        </Form.Item>
+              <Input
+                className="json-value"
+                placeholder="react, nodejs, ui..."
+              />
+            </Form.Item>
+          </Card>
 
-        {/* results */}
-        <Form.Item
-          label={<span className="json-key">results</span>}
-          name="results"
-        >
-          <TextArea
-            className="json-value"
-            placeholder="Enter project results"
-            rows={3}
-          />
-        </Form.Item>
-
-        {/* tags */}
-        <Form.Item label={<span className="json-key">tags</span>} name="tags">
-          <Input
-            className="json-value"
-            placeholder="Enter tags (comma-separated)"
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            loading={isCreating || isUpdating}
-            style={{ width: "100%", marginTop: 16 }}
-          >
-            {isEditMode ? "Update Project" : "Submit Project"}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          {/* ==== STICKY FOOTER ==== */}
+          <Affix offsetBottom={0}>
+            <Card className="footer-card">
+              <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                <Space>
+                  <Button
+                    onClick={() => navigate("/projects")}
+                    icon={<CloseOutlined />}
+                  >
+                    Discard
+                  </Button>
+                  <Button type="dashed" icon={<SaveOutlined />}>
+                    Save Draft
+                  </Button>
+                </Space>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isCreating || isUpdating}
+                  icon={<PlusOutlined />}
+                >
+                  {isEditMode ? "Update" : "Publish"} Project
+                </Button>
+              </Space>
+            </Card>
+          </Affix>
+        </Form>
+      </Card>
+    </div>
   );
 };
 

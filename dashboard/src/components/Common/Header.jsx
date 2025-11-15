@@ -1,38 +1,57 @@
-import React, { useState } from "react";
+// src/components/Header.jsx  (your original code – only tiny clean-up)
+import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/auth";
-import { Form, Image, Input, Dropdown, Menu, Spin } from "antd";
+import { Dropdown, Menu, Spin, Button } from "antd";
 import {
   SearchOutlined,
-  MenuOutlined,
-  DownOutlined,
   UserOutlined,
   ShoppingOutlined,
   LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
 } from "@ant-design/icons";
+import Avatar from "react-avatar";
 import logo_light from "../../assets/images/logo/logo-new.png";
 import logo from "../../assets/images/logo/logo-new.png";
-import Avatar from "react-avatar";
 
-const Header = () => {
+const Header = ({
+  isCollapsed,
+  toggleSidebar,
+  isMobileOpen,
+  toggleMobileSidebar,
+}) => {
   const navigate = useNavigate();
-  const { user, logout, isLoggedIn, isLoading, isError } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { user, logout, isLoggedIn, isLoading } = useAuth();
 
-  // Handle search
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    // Implement search logic
-  };
-
-  // Sidebar toggle stub
-  const initSidebar = () => {
-    console.log("Sidebar toggle clicked");
-  };
-
-  // Profile dropdown menu
   const profileMenu = (
-    <Menu>
+    <Menu className="header-profile-dropdown">
+      <Menu.Divider />
+      <div className="p-3">
+        <div className="d-flex align-items-center gap-2">
+          <div>
+            {isLoading ? (
+              <Spin size="small" />
+            ) : (
+              <Avatar
+                name={user?.name || "Guest"}
+                src={user?.avatar}
+                size="32"
+                round
+              />
+            )}
+          </div>
+          <div>
+            <div className="fw-semibold">{user?.name || "Guest"}</div>
+            <small className="text-muted">
+              <a href={`mailto:${user?.email}`}>
+                {user?.email || "guest@example.com"}
+              </a>
+            </small>
+          </div>
+        </div>
+      </div>
+      <Menu.Divider />
       <Menu.Item key="portfolio" icon={<UserOutlined />}>
         <a
           href="https://dhruvermafz.in"
@@ -46,93 +65,59 @@ const Header = () => {
         <Link to={`/u/${user?.id || "me"}`}>Account</Link>
       </Menu.Item>
       <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={logout}>
-        Log out
+        Log Out
       </Menu.Item>
     </Menu>
   );
 
   return (
-    <div className="page-header">
-      <div className="header-wrapper">
-        {/* Logo and Sidebar Toggle */}
-        <div className="header-logo-wrapper">
-          <div className="logo-wrapper">
-            <Link to="/">
-              <Image
-                src={logo}
-                className="main-logo"
-                alt="logo"
-                preview={false}
-              />
-              <Image
-                src={logo_light}
-                className="white-logo"
-                alt="logo"
-                preview={false}
-              />
-            </Link>
-          </div>
-          <div className="toggle-sidebar">
-            <MenuOutlined
-              className="status_toggle sidebar-toggle"
-              onClick={initSidebar}
-            />
-            <Link to="/">
-              <Image src={logo} alt="logo" preview={false} />
-            </Link>
-          </div>
+    <header className="app-header sticky top-0 bg-white shadow-sm z-50">
+      <div className="main-header-container container-fluid px-4">
+        <div className="header-content-left d-flex align-items-center gap-3">
+          {/* Mobile */}
+          <Button
+            type="text"
+            icon={isMobileOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+            onClick={toggleMobileSidebar}
+            className="d-lg-none"
+          />
+          {/* Desktop */}
+          <Button
+            type="text"
+            icon={isCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={toggleSidebar}
+            className="d-none d-lg-block"
+          />
         </div>
 
-        {/* Search Bar */}
-        <Form className="search-full">
-          <Form.Item>
-            <Input
-              prefix={<SearchOutlined />}
-              placeholder="Search in dashboard .."
-              value={searchQuery}
-              onChange={handleSearch}
-              allowClear
-            />
-          </Form.Item>
-        </Form>
-
-        {/* Right Navigation */}
-        <div className="nav-right">
-          <ul className="nav-menus">
-            {/* Profile Dropdown */}
-            <li className="profile-nav">
-              <Dropdown overlay={profileMenu} trigger={["click"]}>
-                <div className="media profile-media">
-                  {isLoading ? (
-                    <Spin size="small" />
-                  ) : (
-                    <Avatar
-                      name={user?.name || "Guest"}
-                      src={
-                        user?.avatar || "https://example.com/default-avatar.png"
-                      }
-                      size="40"
-                      round={true}
-                      className="user-profile"
-                      alt={user?.name || "User"}
-                    />
-                  )}
-                  <div className="user-name-hide media-body">
-                    <span>
-                      {isLoading ? "Loading..." : user?.name || "Guest"}
-                    </span>
-                    <p className="mb-0 font-roboto">
-                      {isError ? "Error" : user?.role || "Guest"}{" "}
-                      <DownOutlined className="middle" />
-                    </p>
-                  </div>
-                </div>
-              </Dropdown>
-            </li>
-          </ul>
+        <div className="header-content-right d-flex align-items-center gap-3">
+          {/* Avatar dropdown */}
+          <Dropdown
+            overlay={profileMenu}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <a
+              href="#!"
+              className="d-flex align-items-center"
+              onClick={(e) => e.preventDefault()}
+            >
+              {isLoading ? (
+                <Spin size="small" />
+              ) : (
+                <Avatar
+                  name={user?.name || "G"}
+                  src={user?.avatar}
+                  size="36"
+                  round
+                  className="border border-2 border-white shadow-sm"
+                />
+              )}
+            </a>
+          </Dropdown>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

@@ -27,15 +27,6 @@ const ProjectDetailsCard = () => {
   useEffect(() => {
     // Scroll to the top of the page when the slug changes
     window.scrollTo(0, 0);
-    // Debug: Log the slug, normalized slug, and projects
-    console.log("Fetching project with slug:", slug);
-    console.log("Normalized slug:", normalizedSlug);
-    console.log("All projects:", projects);
-    console.log(
-      "Project slugs:",
-      projects.map((p) => p.slug)
-    );
-    console.log("Selected project:", project);
   }, [slug, normalizedSlug, projects, project]);
 
   // Handle loading state

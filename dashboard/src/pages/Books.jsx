@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+// components/Books.jsx
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Row,
@@ -6,12 +7,21 @@ import {
   Card,
   Input,
   Select,
-  Table,
   Button,
   Pagination,
   Spin,
-  Modal,
   message,
+  Tabs,
+  Space,
+  Avatar,
+  Tag,
+  Tooltip,
+  Empty,
+  Radio,
+  Image,
+  Typography,
+  Table,
+  Badge,
 } from "antd";
 import {
   SearchOutlined,
@@ -21,388 +31,515 @@ import {
   BookOutlined,
   GlobalOutlined,
   CheckSquareOutlined,
+  UserOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  ClockCircleOutlined,
+  StarOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { useGetBooksQuery, useDeleteBookMutation } from "../api/bookApi";
-
-// DeleteModal Component
+import {
+  useGetBooksQuery,
+  useGetFiltersQuery,
+  useGetAllAuthorsQuery,
+  useDeleteBookMutation,
+} from "../api/bookApi";
 import DeleteModal from "../components/Common/DeleteModal";
+
+const { TabPane } = Tabs;
+const { Text } = Typography;
 
 const Books = () => {
   const [search, setSearch] = useState("");
   const [languageFilter, setLanguageFilter] = useState("All");
   const [seriesFilter, setSeriesFilter] = useState("All");
+  const [authorFilter, setAuthorFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState("card"); // card | list
+  const [activeTab, setActiveTab] = useState("reading");
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
-  const booksPerPage = 10;
 
+  const booksPerPage = 12;
   const navigate = useNavigate();
 
-  // Fetch books using RTK Query with pagination, search, language, and series filters
+  // === Queries ===
   const {
-    data = {
-      books: [],
-      pagination: { page: 1, totalPages: 1, limit: booksPerPage, total: 0 },
-    },
-    isLoading,
-    error,
+    data: booksData = { books: [], pagination: { total: 0, totalPages: 1 } },
+    isLoading: isBooksLoading,
   } = useGetBooksQuery({
     title: search,
     language: languageFilter === "All" ? "" : languageFilter,
     series_name: seriesFilter === "All" ? "" : seriesFilter,
+    author: authorFilter === "All" ? "" : authorFilter,
     page: currentPage,
     limit: booksPerPage,
   });
+
+  const { data: filtersData = { languages: [], series: [] } } =
+    useGetFiltersQuery();
+  const { data: authorsData = [] } = useGetAllAuthorsQuery();
   const [deleteBook] = useDeleteBookMutation();
 
-  // Get data from pagination
-  const totalBooks = data?.pagination?.total || 0;
-  const totalPages = data?.pagination?.totalPages || 1;
-  const currentBooks = data.books || [];
+  const books = booksData.books || [];
+  const totalBooks = booksData.pagination?.total || 0;
+  const totalPages = booksData.pagination?.totalPages || 1;
 
-  // Get all languages and series from current page
-  const languages = [
-    ...new Set((data.books || []).map((b) => b.language).filter(Boolean)),
-  ];
-  const series = [
-    ...new Set((data.books || []).map((b) => b.series_name).filter(Boolean)),
-  ];
+  // === Reset page on filter change ===
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, languageFilter, seriesFilter, authorFilter, activeTab]);
 
-  // Table columns for library management
-  const columns = [
-    {
-      title: "Title",
-      key: "title",
-      render: (_, book) => (
-        <div>
-          <p style={{ margin: 0 }}>{book.title}</p>
-          {book.subtitle && <small>{book.subtitle}</small>}
-        </div>
-      ),
-    },
-    {
-      title: "Authors",
-      dataIndex: "authors",
-      key: "authors",
-      render: (authors) => authors?.join(", ") || "N/A",
-    },
-    {
-      title: "Series",
-      key: "series",
-      render: (_, book) =>
-        book.is_series && book.series_name
-          ? `${book.series_name} (Part ${book.series_part || "N/A"} of ${
-              book.series_total_parts || "N/A"
-            })`
-          : "N/A",
-    },
-    {
-      title: "Language",
-      dataIndex: "language",
-      key: "language",
-      render: (language) => language || "N/A",
-    },
-    {
-      title: "Shelf Status",
-      dataIndex: "shelf_status",
-      key: "shelf_status",
-      render: (shelf_status) => (
-        <span
-          style={{
-            color:
-              shelf_status === "idle"
-                ? "#52c41a"
-                : shelf_status === "borrowed"
-                ? "#ff4d4f"
-                : "#faad14",
-          }}
-        >
-          {shelf_status || "N/A"}
-        </span>
-      ),
-    },
-    {
-      title: "Reading Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <span
-          style={{
-            color:
-              status === "completed"
-                ? "#52c41a"
-                : status === "unread"
-                ? "#ff4d4f"
-                : "#faad14",
-          }}
-        >
-          {status || "N/A"}
-        </span>
-      ),
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, book) => (
-        <div style={{ display: "flex", gap: 8 }}>
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/book/${book._id}`)}
-            title="View Details"
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/book/${book._id}/edit`)}
-            title="Edit Book"
-          />
-          <Button
-            type="link"
-            icon={<DeleteOutlined />}
-            danger
-            onClick={() => {
-              setSelectedBook(book);
-              setDeleteModalOpen(true);
-            }}
-            title="Delete Book"
-          />
-        </div>
-      ),
-    },
-  ];
+  // === Tabs: Reading vs Completed ===
+  const tabBooks = useMemo(() => {
+    const filtered = books.filter((b) =>
+      activeTab === "completed"
+        ? b.status === "completed"
+        : b.status !== "completed"
+    );
+    return filtered;
+  }, [books, activeTab]);
 
-  // Handle delete
-  const handleDeleteConfirm = async () => {
+  // === Free Book Cover API (OpenLibrary) ===
+  // === Free Book Cover API (OpenLibrary) – works with title + author ===
+  const getCoverUrl = (isbn, title, authors) => {
+    // 1. If we have an ISBN → use the fast ISBN endpoint (as before)
+    if (isbn) {
+      return `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg`;
+    }
+
+    // 2. No ISBN → build a search query
+    const query = encodeURIComponent(
+      `${title} ${authors.length ? authors[0] : ""}`.trim()
+    );
+
+    // Open Library search → returns a list of docs.
+    // We only need the first cover (if any).
+    return `https://covers.openlibrary.org/b/title/${query}-M.jpg`;
+  };
+
+  // === Delete ===
+  const handleDelete = (book) => {
+    setSelectedBook(book);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       await deleteBook(selectedBook._id).unwrap();
+      message.success("Book removed from library");
       setDeleteModalOpen(false);
-      setSelectedBook(null);
-      message.success("Book removed from library successfully!");
-    } catch (error) {
-      message.error(
-        `Failed to remove book: ${error?.data?.message || "Unknown error"}`
-      );
+    } catch {
+      message.error("Failed to delete book");
     }
   };
 
-  // Reset page to 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, languageFilter, seriesFilter]);
+  // === Stats ===
+  const stats = useMemo(() => {
+    const completed = books.filter((b) => b.status === "completed").length;
+    const reading = books.filter((b) => b.status === "reading").length;
+    const borrowed = books.filter((b) => b.shelf_status === "borrowed").length;
+    return { completed, reading, borrowed };
+  }, [books]);
 
   return (
-    <div style={{ padding: "20px" }}>
-      {/* Library Stats Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <div style={{ padding: "24px", background: "#f8f9fa", minHeight: "100vh" }}>
+      {/* === Stats Dashboard === */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
               <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#e6f7ff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ background: "#e6f7ff", padding: 12, borderRadius: 8 }}
               >
                 <BookOutlined style={{ fontSize: 24, color: "#1890ff" }} />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Total Books
-                </p>
-                <h5 style={{ margin: 0 }}>{totalBooks}</h5>
+                <Text type="secondary">Total Books</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {totalBooks}
+                </div>
               </div>
-            </div>
+            </Space>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
               <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#f0e4ff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ background: "#fff2e8", padding: 12, borderRadius: 8 }}
               >
-                <GlobalOutlined style={{ fontSize: 24, color: "#722ed1" }} />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Languages
-                </p>
-                <h5 style={{ margin: 0 }}>{languages.length}</h5>
-              </div>
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#fff7e6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <CheckSquareOutlined
+                <ClockCircleOutlined
                   style={{ fontSize: 24, color: "#fa8c16" }}
                 />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Borrowed Books
-                </p>
-                <h5 style={{ margin: 0 }}>
-                  {
-                    currentBooks.filter((b) => b.shelf_status === "borrowed")
-                      .length
-                  }
-                </h5>
+                <Text type="secondary">Reading</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.reading}
+                </div>
               </div>
-            </div>
+            </Space>
           </Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
               <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 8,
-                  backgroundColor: "#e6fffb",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={{ background: "#f6ffed", padding: 12, borderRadius: 8 }}
               >
-                <BookOutlined style={{ fontSize: 24, color: "#13c2c2" }} />
+                <StarOutlined style={{ fontSize: 24, color: "#52c41a" }} />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: 12, color: "#595959" }}>
-                  Book Series
-                </p>
-                <h5 style={{ margin: 0 }}>{series.length}</h5>
+                <Text type="secondary">Completed</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.completed}
+                </div>
               </div>
-            </div>
+            </Space>
           </Card>
         </Col>
-      </Row>
-
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card
-            title="Library Catalog"
-            extra={
-              <Link to="/book/add">
-                <Button type="primary" icon={<PlusOutlined />}>
-                  Add New Book
-                </Button>
-              </Link>
-            }
-          >
-            <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-              <Col xs={24} sm={12} md={8}>
-                <Input
-                  prefix={<SearchOutlined />}
-                  placeholder="Search books by title..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+        <Col xs={12} sm={6}>
+          <Card bodyStyle={{ padding: 16 }}>
+            <Space>
+              <div
+                style={{ background: "#fff1f0", padding: 12, borderRadius: 8 }}
+              >
+                <CheckSquareOutlined
+                  style={{ fontSize: 24, color: "#ff4d4f" }}
                 />
-              </Col>
-              <Col xs={24} sm={12} md={4}>
-                <Select
-                  value={languageFilter}
-                  onChange={(value) => setLanguageFilter(value)}
-                  style={{ width: "100%" }}
-                  placeholder="Filter by Language"
-                >
-                  <Select.Option value="All">All Languages</Select.Option>
-                  {languages.map((language) => (
-                    <Select.Option key={language} value={language}>
-                      {language}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Col>
-              <Col xs={24} sm={12} md={4}>
-                <Select
-                  value={seriesFilter}
-                  onChange={(value) => setSeriesFilter(value)}
-                  style={{ width: "100%" }}
-                  placeholder="Filter by Series"
-                >
-                  <Select.Option value="All">All Series</Select.Option>
-                  {series.map((seriesName) => (
-                    <Select.Option key={seriesName} value={seriesName}>
-                      {seriesName}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Col>
-            </Row>
-
-            {isLoading ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <Spin size="large" />
-                <p style={{ marginTop: 8 }}>Loading library catalog...</p>
               </div>
-            ) : error ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                <p style={{ color: "#ff4d4f" }}>
-                  Error loading library catalog:{" "}
-                  {error?.data?.message || "Unknown error"}
-                </p>
+              <div>
+                <Text type="secondary">Borrowed</Text>
+                <div style={{ fontSize: 20, fontWeight: "bold" }}>
+                  {stats.borrowed}
+                </div>
               </div>
-            ) : currentBooks.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "20px" }}>
-                No books found in the library catalog.
-              </div>
-            ) : (
-              <Table
-                columns={columns}
-                dataSource={currentBooks}
-                rowKey="_id"
-                pagination={false}
-                locale={{ emptyText: "No books found in the library catalog" }}
-              />
-            )}
-
-            {totalPages > 1 && (
-              <Pagination
-                current={currentPage}
-                total={totalBooks}
-                pageSize={booksPerPage}
-                onChange={(page) => setCurrentPage(page)}
-                style={{ marginTop: 16, textAlign: "center" }}
-                showSizeChanger={false}
-              />
-            )}
+            </Space>
           </Card>
         </Col>
       </Row>
 
-      {/* Delete Modal */}
+      {/* === Main Catalog === */}
+      <Card
+        title={
+          <Space size="middle">
+            <BookOutlined style={{ fontSize: 20 }} />
+            <span style={{ fontSize: 18, fontWeight: 600 }}>My Library</span>
+          </Space>
+        }
+        extra={
+          <Space>
+            <Radio.Group
+              value={viewMode}
+              onChange={(e) => setViewMode(e.target.value)}
+              buttonStyle="solid"
+            >
+              <Radio.Button value="card">
+                <AppstoreOutlined />
+              </Radio.Button>
+              <Radio.Button value="list">
+                <UnorderedListOutlined />
+              </Radio.Button>
+            </Radio.Group>
+            <Link to="/book/add">
+              <Button type="primary" icon={<PlusOutlined />}>
+                Add Book
+              </Button>
+            </Link>
+          </Space>
+        }
+        bodyStyle={{ padding: 0 }}
+        style={{
+          borderRadius: 16,
+          overflow: "hidden",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        }}
+      >
+        {/* === Tabs === */}
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          style={{ margin: "0 24px" }}
+        >
+          <TabPane
+            tab={
+              <span>
+                <ClockCircleOutlined /> Reading ({stats.reading})
+              </span>
+            }
+            key="reading"
+          />
+          <TabPane
+            tab={
+              <span>
+                <StarOutlined /> Completed ({stats.completed})
+              </span>
+            }
+            key="completed"
+          />
+        </Tabs>
+
+        {/* === Filters === */}
+        <div
+          style={{
+            padding: "16px 24px",
+            borderTop: "1px solid #f0f0f0",
+            background: "#fafafa",
+          }}
+        >
+          <Row gutter={[12, 12]}>
+            <Col xs={24} md={8}>
+              <Input
+                prefix={<SearchOutlined />}
+                placeholder="Search by title, author, ISBN..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                allowClear
+              />
+            </Col>
+            <Col xs={12} sm={8} md={4}>
+              <Select
+                value={languageFilter}
+                onChange={setLanguageFilter}
+                style={{ width: "100%" }}
+                placeholder="Language"
+                showSearch
+              >
+                <Select.Option value="All">All Languages</Select.Option>
+                {filtersData.languages.map((l) => (
+                  <Select.Option key={l} value={l}>
+                    {l}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={12} sm={8} md={4}>
+              <Select
+                value={seriesFilter}
+                onChange={setSeriesFilter}
+                style={{ width: "100%" }}
+                placeholder="Series"
+                showSearch
+              >
+                <Select.Option value="All">All Series</Select.Option>
+                {filtersData.series.map((s) => (
+                  <Select.Option key={s} value={s}>
+                    {s}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={12} sm={8} md={4}>
+              <Select
+                value={authorFilter}
+                onChange={setAuthorFilter}
+                style={{ width: "100%" }}
+                placeholder="Author"
+                showSearch
+              >
+                <Select.Option value="All">All Authors</Select.Option>
+                {authorsData.map((a) => (
+                  <Select.Option key={a} value={a}>
+                    {a}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Col>
+          </Row>
+        </div>
+
+        {/* === Content === */}
+        <div style={{ padding: 24 }}>
+          {isBooksLoading ? (
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <Spin size="large" />
+            </div>
+          ) : tabBooks.length === 0 ? (
+            <Empty description="No books in this section" />
+          ) : viewMode === "card" ? (
+            /* === CARD VIEW === */
+            <Row gutter={[16, 24]}>
+              {tabBooks.map((book) => (
+                <Col key={book._id} xs={12} sm={8} md={6} lg={4}>
+                  <Card
+                    hoverable
+                    style={{ borderRadius: 12, overflow: "hidden" }}
+                    cover={
+                      <div
+                        style={{
+                          height: 220,
+                          overflow: "hidden",
+                          background: "#f5f5f5",
+                        }}
+                      >
+                        {book.isbn ? (
+                          <Image
+                            src={getCoverUrl(book.isbn)}
+                            alt={book.title}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                            fallback="https://via.placeholder.com/300x400/eee/ccc?text=No+Cover"
+                            preview={false}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              height: "100%",
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              background:
+                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                              color: "white",
+                              padding: 16,
+                            }}
+                          >
+                            <BookOutlined
+                              style={{ fontSize: 48, marginBottom: 8 }}
+                            />
+                            <Text style={{ color: "white", fontWeight: 500 }}>
+                              {book.title}
+                            </Text>
+                          </div>
+                        )}
+                      </div>
+                    }
+                    actions={[
+                      <Tooltip title="View">
+                        <Button
+                          type="text"
+                          icon={<EyeOutlined />}
+                          onClick={() => navigate(`/book/${book._id}`)}
+                        />
+                      </Tooltip>,
+                      <Tooltip title="Edit">
+                        <Button
+                          type="text"
+                          icon={<EditOutlined />}
+                          onClick={() => navigate(`/book/${book._id}/edit`)}
+                        />
+                      </Tooltip>,
+                      <Tooltip title="Delete">
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() => handleDelete(book)}
+                        />
+                      </Tooltip>,
+                    ]}
+                  >
+                    <Card.Meta
+                      title={
+                        <Tooltip title={book.title}>
+                          <Text strong ellipsis style={{ width: "100%" }}>
+                            {book.title}
+                          </Text>
+                        </Tooltip>
+                      }
+                    />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            /* === LIST VIEW === */
+            <Table
+              dataSource={tabBooks}
+              rowKey="_id"
+              pagination={false}
+              columns={[
+                {
+                  title: "Book",
+                  render: (_, book) => (
+                    <Space>
+                      {book.isbn ? (
+                        <Image
+                          width={40}
+                          src={getCoverUrl(book.isbn)}
+                          fallback="https://via.placeholder.com/40/eee/ccc?text=B"
+                        />
+                      ) : (
+                        <Avatar shape="square" icon={<BookOutlined />} />
+                      )}
+                      <div>
+                        <Text strong>{book.title}</Text>
+                        <br />
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {book.authors?.join(", ") || "Unknown"}
+                        </Text>
+                      </div>
+                    </Space>
+                  ),
+                },
+                {
+                  title: "Series",
+                  dataIndex: "series_name",
+                  render: (s, b) =>
+                    b.is_series ? `${s} #${b.series_part}` : "—",
+                },
+                { title: "Language", dataIndex: "language" },
+                {
+                  title: "Status",
+                  render: (_, b) => (
+                    <Badge
+                      status={
+                        b.status === "completed" ? "success" : "processing"
+                      }
+                      text={b.status}
+                    />
+                  ),
+                },
+                {
+                  title: "Actions",
+                  render: (_, book) => (
+                    <Space>
+                      <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => navigate(`/book/${book._id}`)}
+                      />
+                      <Button
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/book/${book._id}/edit`)}
+                      />
+                      <Button
+                        size="small"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(book)}
+                      />
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+          )}
+
+          {/* === Pagination === */}
+          {totalPages > 1 && (
+            <Pagination
+              current={currentPage}
+              total={totalBooks}
+              pageSize={booksPerPage}
+              onChange={setCurrentPage}
+              style={{ marginTop: 24, textAlign: "center" }}
+            />
+          )}
+        </div>
+      </Card>
+
+      {/* === Delete Modal === */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={confirmDelete}
         itemName={selectedBook?.title || "book"}
       />
     </div>
